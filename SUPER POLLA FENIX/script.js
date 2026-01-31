@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
     // ----------------------------------------------------------------
-    // PARTE 1: Configuración Maestra (Horarios, Ruletas y Reglas)
+    // PARTE 1: Configuración Maestra
     // ----------------------------------------------------------------
-    let resultadosAdmin = ""; // Viene de la columna 'numeros' en Supabase
+    let resultadosAdmin = ""; 
     let participantesData = [];
     let finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 }; 
-    let resultadosDelDiaSet = []; // Aquí guardaremos solo los números para comparar aciertos
+    let resultadosDelDiaSet = []; 
     
     let juegoActual = 'dia'; 
     let aciertosObjetivo = 5;
@@ -14,13 +14,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const selectorJuego = document.getElementById('select-juego-publico');
 
-    // --- FUNCIÓN PARA LOS BOTONES OVALADOS (PILLS) ---
     window.seleccionarJuegoPill = function(elemento, juego) {
-        // 1. Actualizar apariencia visual de los botones
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
         elemento.classList.add('active');
 
-        // 2. Sincronizar con el select (aunque esté oculto) y disparar la carga
         if (selectorJuego) {
             selectorJuego.value = juego;
             selectorJuego.dispatchEvent(new Event('change'));
@@ -51,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- FUNCIÓN PARA LA FECHA ---
     function establecerFechaReal() {
         const headerP = document.getElementById('fecha-actual');
         if (headerP) {
@@ -62,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 2: Renderizado del Cuadro de Resultados (Tabla de arriba)
+    // PARTE 2: Renderizado del Cuadro de Resultados
     // ----------------------------------------------------------------
 
     function renderCuadroResultados() {
@@ -71,17 +67,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const config = CONFIG_JUEGOS[juegoActual];
         const { ruletas, horas } = config;
-
         const mapa = {};
 
-        // Procesamos la cadena de texto "RULETA HORA: NUMERO, RULETA HORA: NUMERO..."
         if (resultadosAdmin && resultadosAdmin.trim() !== "") {
             const items = resultadosAdmin.split(',');
             items.forEach(item => {
                 const partesSeparadoras = item.split(':');
                 if (partesSeparadoras.length === 2) {
-                    const infoSorteo = partesSeparadoras[0].trim(); // "GRANJITA 3PM"
-                    const valorNumero = partesSeparadoras[1].trim(); // "25" u "O"
+                    const infoSorteo = partesSeparadoras[0].trim(); 
+                    const valorNumero = partesSeparadoras[1].trim(); 
                     
                     const partesInfo = infoSorteo.split(' ');
                     const hora = partesInfo.pop(); 
@@ -110,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             horas.forEach(h => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
-                // Aplicamos estilo especial si el resultado es la letra "O"
+                // Visualización: Si es O, se resalta
                 const displayNum = (num === "O") ? '<span style="color:#d32f2f; font-weight:bold;">O</span>' : num;
                 tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;
             });
@@ -127,14 +121,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function cargarDatosDesdeNube() {
         establecerFechaReal();
-        
         juegoActual = selectorJuego ? selectorJuego.value : 'dia';
         const config = CONFIG_JUEGOS[juegoActual];
         
         aciertosObjetivo = config.aciertos;
         jugadaSize = config.size;
 
-        // Actualizar títulos en el Panel
         const tituloSpan = document.getElementById('nombre-juego-titulo');
         if (tituloSpan) tituloSpan.textContent = config.titulo;
         
@@ -142,12 +134,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
         try {
-            if (typeof _supabase === 'undefined') {
-                console.error("Supabase no inicializado.");
-                return;
-            }
-
-            // Peticiones en paralelo para mayor velocidad
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
                 _supabase.from('jugadas').select('*').eq('juego', juegoActual),
                 _supabase.from('resultados').select('numeros').eq('juego', juegoActual).maybeSingle(),
@@ -156,10 +142,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             participantesData = respJugadas.data || [];
             
-            // Procesar los números ganadores para el sistema de aciertos
             if (respResultados.data && respResultados.data.numeros) {
                 resultadosAdmin = respResultados.data.numeros;
-                // Creamos un array limpio con solo los números/letras para comparar
                 resultadosDelDiaSet = resultadosAdmin.split(',').map(item => {
                     const partes = item.split(':');
                     return partes[1] ? partes[1].trim().toUpperCase() : null;
@@ -169,12 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resultadosDelDiaSet = [];
             }
 
-            if (respFinanzas.data) {
-                finanzasData = respFinanzas.data;
-            } else {
-                finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
-            }
-
+            finanzasData = respFinanzas.data || { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
             inicializarSistema();
         } catch (error) {
             console.error("Error cargando datos:", error);
@@ -183,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking de Participantes y Verificación de Aciertos
+    // PARTE 4: Ranking y Verificación (Lógica 0 -> O corregida)
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {
@@ -191,7 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headerCol = document.getElementById('jugada-header-col');
         if (!tbody) return;
 
-        // Ajustar el ancho de la cabecera de la tabla según el tamaño de la jugada
         if (headerCol) headerCol.setAttribute('colspan', jugadaSize);
         tbody.innerHTML = '';
 
@@ -199,14 +177,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const ranking = participantesData.map(p => {
             const campoJugada = p.numeros_jugados || "";
-            // Separar la jugada y limpiar cada número
             const jugadas = campoJugada.split(',').map(n => n.trim().toUpperCase());
             
             let aciertos = 0;
             jugadas.forEach(n => { 
-                // Convertimos el "00" o "0" a "O" si es necesario para comparar correctamente
+                // --- REGLA CRÍTICA ---
                 let numParaComparar = n;
-                if (n === "0" || n === "00") numParaComparar = "O";
+                if (n === "0") numParaComparar = "O"; 
+                // El "00" se queda como "00" para comparar con el "00" de resultados
                 
                 if(resultadosDelDiaSet.includes(numParaComparar)) aciertos++; 
             });
@@ -216,7 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let totalGanadores = 0;
         
         ranking.forEach((p, index) => {
-            // Filtro de búsqueda (Nombre o Referencia)
             if (p.nombre.toLowerCase().includes(term) || (p.refe && p.refe.toString().includes(term))) {
                 if (p.aciertos >= aciertosObjetivo) totalGanadores++;
 
@@ -224,11 +201,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 for (let i = 0; i < jugadaSize; i++) {
                     let numRaw = p.jugadasArray[i] ? p.jugadasArray[i] : '--';
                     
-                    // Lógica visual: Si el usuario jugó 0 o 00, mostrar O
+                    // Lógica visual para el Ranking
                     let numVisual = numRaw;
-                    if (numRaw === "0" || numRaw === "00") numVisual = "O";
+                    if (numRaw === "0") numVisual = "O";
+                    // Nota: 00 se muestra como 00
 
-                    // Verificar si ese número es un acierto
                     const esHit = (numVisual !== '--' && resultadosDelDiaSet.includes(numVisual));
                     
                     jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${numVisual}</span></td>`;
@@ -254,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 5: Cálculos Financieros y Visualización
+    // PARTE 5: Cálculos Financieros
     // ----------------------------------------------------------------
 
     function actualizarFinanzasYEstadisticas() {
@@ -273,20 +250,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const esMini = (juegoActual === 'mini');
         
-        // Ajustar visibilidad de cajas según el juego
         const boxDom = document.getElementById('box-domingo');
         const boxAc2 = document.getElementById('box-acumu2');
-        const boxTotal2 = document.getElementById('box-total-2');
         const labelCasa = document.getElementById('label-casa');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
-        if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
-        
-        // Cambiar texto de porcentaje de casa
         if(labelCasa) labelCasa.textContent = esMini ? "25% Casa" : "20% Casa";
         
-        // Calcular montos específicos
         if(!esMini && document.getElementById('monto-domingo')) {
             document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
         }
@@ -295,7 +266,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
         }
 
-        // Totales de Premios
         if(document.getElementById('total-acumu-premio1')) {
             document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
         }
@@ -310,7 +280,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderRanking();
     }
 
-    // --- EVENTOS ---
     selectorJuego?.addEventListener('change', cargarDatosDesdeNube);
     
     document.getElementById('filtroParticipantes')?.addEventListener('input', (e) => {
@@ -321,7 +290,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.print();
     });
 
-    // --- INICIO ---
     establecerFechaReal();
     cargarDatosDesdeNube();
 });

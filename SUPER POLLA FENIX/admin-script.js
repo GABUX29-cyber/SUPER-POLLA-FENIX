@@ -72,14 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 3. CEREBRO DE VALIDACIÓN (CON REGLAS DEL CÓDIGO ANTIGUO) ---
+    // --- 3. CEREBRO DE VALIDACIÓN (REGLA 0 -> O) ---
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
         let numeros = numerosRaw.map(n => {
-            let num = n.trim().padStart(2, '0');
-            // REGLA DEL OTRO CODIGO: El 0 se convierte en letra O, pero el 00 se respeta
+            let num = n.trim();
+            
+            // REGLA SOLICITADA: Solo el 0 sencillo es la letra O
+            if (num === "0") return "O";
             if (num === "00") return "00";
-            if (parseInt(num) === 0) return "O"; 
-            return num;
+            
+            // Formatear otros números (ej: 5 -> 05)
+            if (num.length === 1 && !isNaN(num)) return num.padStart(2, '0');
+            return num.toUpperCase();
         }).filter(n => n !== "");
 
         let avisos = [];
@@ -91,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             while (numeros.length > tamañoRequerido) {
                 eliminados.push(numeros.pop());
             }
-            let msg = `Se eliminó el sobrante (${eliminados.join(', ')})`;
+            let msg = `Sobrante eliminado (${eliminados.join(', ')})`;
             avisos.push(msg);
             avisosAlert.push(`⚠️ ${msg}`);
         }
@@ -102,10 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
-        // GESTIÓN DE DUPLICADOS CON EL "36" (LOGICA REFORZADA)
+        // GESTIÓN DE DUPLICADOS (La 'O' puede repetirse)
         let counts = {};
         let duplicadosEncontrados = [];
-        numeros.forEach(n => counts[n] = (counts[n] || 0) + 1);
+        // Solo contamos duplicados para lo que NO sea "O"
+        numeros.forEach(n => {
+            if (n !== "O") counts[n] = (counts[n] || 0) + 1;
+        });
+
         for (let n in counts) {
             if (counts[n] > 1) duplicadosEncontrados.push(n);
         }
@@ -128,11 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`🚫 JUGADA NULA (${nombreParticipante}): Hay duplicados (${duplicadosEncontrados.join(', ')}) y el 36 ya existe.`);
                 return null;
             }
-        }
-
-        // Avisar al administrador si hubo cambios automáticos
-        if (avisosAlert.length > 0) {
-            console.log(`Corrección en ${nombreParticipante}: ${avisosAlert.join('\n')}`);
         }
 
         return { 
@@ -190,8 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('id', { ascending: true });
-            const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).single();
-            const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).single();
+            const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).maybeSingle();
+            const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).maybeSingle();
 
             participantes = p || [];
             resultadosActuales = r ? r.numeros : ""; 
@@ -297,7 +300,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let nombre = "CLIENTE", refe = "";
 
         lineas.forEach(l => {
-            const m = l.match(/\b\d{1,2}\b/g);
+            // Buscamos números o la letra O/00
+            const m = l.match(/\b(\d{1,2}|O)\b/gi);
             if (m && m.length >= tamaño) {
                 for (let i = 0; i < m.length; i += tamaño) {
                     let g = m.slice(i, i + tamaño);
@@ -358,8 +362,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const juego = document.getElementById('select-juego-admin').value;
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const numRaw = document.getElementById('numero-ganador').value.trim();
-        // Aplicar la misma lógica de 0 -> O en resultados
-        let numFinal = (numRaw === "0" || (parseInt(numRaw) === 0 && numRaw !== "00")) ? "O" : numRaw.padStart(2, '0');
+        
+        // REGLA APLICADA: 0 es O, 00 es 00
+        let numFinal;
+        if (numRaw === "0") {
+            numFinal = "O";
+        } else if (numRaw === "00") {
+            numFinal = "00";
+        } else {
+            numFinal = numRaw.padStart(2, '0');
+        }
         
         let nuevoItem = `${horaSorteo}: ${numFinal}`;
         let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
@@ -370,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else { e.target.reset(); cargarDatosDesdeNube(); }
     });
 
-    // --- 7. REINICIO CON DOBLE CANDADO (SISTEMA SEGURO) ---
+    // --- 7. REINICIO CON DOBLE CANDADO ---
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
         const confirm1 = confirm(`⚠️ ATENCIÓN CRÍTICA:\n¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`);
