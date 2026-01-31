@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEGA POLLA - Resultados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>MEGA POLLA</h1>
+        <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
+    </header>
+
+    <div class="card-container full-width">
+        <div class="card" style="background-color: #fdd835; padding: 15px;">
+            <label for="select-juego-publico" style="font-weight: 800; color: #333; display: block; margin-bottom: 10px; text-transform: uppercase;">Selecciona el Juego:</label>
+            <select id="select-juego-publico" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #333; font-family: 'Montserrat'; font-weight: 700;">
+                <option value="dia">SUPER POLLA FENIX DÍA (5 Aciertos)</option>
+                <option value="normal" selected>SUPER POLLA FENIX TARDE (5 Aciertos)</option>
+                <option value="mini">MINI EXPRES FENIX (3 Aciertos)</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="card-container full-width">
+        <div class="card">
+            <h2><i class="fas fa-clock"></i> Cuadro de Resultados - <span id="nombre-juego-titulo">TARDE</span></h2>
+            <div id="numeros-ganadores-display" class="numeros-ganadores">
+                <p>Cargando resultados oficiales...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-container full-width">
+        <div class="card compact-resumen">
+            <h2><i class="fas fa-chart-line"></i> Información Financiera</h2>
+            <div class="stats-grid-ultra">
+                
+                <div class="est-mini ventas">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span class="val-mini" id="ventas">0</span>
+                    <label>Tickets Vendidos</label>
+                </div>
+
+                <div class="est-mini recaudado">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="val-mini" id="recaudado">0.00 BS</span>
+                    <label>Recaudado</label>
+                </div>
+
+                <div class="est-mini acumulado">
+                    <i class="fas fa-trophy"></i>
+                    <span class="val-mini" id="acumulado1">0.00 BS</span>
+                    <label>Acumulado</label>
+                </div>
+
+                <div class="est-mini casa">
+                    <i class="fas fa-university"></i>
+                    <span class="val-mini" id="monto-casa">0.00 BS</span>
+                    <label>20% Casa</label>
+                </div>
+
+                <div class="est-mini domingo">
+                    <i class="fas fa-calendar-day"></i>
+                    <span class="val-mini" id="monto-domingo">0.00 BS</span>
+                    <label>5% Domingo</label>
+                </div>
+
+                <div class="est-mini repartir">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span class="val-mini" id="repartir75">0.00 BS</span>
+                    <label>A Repartir</label>
+                </div>
+
+                <div class="est-mini ganadores-box-item">
+                    <i class="fas fa-users"></i>
+                    <span class="val-mini" id="total-ganadores">0</span>
+                    <label id="label-ganadores">Ganadores</label>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px; text-align: center;">
+        <button id="btn-descargar-pdf">
+            <i class="fas fa-file-pdf"></i> Descargar Reporte de Resultados
+        </button>
+    </div>
+
+    <div class="filtro-container">
+        <div class="filtro-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="filtroParticipantes" class="filtro-input" placeholder="🔍 Buscar tu nombre o REFE...">
+        </div>
+    </div>
+
+    <div class="card-container full-width">
+        <div class="card ranking">
+            <h2><i class="fas fa-list-ol"></i> Listado y Aciertos</h2>
+            <div style="overflow-x: auto;">
+                <table id="tabla-participantes-publica">
+                    <thead>
+                        <tr id="header-tabla">
+                            <th>NRO</th>
+                            <th>PARTICIPANTE</th>
+                            <th>REFE</th>
+                            <th id="jugada-header-col">JUGADA</th> 
+                            <th>ACIERTOS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 MEGA POLLA - Sistema Profesional de Gestión de Resultados.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
