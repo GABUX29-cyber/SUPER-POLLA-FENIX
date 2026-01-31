@@ -55,6 +55,10 @@
             
             body { background-color: white !important; }
             .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+            
+            /* Asegurar que la tabla sea legible en PDF */
+            table { width: 100% !important; font-size: 10pt; }
+            th, td { padding: 4px !important; }
         }
     </style>
 </head>
@@ -81,7 +85,7 @@
 
     <select id="select-juego-publico" style="display: none;">
         <option value="dia">dia</option>
-        <option value="tarde" selected>tarde</option>
+        <option value="tarde">tarde</option>
         <option value="mini">mini</option>
     </select>
     
@@ -205,17 +209,18 @@
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
     <script>
-        // FUNCIÓN PARA MANEJAR EL CLIC EN LOS BOTONES OVALADOS
+        // Función para sincronizar los botones ovalados con la lógica de carga de datos
         function seleccionarJuegoPill(elemento, juego) {
-            // Actualizar interfaz visual
+            // 1. Quitar clase activa de todos los botones
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            // 2. Agregar clase activa al seleccionado
             elemento.classList.add('active');
 
-            // Cambiar valor en el select oculto
+            // 3. Cambiar el valor del select oculto
             const selectReal = document.getElementById('select-juego-publico');
             if (selectReal) {
                 selectReal.value = juego;
-                // Disparar el evento 'change' para que el script.js original cargue los datos
+                // 4. Disparar evento de cambio para que script.js detecte que debe recargar datos
                 selectReal.dispatchEvent(new Event('change'));
             }
         }

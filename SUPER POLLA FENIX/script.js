@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ----------------------------------------------------------------
     // PARTE 1: Configuración Maestra (Horarios, Ruletas y Reglas)
     // ----------------------------------------------------------------
-    let resultadosAdmin = ""; // Ahora es un String que viene de la columna 'numeros'
+    let resultadosAdmin = ""; // Viene de la columna 'numeros' en Supabase
     let participantesData = [];
     let finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 }; 
-    let resultadosDelDiaSet = [];
+    let resultadosDelDiaSet = []; // Aquí guardaremos solo los números para comparar aciertos
     
     let juegoActual = 'dia'; 
     let aciertosObjetivo = 5;
@@ -14,8 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const selectorJuego = document.getElementById('select-juego-publico');
 
-    // --- NUEVA FUNCIÓN PARA LOS BOTONES OVALADOS ---
-    // Esta función vincula los botones visuales con tu lógica de Supabase
+    // --- FUNCIÓN PARA LOS BOTONES OVALADOS (PILLS) ---
     window.seleccionarJuegoPill = function(elemento, juego) {
         // 1. Actualizar apariencia visual de los botones
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
@@ -24,29 +23,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Sincronizar con el select (aunque esté oculto) y disparar la carga
         if (selectorJuego) {
             selectorJuego.value = juego;
-            // Disparamos el evento 'change' que ya tienes configurado abajo
             selectorJuego.dispatchEvent(new Event('change'));
         }
     };
 
     const CONFIG_JUEGOS = {
         dia: {
-            titulo: "SORTEO DÍA",
+            titulo: "SUPER POLLA FENIX (DIA)",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["8AM", "9AM", "10AM", "11AM", "12PM"],
             aciertos: 5,
             size: 5
         },
-        // Cambiado de 'normal' a 'tarde' según lo acordado [cite: 2026-01-31]
         tarde: {
-            titulo: "SORTEO TARDE",
+            titulo: "SUPER POLLA FENIX (TARDE)",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["3PM", "4PM", "5PM", "6PM", "7PM"],
             aciertos: 5,
             size: 5
         },
         mini: {
-            titulo: "MINI EXPRES",
+            titulo: "MINI EXPRES FENIX",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS"],
             horas: ["5PM", "6PM", "7PM"],
             aciertos: 3,
@@ -54,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- FUNCIÓN PARA LA FECHA (Ejecución Inmediata) ---
+    // --- FUNCIÓN PARA LA FECHA ---
     function establecerFechaReal() {
         const headerP = document.getElementById('fecha-actual');
         if (headerP) {
@@ -65,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 2: Renderizado Dinámico del Cuadro de Resultados
+    // PARTE 2: Renderizado del Cuadro de Resultados (Tabla de arriba)
     // ----------------------------------------------------------------
 
     function renderCuadroResultados() {
@@ -77,19 +74,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const mapa = {};
 
-        // Procesamos la cadena de texto que viene de la columna 'numeros'
+        // Procesamos la cadena de texto "RULETA HORA: NUMERO, RULETA HORA: NUMERO..."
         if (resultadosAdmin && resultadosAdmin.trim() !== "") {
             const items = resultadosAdmin.split(',');
             items.forEach(item => {
-                // El formato guardado es "RULETA HORA: NUMERO"
                 const partesSeparadoras = item.split(':');
                 if (partesSeparadoras.length === 2) {
-                    const infoSorteo = partesSeparadoras[0].trim(); // Ej: "GRANJITA 3PM"
-                    const valorNumero = partesSeparadoras[1].trim(); // Ej: "25"
+                    const infoSorteo = partesSeparadoras[0].trim(); // "GRANJITA 3PM"
+                    const valorNumero = partesSeparadoras[1].trim(); // "25" u "O"
                     
                     const partesInfo = infoSorteo.split(' ');
-                    const hora = partesInfo.pop(); // Saca "3PM"
-                    const nombreRuleta = partesInfo.join(' '); // Queda "GRANJITA"
+                    const hora = partesInfo.pop(); 
+                    const nombreRuleta = partesInfo.join(' '); 
                     
                     if (!mapa[nombreRuleta]) mapa[nombreRuleta] = {};
                     mapa[nombreRuleta][hora] = valorNumero;
@@ -114,7 +110,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             horas.forEach(h => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
-                tablaHTML += `<td class="${claseNum}">${num}</td>`;
+                // Aplicamos estilo especial si el resultado es la letra "O"
+                const displayNum = (num === "O") ? '<span style="color:#d32f2f; font-weight:bold;">O</span>' : num;
+                tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;
             });
             tablaHTML += `</tr>`;
         });
@@ -124,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 3: Carga de Datos
+    // PARTE 3: Carga de Datos desde Supabase
     // ----------------------------------------------------------------
 
     async function cargarDatosDesdeNube() {
@@ -136,7 +134,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         aciertosObjetivo = config.aciertos;
         jugadaSize = config.size;
 
-        document.getElementById('nombre-juego-titulo').textContent = config.titulo;
+        // Actualizar títulos en el Panel
+        const tituloSpan = document.getElementById('nombre-juego-titulo');
+        if (tituloSpan) tituloSpan.textContent = config.titulo;
+        
         const labelGan = document.getElementById('label-ganadores');
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
@@ -146,39 +147,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Peticiones optimizadas a la nueva estructura de tablas
+            // Peticiones en paralelo para mayor velocidad
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
                 _supabase.from('jugadas').select('*').eq('juego', juegoActual),
-                _supabase.from('resultados').select('numeros').eq('juego', juegoActual).single(),
-                _supabase.from('finanzas').select('*').eq('juego', juegoActual).single()
+                _supabase.from('resultados').select('numeros').eq('juego', juegoActual).maybeSingle(),
+                _supabase.from('finanzas').select('*').eq('juego', juegoActual).maybeSingle()
             ]);
 
             participantesData = respJugadas.data || [];
             
-            // Extraemos la cadena de números y creamos el Set para el Ranking
+            // Procesar los números ganadores para el sistema de aciertos
             if (respResultados.data && respResultados.data.numeros) {
                 resultadosAdmin = respResultados.data.numeros;
-                // Extraer solo los números (después del :) para comparar aciertos
+                // Creamos un array limpio con solo los números/letras para comparar
                 resultadosDelDiaSet = resultadosAdmin.split(',').map(item => {
                     const partes = item.split(':');
-                    return partes[1] ? partes[1].trim() : null;
+                    return partes[1] ? partes[1].trim().toUpperCase() : null;
                 }).filter(n => n !== null);
             } else {
                 resultadosAdmin = "";
                 resultadosDelDiaSet = [];
             }
 
-            if (respFinanzas.data) finanzasData = respFinanzas.data;
+            if (respFinanzas.data) {
+                finanzasData = respFinanzas.data;
+            } else {
+                finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
+            }
 
             inicializarSistema();
         } catch (error) {
-            console.error("Error en conexión:", error);
+            console.error("Error cargando datos:", error);
             inicializarSistema();
         }
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking y Finanzas
+    // PARTE 4: Ranking de Participantes y Verificación de Aciertos
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {
@@ -186,6 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headerCol = document.getElementById('jugada-header-col');
         if (!tbody) return;
 
+        // Ajustar el ancho de la cabecera de la tabla según el tamaño de la jugada
         if (headerCol) headerCol.setAttribute('colspan', jugadaSize);
         tbody.innerHTML = '';
 
@@ -193,24 +199,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const ranking = participantesData.map(p => {
             const campoJugada = p.numeros_jugados || "";
-            const jugadas = campoJugada ? campoJugada.split(',') : [];
+            // Separar la jugada y limpiar cada número
+            const jugadas = campoJugada.split(',').map(n => n.trim().toUpperCase());
+            
             let aciertos = 0;
             jugadas.forEach(n => { 
-                if(resultadosDelDiaSet.includes(n.trim().padStart(2, '0'))) aciertos++; 
+                // Convertimos el "00" o "0" a "O" si es necesario para comparar correctamente
+                let numParaComparar = n;
+                if (n === "0" || n === "00") numParaComparar = "O";
+                
+                if(resultadosDelDiaSet.includes(numParaComparar)) aciertos++; 
             });
             return { ...p, jugadasArray: jugadas, aciertos };
         }).sort((a, b) => b.aciertos - a.aciertos);
 
         let totalGanadores = 0;
+        
         ranking.forEach((p, index) => {
+            // Filtro de búsqueda (Nombre o Referencia)
             if (p.nombre.toLowerCase().includes(term) || (p.refe && p.refe.toString().includes(term))) {
                 if (p.aciertos >= aciertosObjetivo) totalGanadores++;
 
                 let jugadasHTML = '';
                 for (let i = 0; i < jugadaSize; i++) {
-                    const numRaw = p.jugadasArray[i] ? p.jugadasArray[i].trim().padStart(2, '0') : '--';
-                    const esHit = (numRaw !== '--' && resultadosDelDiaSet.includes(numRaw));
-                    jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${numRaw}</span></td>`;
+                    let numRaw = p.jugadasArray[i] ? p.jugadasArray[i] : '--';
+                    
+                    // Lógica visual: Si el usuario jugó 0 o 00, mostrar O
+                    let numVisual = numRaw;
+                    if (numRaw === "0" || numRaw === "00") numVisual = "O";
+
+                    // Verificar si ese número es un acierto
+                    const esHit = (numVisual !== '--' && resultadosDelDiaSet.includes(numVisual));
+                    
+                    jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${numVisual}</span></td>`;
                 }
 
                 const tr = document.createElement('tr');
@@ -227,32 +248,60 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tbody.appendChild(tr);
             }
         });
-        if (document.getElementById('total-ganadores')) document.getElementById('total-ganadores').textContent = totalGanadores;
+
+        const totalGanElem = document.getElementById('total-ganadores');
+        if (totalGanElem) totalGanElem.textContent = totalGanadores;
     }
+
+    // ----------------------------------------------------------------
+    // PARTE 5: Cálculos Financieros y Visualización
+    // ----------------------------------------------------------------
 
     function actualizarFinanzasYEstadisticas() {
         const rec = parseFloat(finanzasData.recaudado) || 0;
         const acumu1 = parseFloat(finanzasData.acumulado1) || 0;
+        const acumu2 = parseFloat(finanzasData.acumulado2) || 0;
         const repartir75 = rec * 0.75;
+        
         const formatear = (m) => new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2}).format(m) + " BS";
 
         if(document.getElementById('ventas')) document.getElementById('ventas').textContent = finanzasData.ventas || 0;
         if(document.getElementById('recaudado')) document.getElementById('recaudado').textContent = formatear(rec);
         if(document.getElementById('acumulado1')) document.getElementById('acumulado1').textContent = formatear(acumu1);
+        if(document.getElementById('acumulado2')) document.getElementById('acumulado2').textContent = formatear(acumu2);
         if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartir75);
 
-        const esMini = juegoActual === 'mini';
+        const esMini = (juegoActual === 'mini');
+        
+        // Ajustar visibilidad de cajas según el juego
         const boxDom = document.getElementById('box-domingo');
         const boxAc2 = document.getElementById('box-acumu2');
+        const boxTotal2 = document.getElementById('box-total-2');
+        const labelCasa = document.getElementById('label-casa');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
+        if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
         
-        if(!esMini && document.getElementById('monto-domingo')) 
+        // Cambiar texto de porcentaje de casa
+        if(labelCasa) labelCasa.textContent = esMini ? "25% Casa" : "20% Casa";
+        
+        // Calcular montos específicos
+        if(!esMini && document.getElementById('monto-domingo')) {
             document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
+        }
         
-        if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
-        if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
+        if(document.getElementById('monto-casa')) {
+            document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
+        }
+
+        // Totales de Premios
+        if(document.getElementById('total-acumu-premio1')) {
+            document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
+        }
+        if(document.getElementById('total-acumu-premio2') && !esMini) {
+            document.getElementById('total-acumu-premio2').textContent = formatear(acumu2);
+        }
     }
 
     function inicializarSistema() {
@@ -263,10 +312,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- EVENTOS ---
     selectorJuego?.addEventListener('change', cargarDatosDesdeNube);
-    document.getElementById('filtroParticipantes')?.addEventListener('input', (e) => renderRanking(e.target.value.trim()));
-    document.getElementById('btn-descargar-pdf')?.addEventListener('click', () => window.print());
+    
+    document.getElementById('filtroParticipantes')?.addEventListener('input', (e) => {
+        renderRanking(e.target.value.trim());
+    });
 
-    // Inicio
+    document.getElementById('btn-descargar-pdf')?.addEventListener('click', () => {
+        window.print();
+    });
+
+    // --- INICIO ---
     establecerFechaReal();
     cargarDatosDesdeNube();
 });

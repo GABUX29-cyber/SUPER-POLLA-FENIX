@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. SEGURIDAD Y SESIÓN ---
+    // --- 1. SEGURIDAD Y SESIÓN (AUTH SUPABASE) ---
     const loginOverlay = document.getElementById('login-overlay');
     const contenidoPrincipal = document.getElementById('contenido-principal');
     const btnEntrar = document.getElementById('btn-entrar');
@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function verificarSesion() {
         const { data: { session } } = await _supabase.auth.getSession();
         if (session) {
-            loginOverlay.style.display = 'none';
-            contenidoPrincipal.style.display = 'block';
+            if(loginOverlay) loginOverlay.style.display = 'none';
+            if(contenidoPrincipal) contenidoPrincipal.style.display = 'block';
             cargarDatosDesdeNube();
         }
     }
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
-        'tarde': { // ACTUALIZADO: de 'normal' a 'tarde'
+        'tarde': { 
             tamaño: 5,
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
@@ -61,104 +61,124 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 2.1 LÓGICA DE BOTONES OVALADOS (PILLS) EN ADMIN ---
-    // Esta función permite que los nuevos botones ovalados controlen el select oculto
+    // --- 2.1 LÓGICA DE BOTONES OVALADOS (PILLS) ---
     window.seleccionarJuegoAdminPill = function(elemento, juego) {
-        // Actualizar visualmente los botones
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
         elemento.classList.add('active');
-
-        // Actualizar el valor del selector original
         const selector = document.getElementById('select-juego-admin');
         if (selector) {
             selector.value = juego;
-            // Disparar manualmente el evento change para que se ejecute cargarDatosDesdeNube()
             selector.dispatchEvent(new Event('change'));
         }
     };
 
-    // --- 3. PROCESAMIENTO DINÁMICO DE JUGADAS ---
+    // --- 3. CEREBRO DE VALIDACIÓN (CON REGLAS DEL CÓDIGO ANTIGUO) ---
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
         let numeros = numerosRaw.map(n => {
             let num = n.trim().padStart(2, '0');
-            return (num === "00") ? "00" : (parseInt(num) === 0 ? "0" : num);
+            // REGLA DEL OTRO CODIGO: El 0 se convierte en letra O, pero el 00 se respeta
+            if (num === "00") return "00";
+            if (parseInt(num) === 0) return "O"; 
+            return num;
         }).filter(n => n !== "");
 
         let avisos = [];
+        let avisosAlert = [];
+
+        // Regla: Sobrante
         if (numeros.length > tamañoRequerido) {
-            while (numeros.length > tamañoRequerido) numeros.pop();
-            avisos.push("Sobrante eliminado");
+            let eliminados = [];
+            while (numeros.length > tamañoRequerido) {
+                eliminados.push(numeros.pop());
+            }
+            let msg = `Se eliminó el sobrante (${eliminados.join(', ')})`;
+            avisos.push(msg);
+            avisosAlert.push(`⚠️ ${msg}`);
         }
+
+        // Regla: Faltantes
         if (numeros.length < tamañoRequerido) {
-            alert(`❌ Error en ${nombreParticipante}: Faltan números.`);
+            alert(`❌ ERROR en ${nombreParticipante}: Solo tiene ${numeros.length} números de ${tamañoRequerido} requeridos.`);
             return null;
         }
 
+        // GESTIÓN DE DUPLICADOS CON EL "36" (LOGICA REFORZADA)
         let counts = {};
+        let duplicadosEncontrados = [];
         numeros.forEach(n => counts[n] = (counts[n] || 0) + 1);
         for (let n in counts) {
-            if (counts[n] > 1) {
+            if (counts[n] > 1) duplicadosEncontrados.push(n);
+        }
+
+        if (duplicadosEncontrados.length > 0) {
+            let sePudoCorregir = true;
+            duplicadosEncontrados.forEach(dup => {
                 if (!numeros.includes("36")) {
-                    numeros[numeros.lastIndexOf(n)] = "36";
-                    avisos.push(`Duplicado ${n} por 36`);
+                    let index = numeros.lastIndexOf(dup);
+                    numeros[index] = "36";
+                    let msg = `Duplicado (${dup}) reemplazado por 36`;
+                    avisos.push(msg);
+                    avisosAlert.push(`🔄 ${msg}`);
                 } else {
-                    alert(`🚫 Nula ${nombreParticipante}: Duplicados con 36 ya presente.`);
-                    return null;
+                    sePudoCorregir = false;
                 }
+            });
+
+            if (!sePudoCorregir) {
+                alert(`🚫 JUGADA NULA (${nombreParticipante}): Hay duplicados (${duplicadosEncontrados.join(', ')}) y el 36 ya existe.`);
+                return null;
             }
         }
+
+        // Avisar al administrador si hubo cambios automáticos
+        if (avisosAlert.length > 0) {
+            console.log(`Corrección en ${nombreParticipante}: ${avisosAlert.join('\n')}`);
+        }
+
         return { 
             numeros: numeros.join(','), 
-            nota: avisos.length > 0 ? `📝 ${avisos.join('. ')}` : "" 
+            nota: avisos.length > 0 ? `📝 Auto-corrección: ${avisos.join('. ')}` : "" 
         };
     }
 
-    // --- 4. FUNCIONES DE EDICIÓN MANUAL (NUBE) ---
-    
+    // --- 4. FUNCIONES DE EDICIÓN Y ELIMINACIÓN ---
     window.editarParticipanteNube = async (id, nombreAct, refeAct, jugadasAct) => {
-        const nuevoNombre = prompt("Editar Nombre del Participante:", nombreAct);
+        const nuevoNombre = prompt("Nombre:", nombreAct);
         if (nuevoNombre === null) return;
-
-        const nuevaRefe = prompt("Editar Referencia:", refeAct);
+        const nuevaRefe = prompt("Referencia (REFE):", refeAct);
         if (nuevaRefe === null) return;
-
-        const nuevasJugadasStr = prompt("Editar Números (separados por coma):", jugadasAct);
+        const nuevasJugadasStr = prompt("Jugadas (separadas por coma):", jugadasAct);
         if (nuevasJugadasStr === null) return;
+        const motivo = prompt("Motivo de la edición:", "Manual");
 
-        const { error } = await _supabase
-            .from('jugadas')
-            .update({ 
-                nombre: nuevoNombre.toUpperCase(), 
-                refe: nuevaRefe,
-                numeros_jugados: nuevasJugadasStr,
-                notas_correccion: "⚠️ Editado manualmente"
-            })
-            .eq('id', id);
+        const { error } = await _supabase.from('jugadas').update({ 
+            nombre: nuevoNombre.toUpperCase(), 
+            refe: nuevaRefe,
+            numeros_jugados: nuevasJugadasStr,
+            notas_correccion: `⚠️ Editado: ${motivo}`
+        }).eq('id', id);
 
-        if (error) {
-            alert("Error al actualizar: " + error.message);
-        } else {
-            cargarDatosDesdeNube();
-        }
+        if (error) alert("Error: " + error.message);
+        else cargarDatosDesdeNube();
     };
 
     window.removerResultadoEspecifico = async (itemCompleto) => {
-        if (!confirm(`¿Seguro que deseas eliminar el resultado "${itemCompleto}"?`)) return;
-        
+        if (!confirm(`¿Eliminar resultado "${itemCompleto}"?`)) return;
         const juego = document.getElementById('select-juego-admin').value;
-        let listaArray = resultadosActuales.split(',');
+        let listaArray = resultadosActuales.split(',').filter(x => x.trim() !== "");
         const index = listaArray.indexOf(itemCompleto);
-        
         if (index > -1) {
             listaArray.splice(index, 1);
-            const nuevaLista = listaArray.join(',');
-            const { error } = await _supabase
-                .from('resultados')
-                .update({ numeros: nuevaLista }) // Columna 'numeros' unificada
-                .eq('juego', juego);
-
+            const { error } = await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
             if (error) alert("Error: " + error.message);
             else cargarDatosDesdeNube();
+        }
+    };
+
+    window.eliminarJugada = async (id) => {
+        if (confirm("¿Eliminar definitivamente esta jugada?")) {
+            await _supabase.from('jugadas').delete().eq('id', id);
+            cargarDatosDesdeNube();
         }
     };
 
@@ -169,15 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarInterfazFinanzas(juegoActivo);
 
         try {
-            // Cargar Participantes
             const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('id', { ascending: true });
-            // Cargar Resultados
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).single();
-            // Cargar Finanzas específicas por juego
             const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).single();
 
             participantes = p || [];
-            resultadosActuales = r ? r.numeros : ""; // Lee de columna 'numeros'
+            resultadosActuales = r ? r.numeros : ""; 
             
             if (f) {
                 finanzas = f;
@@ -188,11 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('input-acumulado2').value = f.acumulado2 || 0;
                 }
                 calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
-            } else {
-                if(document.getElementById('form-finanzas')) document.getElementById('form-finanzas').reset();
-                calcularPrevisualizacionFinanzas(0, juegoActivo);
             }
-
             renderizarListas();
         } catch (e) { console.error(e); }
     }
@@ -201,18 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const contAcumu2 = document.getElementById('container-acumu2');
         const cardDomingo = document.getElementById('card-domingo');
         const labelCasa = document.getElementById('label-porcentaje-casa');
-        const labelAcumu1 = document.getElementById('label-acumu1');
-
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
             if (cardDomingo) cardDomingo.style.display = 'none';
             if (labelCasa) labelCasa.textContent = "25% CASA";
-            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Único:";
         } else {
             if (contAcumu2) contAcumu2.style.display = 'block';
             if (cardDomingo) cardDomingo.style.display = 'block';
             if (labelCasa) labelCasa.textContent = "20% CASA";
-            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Primer Lugar:";
         }
     }
 
@@ -220,9 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const montoRec = parseFloat(recaudado) || 0;
         const casaVal = document.getElementById('casa-valor');
         const domVal = document.getElementById('domingo-valor');
-
         if (!casaVal || !domVal) return;
-
         if (juego === 'mini') {
             casaVal.textContent = (montoRec * 0.25).toFixed(2) + " BS";
             domVal.textContent = "0.00 BS";
@@ -254,15 +261,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
 
         participantes.filter(p => 
-            p.nombre.toLowerCase().includes(filtro) || 
-            (p.refe && p.refe.toString().includes(filtro))
+            p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
         ).forEach(p => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <div style="flex-grow:1;">
                     <strong>${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
                     <small>${p.numeros_jugados}</small> 
-                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 12px;">'+p.notas_correccion+'</i>' : ''}
+                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
                 </div>
                 <div style="display: flex; gap: 5px;">
                     <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">✏️</button>
@@ -274,21 +280,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const listaRes = document.getElementById('lista-resultados');
         if(!listaRes) return;
         listaRes.innerHTML = resultadosActuales ? 
-            resultadosActuales.split(',').map(n => `
+            resultadosActuales.split(',').filter(x => x.trim() !== "").map(n => `
                 <li>
                     <span>${n}</span>
                     <button class="btn-eliminar" onclick="removerResultadoEspecifico('${n}')">×</button>
-                </li>`).join('') : 
-            "<li>Sin resultados</li>";
+                </li>`).join('') : "<li>Sin resultados</li>";
     }
 
-    // --- 6. EVENTOS DE FORMULARIO ---
+    // --- 6. GESTIÓN DE FORMULARIOS ---
     document.getElementById('btn-procesar-pegado').addEventListener('click', () => {
         const juego = document.getElementById('select-juego-admin').value;
         const tamaño = reglasJuegos[juego].tamaño;
         const raw = document.getElementById('input-paste-data').value;
         const lineas = raw.split('\n');
-        
         let jugadas = [];
         let nombre = "CLIENTE", refe = "";
 
@@ -305,10 +309,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 nombre = l.trim().toUpperCase();
             }
         });
-
         document.getElementById('nombre').value = nombre;
         document.getElementById('refe').value = refe;
         document.getElementById('jugadas-procesadas').value = jugadas.join(' | ');
+        alert("✅ Datos procesados al recuadro.");
     });
 
     document.getElementById('form-finanzas').addEventListener('submit', async (e) => {
@@ -321,36 +325,30 @@ document.addEventListener('DOMContentLoaded', () => {
             acumulado1: parseFloat(document.getElementById('input-acumulado1').value) || 0,
             acumulado2: juego !== 'mini' ? (parseFloat(document.getElementById('input-acumulado2').value) || 0) : 0
         };
-
         const { error } = await _supabase.from('finanzas').upsert(dataFinanzas, { onConflict: 'juego' });
-        if (error) alert("Error al guardar finanzas: " + error.message);
-        else alert("Finanzas de " + juego.toUpperCase() + " actualizadas ✅");
-        cargarDatosDesdeNube();
+        if (error) alert("Error: " + error.message);
+        else { alert("✅ Finanzas actualizadas."); cargarDatosDesdeNube(); }
     });
 
     document.getElementById('form-participante').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
         const tamaño = reglasJuegos[juego].tamaño;
-        const jugadasRaw = document.getElementById('jugadas-procesadas').value.split('|');
-        const nombreVal = document.getElementById('nombre').value.toUpperCase();
-        const refeVal = document.getElementById('refe').value;
+        const jugadasRaw = document.getElementById('jugadas-procesadas').value.split('|').map(x => x.trim()).filter(x => x !== "");
+        const nombreVal = document.getElementById('nombre').value.trim().toUpperCase();
+        const refeVal = document.getElementById('refe').value.trim();
+
+        if(!refeVal) return alert("El REFE es obligatorio");
 
         for (let j of jugadasRaw) {
-            if (j.trim() === "") continue;
             let proc = procesarYValidarJugada(j.split(','), nombreVal, tamaño);
             if (proc) {
                 await _supabase.from('jugadas').insert([{
-                    nombre: nombreVal,
-                    refe: refeVal,
-                    numeros_jugados: proc.numeros,
-                    juego: juego,
-                    notas_correccion: proc.nota
+                    nombre: nombreVal, refe: refeVal, numeros_jugados: proc.numeros, juego: juego, notas_correccion: proc.nota
                 }]);
             }
         }
-        alert("Participante(s) registrado(s)");
-        document.getElementById('form-participante').reset();
+        e.target.reset();
         document.getElementById('input-paste-data').value = "";
         cargarDatosDesdeNube();
     });
@@ -359,59 +357,39 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
         const horaSorteo = document.getElementById('sorteo-hora').value;
-        const num = document.getElementById('numero-ganador').value.trim().padStart(2, '0');
+        const numRaw = document.getElementById('numero-ganador').value.trim();
+        // Aplicar la misma lógica de 0 -> O en resultados
+        let numFinal = (numRaw === "0" || (parseInt(numRaw) === 0 && numRaw !== "00")) ? "O" : numRaw.padStart(2, '0');
         
-        // Formato unificado: "RULETA HORA: NUMERO"
-        let nuevoItem = `${horaSorteo}: ${num}`;
-        let nuevaLista = resultadosActuales ? `${resultadosActuales},${nuevoItem}` : nuevoItem;
+        let nuevoItem = `${horaSorteo}: ${numFinal}`;
+        let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
+        listaArray.push(nuevoItem);
         
-        const { error } = await _supabase.from('resultados').upsert({ 
-            juego: juego, 
-            numeros: nuevaLista // Columna 'numeros' unificada
-        }, { onConflict: 'juego' });
-
+        const { error } = await _supabase.from('resultados').upsert({ juego: juego, numeros: listaArray.join(',') }, { onConflict: 'juego' });
         if (error) alert("Error: " + error.message);
-        else alert("Resultado agregado");
-        
-        document.getElementById('numero-ganador').value = "";
-        cargarDatosDesdeNube();
+        else { e.target.reset(); cargarDatosDesdeNube(); }
     });
 
-    // --- 7. ACCIONES Y FILTROS ---
-    document.getElementById('input-buscar-participante').addEventListener('input', renderizarListas);
-
-    window.removerUltimoResultado = async (numAEliminar) => {
-        const juego = document.getElementById('select-juego-admin').value;
-        let listaArray = resultadosActuales.split(',');
-        const index = listaArray.indexOf(numAEliminar);
-        if (index > -1) {
-            listaArray.splice(index, 1);
-            const nuevaLista = listaArray.join(',');
-            await _supabase.from('resultados').update({ numeros: nuevaLista }).eq('juego', juego);
-            cargarDatosDesdeNube();
-        }
-    };
-
+    // --- 7. REINICIO CON DOBLE CANDADO (SISTEMA SEGURO) ---
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
-        if (confirm(`⚠️ ¿BORRAR TODOS LOS DATOS (Jugadores y Resultados) DEL JUEGO ${juego.toUpperCase()}?`)) {
-            const confirmacion = prompt("Para confirmar, escribe el nombre del juego:");
-            if (confirmacion && confirmacion.toLowerCase() === juego.toLowerCase()) {
+        const confirm1 = confirm(`⚠️ ATENCIÓN CRÍTICA:\n¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`);
+        
+        if (confirm1) {
+            const confirmTexto = prompt("Para confirmar la eliminación permanente, escribe la palabra: BORRAR");
+            if (confirmTexto === "BORRAR") {
                 await _supabase.from('jugadas').delete().eq('juego', juego);
                 await _supabase.from('resultados').upsert({ juego: juego, numeros: "" }, { onConflict: 'juego' });
-                alert("Datos reiniciados.");
+                alert("✅ Sistema reiniciado con éxito.");
                 cargarDatosDesdeNube();
+            } else {
+                alert("❌ Palabra incorrecta. Acción cancelada.");
             }
         }
     });
 
-    window.eliminarJugada = async (id) => {
-        if (confirm("¿Eliminar esta jugada?")) {
-            await _supabase.from('jugadas').delete().eq('id', id);
-            cargarDatosDesdeNube();
-        }
-    };
-
+    document.getElementById('input-buscar-participante').addEventListener('input', renderizarListas);
     document.getElementById('select-juego-admin').addEventListener('change', cargarDatosDesdeNube);
+    
     verificarSesion();
 });
