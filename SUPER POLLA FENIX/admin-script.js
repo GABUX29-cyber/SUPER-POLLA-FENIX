@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
-        'normal': {
+        'tarde': { // ACTUALIZADO: de 'normal' a 'tarde'
             tamaño: 5,
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
@@ -58,6 +58,22 @@ document.addEventListener('DOMContentLoaded', () => {
             tamaño: 3,
             ruletas: ["GRANJITA", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["5PM", "6PM", "7PM"]
+        }
+    };
+
+    // --- 2.1 LÓGICA DE BOTONES OVALADOS (PILLS) EN ADMIN ---
+    // Esta función permite que los nuevos botones ovalados controlen el select oculto
+    window.seleccionarJuegoAdminPill = function(elemento, juego) {
+        // Actualizar visualmente los botones
+        document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+        elemento.classList.add('active');
+
+        // Actualizar el valor del selector original
+        const selector = document.getElementById('select-juego-admin');
+        if (selector) {
+            selector.value = juego;
+            // Disparar manualmente el evento change para que se ejecute cargarDatosDesdeNube()
+            selector.dispatchEvent(new Event('change'));
         }
     };
 

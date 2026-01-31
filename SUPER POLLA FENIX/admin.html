@@ -89,11 +89,16 @@
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
         </header>
 
-        <div class="game-selector-container">
-            <label for="select-juego-admin" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECCIONE EL JUEGO A GESTIONAR:</label>
+        <div class="tabs-fenix-container no-print">
+            <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')">POLLA DÍA</div>
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'tarde')">POLLA TARDE</div>
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'mini')">MICRO</div>
+        </div>
+
+        <div class="game-selector-container" style="display: none;"> <label for="select-juego-admin" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECCIONE EL JUEGO A GESTIONAR:</label>
             <select id="select-juego-admin">
                 <option value="dia">SUPER POLLA FENIX DÍA (5 Aciertos)</option>
-                <option value="normal">SUPER POLLA FENIX TARDE (5 Aciertos)</option>
+                <option value="tarde">SUPER POLLA FENIX TARDE (5 Aciertos)</option>
                 <option value="mini">MINI EXPRES FENIX (3 Aciertos)</option>
             </select>
         </div>
@@ -181,6 +186,21 @@
             </button>
         </div>
     </div>
+
+    <script>
+        function seleccionarJuegoAdminPill(elemento, juego) {
+            // Actualizar clase activa visualmente
+            document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            elemento.classList.add('active');
+
+            // Actualizar el select oculto y disparar evento
+            const selector = document.getElementById('select-juego-admin');
+            if (selector) {
+                selector.value = juego;
+                selector.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
