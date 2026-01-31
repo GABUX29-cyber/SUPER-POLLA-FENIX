@@ -98,7 +98,56 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- 4. CARGA Y RENDERIZADO ---
+    // --- 4. FUNCIONES DE EDICIÓN MANUAL (NUBE) ---
+    
+    window.editarParticipanteNube = async (id, nombreAct, refeAct, jugadasAct) => {
+        const nuevoNombre = prompt("Editar Nombre del Participante:", nombreAct);
+        if (nuevoNombre === null) return;
+
+        const nuevaRefe = prompt("Editar Referencia:", refeAct);
+        if (nuevaRefe === null) return;
+
+        const nuevasJugadasStr = prompt("Editar Números (separados por coma):", jugadasAct);
+        if (nuevasJugadasStr === null) return;
+
+        const { error } = await _supabase
+            .from('jugadas')
+            .update({ 
+                nombre: nuevoNombre.toUpperCase(), 
+                refe: nuevaRefe,
+                numeros_jugados: nuevasJugadasStr,
+                notas_correccion: "⚠️ Editado manualmente"
+            })
+            .eq('id', id);
+
+        if (error) {
+            alert("Error al actualizar: " + error.message);
+        } else {
+            cargarDatosDesdeNube();
+        }
+    };
+
+    window.removerResultadoEspecifico = async (itemCompleto) => {
+        if (!confirm(`¿Seguro que deseas eliminar el resultado "${itemCompleto}"?`)) return;
+        
+        const juego = document.getElementById('select-juego-admin').value;
+        let listaArray = resultadosActuales.split(',');
+        const index = listaArray.indexOf(itemCompleto);
+        
+        if (index > -1) {
+            listaArray.splice(index, 1);
+            const nuevaLista = listaArray.join(',');
+            const { error } = await _supabase
+                .from('resultados')
+                .update({ numeros: nuevaLista })
+                .eq('juego', juego);
+
+            if (error) alert("Error: " + error.message);
+            else cargarDatosDesdeNube();
+        }
+    };
+
+    // --- 5. CARGA Y RENDERIZADO ---
     async function cargarDatosDesdeNube() {
         const juegoActivo = document.getElementById('select-juego-admin').value;
         actualizarOpcionesSorteo(juegoActivo);
@@ -106,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Cargar Participantes
-            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo);
+            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('id', { ascending: true });
             // Cargar Resultados
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).single();
             // Cargar Finanzas específicas por juego
@@ -125,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
             } else {
-                // Resetear campos si no hay datos
                 document.getElementById('form-finanzas').reset();
                 calcularPrevisualizacionFinanzas(0, juegoActivo);
             }
@@ -191,18 +239,30 @@ document.addEventListener('DOMContentLoaded', () => {
             p.refe.toString().includes(filtro)
         ).forEach(p => {
             const li = document.createElement('li');
-            li.innerHTML = `<div><strong>${p.nombre}</strong> (Refe: ${p.refe})<br><small>${p.numeros_jugados}</small> ${p.notas_correccion ? '<br><i style="color:red">'+p.notas_correccion+'</i>' : ''}</div>
-                            <button class="btn-eliminar" onclick="eliminarJugada(${p.id})">🗑️</button>`;
+            li.innerHTML = `
+                <div style="flex-grow:1;">
+                    <strong>${p.nombre}</strong> (Refe: ${p.refe})<br>
+                    <small>${p.numeros_jugados}</small> 
+                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 12px;">'+p.notas_correccion+'</i>' : ''}
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">✏️</button>
+                    <button class="btn-eliminar" onclick="eliminarJugada(${p.id})">🗑️</button>
+                </div>`;
             listaPart.appendChild(li);
         });
 
         const listaRes = document.getElementById('lista-resultados');
         listaRes.innerHTML = resultadosActuales ? 
-            resultadosActuales.split(',').map(n => `<li>Sorteo: ${n} <button class="btn-eliminar" onclick="removerUltimoResultado('${n}')">×</button></li>`).join('') : 
+            resultadosActuales.split(',').map(n => `
+                <li>
+                    <span>${n}</span>
+                    <button class="btn-eliminar" onclick="removerResultadoEspecifico('${n}')">×</button>
+                </li>`).join('') : 
             "<li>Sin resultados</li>";
     }
 
-    // --- 5. EVENTOS DE FORMULARIO ---
+    // --- 6. EVENTOS DE FORMULARIO ---
     document.getElementById('btn-procesar-pegado').addEventListener('click', () => {
         const juego = document.getElementById('select-juego-admin').value;
         const tamaño = reglasJuegos[juego].tamaño;
@@ -253,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const juego = document.getElementById('select-juego-admin').value;
         const tamaño = reglasJuegos[juego].tamaño;
         const jugadasRaw = document.getElementById('jugadas-procesadas').value.split('|');
-        const nombreVal = document.getElementById('nombre').value;
+        const nombreVal = document.getElementById('nombre').value.toUpperCase();
         const refeVal = document.getElementById('refe').value;
 
         for (let j of jugadasRaw) {
@@ -278,9 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
+        const horaSorteo = document.getElementById('sorteo-hora').value;
         const num = document.getElementById('numero-ganador').value.trim().padStart(2, '0');
         
-        let nuevaLista = resultadosActuales ? `${resultadosActuales},${num}` : num;
+        // Formato: "Ruleta Hora: Numero"
+        let nuevoItem = `${horaSorteo}: ${num}`;
+        let nuevaLista = resultadosActuales ? `${resultadosActuales},${nuevoItem}` : nuevoItem;
         
         const { error } = await _supabase.from('resultados').upsert({ 
             juego: juego, 
@@ -294,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDatosDesdeNube();
     });
 
-    // --- 6. ACCIONES Y FILTROS ---
+    // --- 7. ACCIONES Y FILTROS ---
     document.getElementById('input-buscar-participante').addEventListener('input', renderizarListas);
 
     window.removerUltimoResultado = async (numAEliminar) => {

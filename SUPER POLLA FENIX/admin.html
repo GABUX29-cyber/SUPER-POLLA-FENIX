@@ -6,7 +6,7 @@
     <title>Panel de Administración - MEGA POLLA</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
-        /* --- TUS ESTILOS ORIGINALES MANTENIDOS --- */
+        /* --- ESTILOS ORIGINALES --- */
         .btn-editar, .btn-eliminar {
             padding: 5px 10px; border: none; cursor: pointer; border-radius: 4px;
             font-weight: bold; font-size: 0.85em; margin-left: 5px;
@@ -21,7 +21,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- NUEVO ESTILO PARA EL SELECTOR DE JUEGO --- */
         .game-selector-container {
             background: #fdd835;
             padding: 15px;
@@ -133,12 +132,12 @@
         <div class="admin-section">
             <h2>🔢 Resultados del Sorteo</h2>
             <form id="form-resultados">
-                <label for="sorteo-hora">Sorteo y Hora (Se actualiza según el juego):</label>
+                <label for="sorteo-hora">Sorteo y Hora:</label>
                 <select id="sorteo-hora" required>
                     </select>
                 
                 <label for="numero-ganador">Número Ganador:</label>
-                <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
+                <input type="text" id="numero-ganador" placeholder="Ej: 05" required>
                 
                 <button type="submit">Guardar Resultado</button>
             </form>
