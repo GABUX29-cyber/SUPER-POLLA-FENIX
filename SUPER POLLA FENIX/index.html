@@ -38,7 +38,7 @@
     <div class="card-container full-width">
         <div class="card compact-resumen">
             <h2><i class="fas fa-chart-line"></i> Información Financiera</h2>
-            <div class="stats-grid-ultra">
+            <div class="stats-grid-ultra" id="grid-finanzas">
                 
                 <div class="est-mini ventas">
                     <i class="fas fa-ticket-alt"></i>
@@ -52,19 +52,13 @@
                     <label>Recaudado</label>
                 </div>
 
-                <div class="est-mini acumulado">
-                    <i class="fas fa-trophy"></i>
-                    <span class="val-mini" id="acumulado1">0.00 BS</span>
-                    <label>Acumulado</label>
-                </div>
-
-                <div class="est-mini casa">
+                <div class="est-mini casa" id="box-casa">
                     <i class="fas fa-university"></i>
                     <span class="val-mini" id="monto-casa">0.00 BS</span>
-                    <label>20% Casa</label>
+                    <label id="label-casa">20% Casa</label>
                 </div>
 
-                <div class="est-mini domingo">
+                <div class="est-mini domingo" id="box-domingo">
                     <i class="fas fa-calendar-day"></i>
                     <span class="val-mini" id="monto-domingo">0.00 BS</span>
                     <label>5% Domingo</label>
@@ -73,7 +67,31 @@
                 <div class="est-mini repartir">
                     <i class="fas fa-hand-holding-usd"></i>
                     <span class="val-mini" id="repartir75">0.00 BS</span>
-                    <label>A Repartir</label>
+                    <label>Repartir 75%</label>
+                </div>
+
+                <div class="est-mini acumulado" id="box-acumu1">
+                    <i class="fas fa-trophy"></i>
+                    <span class="val-mini" id="acumulado1">0.00 BS</span>
+                    <label id="label-acumu1">Acumu Primer Lugar</label>
+                </div>
+
+                <div class="est-mini acumulado" id="box-acumu2">
+                    <i class="fas fa-medal"></i>
+                    <span class="val-mini" id="acumulado2">0.00 BS</span>
+                    <label>Acumu Segundo Lugar</label>
+                </div>
+
+                <div class="est-mini ganadores-box-item" id="box-total-1" style="grid-column: span 2; background: #fff9c4; color: #333;">
+                    <i class="fas fa-star"></i>
+                    <span class="val-mini" id="total-acumu-premio1">0.00 BS</span>
+                    <label id="label-total1">A REPARTIR ACUMU+PRIMER PREMIO</label>
+                </div>
+
+                <div class="est-mini ganadores-box-item" id="box-total-2" style="grid-column: span 2; background: #e3f2fd; color: #333;">
+                    <i class="fas fa-star-half-alt"></i>
+                    <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
+                    <label>A REPARTIR ACUMU+SEGUNDO PREMIO</label>
                 </div>
 
                 <div class="est-mini ganadores-box-item">
@@ -114,7 +132,7 @@
                         </tr>
                     </thead>
                     <tbody id="ranking-body">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>

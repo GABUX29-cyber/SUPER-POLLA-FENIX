@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. SEGURIDAD Y SESIÓN (Tus funciones originales) ---
+    // --- 1. SEGURIDAD Y SESIÓN ---
     const loginOverlay = document.getElementById('login-overlay');
     const contenidoPrincipal = document.getElementById('contenido-principal');
     const btnEntrar = document.getElementById('btn-entrar');
@@ -37,12 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
             cargarDatosDesdeNube();
         }
     }
-    verificarSesion();
 
     // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO ---
     let participantes = [];
     let resultadosActuales = "";
-    let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00 };
+    // Estructura de finanzas ampliada para soportar el segundo acumulado
+    let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
 
     const reglasJuegos = {
         'dia': {
@@ -66,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
         let numeros = numerosRaw.map(n => {
             let num = n.trim().padStart(2, '0');
-            return (num === "00") ? "00" : (parseInt(num) === 0 ? "O" : num);
-        });
+            return (num === "00") ? "00" : (parseInt(num) === 0 ? "0" : num);
+        }).filter(n => n !== "");
 
         let avisos = [];
         if (numeros.length > tamañoRequerido) {
@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
-        // Lógica del 36 para duplicados
         let counts = {};
         numeros.forEach(n => counts[n] = (counts[n] || 0) + 1);
         for (let n in counts) {
@@ -103,18 +102,69 @@ document.addEventListener('DOMContentLoaded', () => {
     async function cargarDatosDesdeNube() {
         const juegoActivo = document.getElementById('select-juego-admin').value;
         actualizarOpcionesSorteo(juegoActivo);
+        ajustarInterfazFinanzas(juegoActivo);
 
         try {
+            // Cargar Participantes
             const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo);
+            // Cargar Resultados
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).single();
-            const { data: f } = await _supabase.from('finanzas').select('*').single();
+            // Cargar Finanzas específicas por juego
+            const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).single();
 
             participantes = p || [];
             resultadosActuales = r ? r.numeros : "";
-            if (f) finanzas = f;
+            
+            if (f) {
+                finanzas = f;
+                document.getElementById('input-ventas').value = f.ventas || 0;
+                document.getElementById('input-recaudado').value = f.recaudado || 0;
+                document.getElementById('input-acumulado1').value = f.acumulado1 || 0;
+                if (document.getElementById('input-acumulado2')) {
+                    document.getElementById('input-acumulado2').value = f.acumulado2 || 0;
+                }
+                calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
+            } else {
+                // Resetear campos si no hay datos
+                document.getElementById('form-finanzas').reset();
+                calcularPrevisualizacionFinanzas(0, juegoActivo);
+            }
 
             renderizarListas();
         } catch (e) { console.error(e); }
+    }
+
+    function ajustarInterfazFinanzas(juego) {
+        const contAcumu2 = document.getElementById('container-acumu2');
+        const cardDomingo = document.getElementById('card-domingo');
+        const labelCasa = document.getElementById('label-porcentaje-casa');
+        const labelAcumu1 = document.getElementById('label-acumu1');
+
+        if (juego === 'mini') {
+            if (contAcumu2) contAcumu2.style.display = 'none';
+            if (cardDomingo) cardDomingo.style.display = 'none';
+            if (labelCasa) labelCasa.textContent = "25% CASA";
+            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Único:";
+        } else {
+            if (contAcumu2) contAcumu2.style.display = 'block';
+            if (cardDomingo) cardDomingo.style.display = 'block';
+            if (labelCasa) labelCasa.textContent = "20% CASA";
+            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Primer Lugar:";
+        }
+    }
+
+    function calcularPrevisualizacionFinanzas(recaudado, juego) {
+        const montoRec = parseFloat(recaudado) || 0;
+        const casaVal = document.getElementById('casa-valor');
+        const domVal = document.getElementById('domingo-valor');
+
+        if (juego === 'mini') {
+            casaVal.textContent = (montoRec * 0.25).toFixed(2) + " BS";
+            domVal.textContent = "0.00 BS";
+        } else {
+            casaVal.textContent = (montoRec * 0.20).toFixed(2) + " BS";
+            domVal.textContent = (montoRec * 0.05).toFixed(2) + " BS";
+        }
     }
 
     function actualizarOpcionesSorteo(juego) {
@@ -132,19 +182,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarListas() {
-        // Render participantes
         const listaPart = document.getElementById('lista-participantes');
         listaPart.innerHTML = '';
-        participantes.forEach(p => {
+        const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
+
+        participantes.filter(p => 
+            p.nombre.toLowerCase().includes(filtro) || 
+            p.refe.toString().includes(filtro)
+        ).forEach(p => {
             const li = document.createElement('li');
-            li.innerHTML = `<div><strong>${p.nombre}</strong><br><small>${p.numeros_jugados}</small></div>
-                            <button onclick="eliminarJugada(${p.id})">🗑️</button>`;
+            li.innerHTML = `<div><strong>${p.nombre}</strong> (Refe: ${p.refe})<br><small>${p.numeros_jugados}</small> ${p.notas_correccion ? '<br><i style="color:red">'+p.notas_correccion+'</i>' : ''}</div>
+                            <button class="btn-eliminar" onclick="eliminarJugada(${p.id})">🗑️</button>`;
             listaPart.appendChild(li);
         });
 
-        // Render resultados actuales
         const listaRes = document.getElementById('lista-resultados');
-        listaRes.innerHTML = resultadosActuales ? `<li>Ganadores: ${resultadosActuales}</li>` : "<li>Sin resultados</li>";
+        listaRes.innerHTML = resultadosActuales ? 
+            resultadosActuales.split(',').map(n => `<li>Sorteo: ${n} <button class="btn-eliminar" onclick="removerUltimoResultado('${n}')">×</button></li>`).join('') : 
+            "<li>Sin resultados</li>";
     }
 
     // --- 5. EVENTOS DE FORMULARIO ---
@@ -164,8 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     let g = m.slice(i, i + tamaño);
                     if (g.length === tamaño) jugadas.push(g.join(','));
                 }
-            } else if (l.toLowerCase().includes("refe")) refe = l.replace(/\D/g, "");
-            else if (l.length > 3 && !refe) nombre = l.toUpperCase();
+            } else if (l.toLowerCase().includes("refe")) {
+                refe = l.replace(/\D/g, "");
+            } else if (l.trim().length > 3 && !refe && !l.includes(',')) {
+                nombre = l.trim().toUpperCase();
+            }
         });
 
         document.getElementById('nombre').value = nombre;
@@ -173,25 +231,47 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('jugadas-procesadas').value = jugadas.join(' | ');
     });
 
+    document.getElementById('form-finanzas').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const juego = document.getElementById('select-juego-admin').value;
+        const dataFinanzas = {
+            juego: juego,
+            ventas: parseInt(document.getElementById('input-ventas').value) || 0,
+            recaudado: parseFloat(document.getElementById('input-recaudado').value) || 0,
+            acumulado1: parseFloat(document.getElementById('input-acumulado1').value) || 0,
+            acumulado2: juego !== 'mini' ? (parseFloat(document.getElementById('input-acumulado2').value) || 0) : 0
+        };
+
+        const { error } = await _supabase.from('finanzas').upsert(dataFinanzas, { onConflict: 'juego' });
+        if (error) alert("Error al guardar finanzas: " + error.message);
+        else alert("Finanzas de " + juego.toUpperCase() + " actualizadas ✅");
+        cargarDatosDesdeNube();
+    });
+
     document.getElementById('form-participante').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
         const tamaño = reglasJuegos[juego].tamaño;
         const jugadasRaw = document.getElementById('jugadas-procesadas').value.split('|');
+        const nombreVal = document.getElementById('nombre').value;
+        const refeVal = document.getElementById('refe').value;
 
         for (let j of jugadasRaw) {
-            let proc = procesarYValidarJugada(j.split(','), document.getElementById('nombre').value, tamaño);
+            if (j.trim() === "") continue;
+            let proc = procesarYValidarJugada(j.split(','), nombreVal, tamaño);
             if (proc) {
                 await _supabase.from('jugadas').insert([{
-                    nombre: document.getElementById('nombre').value,
-                    refe: document.getElementById('refe').value,
+                    nombre: nombreVal,
+                    refe: refeVal,
                     numeros_jugados: proc.numeros,
                     juego: juego,
                     notas_correccion: proc.nota
                 }]);
             }
         }
-        alert("Guardado");
+        alert("Participante(s) registrado(s)");
+        document.getElementById('form-participante').reset();
+        document.getElementById('input-paste-data').value = "";
         cargarDatosDesdeNube();
     });
 
@@ -202,25 +282,48 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let nuevaLista = resultadosActuales ? `${resultadosActuales},${num}` : num;
         
-        await _supabase.from('resultados').update({ numeros: nuevaLista }).eq('juego', juego);
-        alert("Resultado agregado");
+        const { error } = await _supabase.from('resultados').upsert({ 
+            juego: juego, 
+            numeros: nuevaLista 
+        }, { onConflict: 'juego' });
+
+        if (error) alert("Error: " + error.message);
+        else alert("Resultado agregado");
+        
+        document.getElementById('numero-ganador').value = "";
         cargarDatosDesdeNube();
     });
 
-    // --- 6. REINICIO DE DATOS ---
+    // --- 6. ACCIONES Y FILTROS ---
+    document.getElementById('input-buscar-participante').addEventListener('input', renderizarListas);
+
+    window.removerUltimoResultado = async (numAEliminar) => {
+        const juego = document.getElementById('select-juego-admin').value;
+        let listaArray = resultadosActuales.split(',');
+        const index = listaArray.indexOf(numAEliminar);
+        if (index > -1) {
+            listaArray.splice(index, 1);
+            const nuevaLista = listaArray.join(',');
+            await _supabase.from('resultados').update({ numeros: nuevaLista }).eq('juego', juego);
+            cargarDatosDesdeNube();
+        }
+    };
+
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
-        if (confirm(`¿BORRAR TODO EL JUEGO ${juego.toUpperCase()}?`)) {
-            if (prompt("Escribe BORRAR") === "BORRAR") {
+        if (confirm(`⚠️ ¿BORRAR TODOS LOS DATOS (Jugadores y Resultados) DEL JUEGO ${juego.toUpperCase()}?`)) {
+            const confirmacion = prompt("Para confirmar, escribe el nombre del juego:");
+            if (confirmacion && confirmacion.toLowerCase() === juego.toLowerCase()) {
                 await _supabase.from('jugadas').delete().eq('juego', juego);
-                await _supabase.from('resultados').update({ numeros: "" }).eq('juego', juego);
+                await _supabase.from('resultados').upsert({ juego: juego, numeros: "" }, { onConflict: 'juego' });
+                alert("Datos reiniciados.");
                 cargarDatosDesdeNube();
             }
         }
     });
 
     window.eliminarJugada = async (id) => {
-        if (confirm("¿Eliminar?")) {
+        if (confirm("¿Eliminar esta jugada?")) {
             await _supabase.from('jugadas').delete().eq('id', id);
             cargarDatosDesdeNube();
         }

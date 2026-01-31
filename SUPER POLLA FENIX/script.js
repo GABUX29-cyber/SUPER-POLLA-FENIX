@@ -6,17 +6,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let resultadosAdmin = [];
     let participantesData = [];
-    let finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00 };
+    // Actualizado para soportar acumulado2
+    let finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 }; 
     let resultadosDelDia = [];
     
-    // Variables dinámicas según el juego
-    let juegoActual = 'normal'; // 'dia', 'normal', 'mini'
+    let juegoActual = 'normal'; 
     let aciertosObjetivo = 5; 
     let jugadaSize = 5; 
 
     const selectorJuego = document.getElementById('select-juego-publico');
 
-    // FORMATO MONEDA
     const formatearBS = (monto) => {
         return new Intl.NumberFormat('de-DE', {
             minimumFractionDigits: 2,
@@ -40,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function cargarDatosDesdeNube() {
         juegoActual = selectorJuego ? selectorJuego.value : 'normal';
         
-        // Ajustar reglas según el juego seleccionado
         if (juegoActual === 'mini') {
             aciertosObjetivo = 3;
             jugadaSize = 3;
@@ -54,19 +52,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // 1. Cargar Participantes de este juego
             const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActual);
-            
-            // 2. Cargar Resultados de este juego (guardados como string separado por comas)
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActual).single();
-            
-            // 3. Cargar Finanzas (puedes tener una tabla por juego o una general, aquí usamos general)
-            const { data: f } = await _supabase.from('finanzas').select('*').single();
+            // Se asume que en la tabla finanzas hay una fila por cada juego
+            const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActual).single();
 
             participantesData = p || [];
             
             if (r && r.numeros) {
-                // Convertimos el string "01,02,05" en un array ["01", "02", "05"]
                 resultadosDelDia = r.numeros.split(',').filter(n => n !== "");
             } else {
                 resultadosDelDia = [];
@@ -83,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function inicializarSistema() {
         establecerFechaReal();
         actualizarFinanzasYEstadisticas();
-        renderResultadosBolas(); // Cambiado a visualización de bolas para el público
+        renderResultadosBolas(); 
         renderRanking();
         configurarFiltro();
     }
@@ -93,6 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ----------------------------------------------------------------
 
     function calcularAciertos(jugadaString, ganadores) {
+        if (!jugadaString) return 0;
         const misNumeros = jugadaString.split(',').map(n => n.trim());
         let aciertos = 0;
         misNumeros.forEach(num => {
@@ -101,17 +95,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         return aciertos;
     }
 
+    // NUEVA LÓGICA DE PREMIOS ADAPTADA
     function actualizarFinanzasYEstadisticas() {
-        const montoRecaudadoHoy = parseFloat(finanzasData.recaudado) || 0;
-        const montoAcumuladoAnterior = parseFloat(finanzasData.acumulado1) || 0;
-        const GRAN_TOTAL = montoRecaudadoHoy + montoAcumuladoAnterior;
+        const rec = parseFloat(finanzasData.recaudado) || 0;
+        const acumu1 = parseFloat(finanzasData.acumulado1) || 0;
+        const acumu2 = parseFloat(finanzasData.acumulado2) || 0;
+        
+        const ventasEl = document.getElementById('ventas');
+        const recaudadoEl = document.getElementById('recaudado');
+        const repartirEl = document.getElementById('repartir75');
+        const casaEl = document.getElementById('monto-casa');
+        const labelCasa = document.getElementById('label-casa');
+        const domEl = document.getElementById('monto-domingo');
+        const boxDom = document.getElementById('box-domingo');
+        const ac1El = document.getElementById('acumulado1');
+        const ac2El = document.getElementById('acumulado2');
+        const boxAc2 = document.getElementById('box-acumu2');
+        const labelAc1 = document.getElementById('label-acumu1');
+        
+        // Totales Sumados (Acumu + Premio)
+        const total1El = document.getElementById('total-acumu-premio1');
+        const total2El = document.getElementById('total-acumu-premio2');
+        const boxTotal2 = document.getElementById('box-total-2');
 
-        document.getElementById('ventas').textContent = finanzasData.ventas || 0;
-        document.getElementById('recaudado').textContent = formatearBS(montoRecaudadoHoy);
-        document.getElementById('acumulado1').textContent = formatearBS(montoAcumuladoAnterior);
-        document.getElementById('monto-casa').textContent = formatearBS(GRAN_TOTAL * 0.20);
-        document.getElementById('monto-domingo').textContent = formatearBS(GRAN_TOTAL * 0.05);
-        document.getElementById('repartir75').textContent = formatearBS(GRAN_TOTAL * 0.75);
+        if (ventasEl) ventasEl.textContent = finanzasData.ventas || 0;
+        if (recaudadoEl) recaudadoEl.textContent = formatearBS(rec);
+        if (ac1El) ac1El.textContent = formatearBS(acumu1);
+
+        const repartir75 = rec * 0.75;
+        if (repartirEl) repartirEl.textContent = formatearBS(repartir75);
+
+        if (juegoActual === 'mini') {
+            // AJUSTES MINI EXPRES
+            if (casaEl) casaEl.textContent = formatearBS(rec * 0.25);
+            if (labelCasa) labelCasa.textContent = "25% Casa";
+            if (boxDom) boxDom.style.display = "none";
+            if (boxAc2) boxAc2.style.display = "none";
+            if (boxTotal2) boxTotal2.style.display = "none";
+            if (labelAc1) labelAc1.textContent = "Acumulado";
+            if (total1El) total1El.textContent = formatearBS(repartir75 + acumu1);
+        } else {
+            // AJUSTES DÍA / TARDE
+            if (casaEl) casaEl.textContent = formatearBS(rec * 0.20);
+            if (labelCasa) labelCasa.textContent = "20% Casa";
+            if (boxDom) boxDom.style.display = "flex";
+            if (domEl) domEl.textContent = formatearBS(rec * 0.05);
+            if (boxAc2) boxAc2.style.display = "flex";
+            if (ac2El) ac2El.textContent = formatearBS(acumu2);
+            if (boxTotal2) boxTotal2.style.display = "flex";
+            if (labelAc1) labelAc1.textContent = "Acumu Primer Lugar";
+            if (total1El) total1El.textContent = formatearBS(repartir75 + acumu1);
+            if (total2El) total2El.textContent = formatearBS(acumu2); // O la lógica que definas para el 2do
+        }
     }
 
     function renderResultadosBolas() {
@@ -135,12 +170,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headerCol = document.getElementById('jugada-header-col');
         if (!tbody) return;
 
-        // Ajustar el encabezado de la tabla dinámicamente
         if (headerCol) headerCol.setAttribute('colspan', jugadaSize);
 
         const term = filtro.toLowerCase();
         let totalGanadores = 0;
-
         tbody.innerHTML = '';
 
         const dataConAciertos = participantesData.map(p => ({
@@ -152,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (p.nombre.toLowerCase().includes(term) || p.refe.toString().includes(term)) {
                 if (p.aciertos >= aciertosObjetivo) totalGanadores++;
 
-                const numerosArray = p.numeros_jugados.split(',');
+                const numerosArray = p.numeros_jugados ? p.numeros_jugados.split(',') : [];
                 let jugadasHTML = '';
                 
                 for (let i = 0; i < jugadaSize; i++) {
@@ -176,7 +209,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        document.getElementById('total-ganadores').textContent = totalGanadores;
+        const totalGanadoresEl = document.getElementById('total-ganadores');
+        if (totalGanadoresEl) totalGanadoresEl.textContent = totalGanadores;
     }
 
     // ----------------------------------------------------------------

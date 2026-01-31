@@ -88,7 +88,8 @@ header p {
 
 .stats-grid-ultra {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    /* Ajuste para soportar más columnas según el juego */
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 5px;
 }
 
@@ -101,6 +102,7 @@ header p {
     justify-content: center;
     border: 1px solid rgba(0,0,0,0.1);
     min-height: 60px;
+    transition: all 0.3s ease;
 }
 
 .est-mini i {
@@ -123,10 +125,10 @@ header p {
     margin-top: 3px;
     text-align: center;
     width: 95%;
-    white-space: normal; /* Asegura que el texto no se corte y baje */
+    white-space: normal; 
 }
 
-/* Restauración de colores originales */
+/* Colores de las tarjetas financieras */
 .ventas { background-color: #e3f2fd; border-bottom: 3px solid #2196f3; }
 .ventas i { color: #2196f3; }
 
@@ -222,8 +224,8 @@ header p {
 
 .celda-numero {
     font-weight: 800;
-    font-size: 1.5em; /* CAMBIO: Tamaño aumentado */
-    color: #000000 !important; /* CAMBIO: Color negro */
+    font-size: 1.5em;
+    color: #000000 !important;
 }
 
 .sin-resultado {
@@ -320,13 +322,16 @@ tbody tr:hover {
     font-weight: 700;
     border: 1px solid #ccc;
     font-size: 0.85em;
+    transition: transform 0.2s;
 }
 
 .ranking-box.hit {
-    background-color: #4caf50;
-    color: white;
-    border-color: #2e7d32;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    background-color: #4caf50 !important; /* Verde vibrante */
+    color: white !important;
+    border-color: #388e3c !important;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+    transform: scale(1.1);
+    font-weight: bold;
 }
 
 .aciertos-box {
@@ -339,15 +344,17 @@ tbody tr:hover {
     font-size: 1em;
 }
 
+/* Efecto de Ganador Destacado */
 .ganador-final {
-    background-color: #d32f2f;
+    background: linear-gradient(45deg, #d32f2f, #f44336);
     color: white;
-    padding: 5px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
     font-weight: 800;
     font-size: 0.8em;
     animation: pulse 1.5s infinite;
     display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 @keyframes pulse {
@@ -428,6 +435,37 @@ tbody tr:hover {
     box-sizing: border-box;
 }
 
+/* Grid para el Formulario de Finanzas Admin */
+#form-finanzas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+#form-finanzas label {
+    grid-column: span 2;
+    margin-bottom: -10px;
+    font-size: 0.95em;
+}
+
+#form-finanzas input {
+    width: 100%;
+    margin-bottom: 0; /* Espaciado manejado por el gap */
+}
+
+#form-finanzas button {
+    grid-column: span 2;
+    margin-top: 10px;
+}
+
+/* Contenedor del Acumulado 2 en Admin */
+#container-acumu2 {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
 #paste-section {
     margin-top: 20px;
     border-top: 1px solid #eee;
@@ -495,16 +533,6 @@ form button {
     text-transform: uppercase;
 }
 
-form button:hover {
-    background-color: #2e7d32;
-}
-
-#lista-participantes, #lista-resultados {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-}
-
 #lista-participantes li, #lista-resultados li {
     background-color: #f5f5f5;
     padding: 15px;
@@ -530,23 +558,8 @@ form button:hover {
     transition: 0.2s;
 }
 
-.btn-editar {
-    background-color: #ffc107;
-    color: #333;
-}
-
-.btn-editar:hover {
-    background-color: #e0a800;
-}
-
-.btn-eliminar {
-    background-color: #dc3545;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background-color: #c82333;
-}
+.btn-editar { background-color: #ffc107; color: #333; }
+.btn-eliminar { background-color: #dc3545; color: white; }
 
 /* ========================================================= */
 /* 10. FOOTER                                                */
@@ -566,8 +579,9 @@ footer {
     .stats-grid-ultra {
         grid-template-columns: repeat(2, 1fr);
     }
-    .ganadores-destacado {
-        grid-column: span 2;
+    
+    #form-finanzas {
+        grid-template-columns: 1fr; /* Una columna en móvil para el formulario */
     }
 
     .card-container {
@@ -614,20 +628,15 @@ footer {
     header {
         background-color: #fdd835 !important;
         color: #333 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
-    /* REDUCCIÓN DE RESUMEN AL IMPRIMIR A UNA FILA HORIZONTAL */
     .stats-grid-ultra {
-        grid-template-columns: repeat(7, 1fr) !important;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
         gap: 2px !important;
     }
 
@@ -635,13 +644,10 @@ footer {
         border: 1px solid #ddd !important;
         padding: 4px 1px !important;
         min-height: auto !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 
     .val-mini { font-size: 0.75em !important; }
     .est-mini label { font-size: 0.45em !important; }
-    .est-mini i { font-size: 0.7em !important; }
 
     tbody tr, tr {
         page-break-inside: avoid !important;
