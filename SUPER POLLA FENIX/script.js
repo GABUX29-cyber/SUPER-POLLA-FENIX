@@ -104,7 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             horas.forEach(h => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
-                // Visualización: Si es O, se resalta
                 const displayNum = (num === "O") ? '<span style="color:#d32f2f; font-weight:bold;">O</span>' : num;
                 tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;
             });
@@ -181,11 +180,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             let aciertos = 0;
             jugadas.forEach(n => { 
-                // --- REGLA CRÍTICA ---
                 let numParaComparar = n;
                 if (n === "0") numParaComparar = "O"; 
-                // El "00" se queda como "00" para comparar con el "00" de resultados
-                
                 if(resultadosDelDiaSet.includes(numParaComparar)) aciertos++; 
             });
             return { ...p, jugadasArray: jugadas, aciertos };
@@ -200,14 +196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let jugadasHTML = '';
                 for (let i = 0; i < jugadaSize; i++) {
                     let numRaw = p.jugadasArray[i] ? p.jugadasArray[i] : '--';
-                    
-                    // Lógica visual para el Ranking
                     let numVisual = numRaw;
                     if (numRaw === "0") numVisual = "O";
-                    // Nota: 00 se muestra como 00
 
                     const esHit = (numVisual !== '--' && resultadosDelDiaSet.includes(numVisual));
-                    
                     jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${numVisual}</span></td>`;
                 }
 
@@ -231,46 +223,60 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 5: Cálculos Financieros
+    // PARTE 5: Cálculos Financieros (NUEVA REGLA 80/20)
     // ----------------------------------------------------------------
 
     function actualizarFinanzasYEstadisticas() {
         const rec = parseFloat(finanzasData.recaudado) || 0;
         const acumu1 = parseFloat(finanzasData.acumulado1) || 0;
         const acumu2 = parseFloat(finanzasData.acumulado2) || 0;
-        const repartir75 = rec * 0.75;
+        
+        // El 75% es el total a repartir entre 1er y 2do lugar
+        const repartirTotal75 = rec * 0.75;
         
         const formatear = (m) => new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2}).format(m) + " BS";
+        const esMini = (juegoActual === 'mini');
 
+        // Referencias a elementos UI
         if(document.getElementById('ventas')) document.getElementById('ventas').textContent = finanzasData.ventas || 0;
         if(document.getElementById('recaudado')) document.getElementById('recaudado').textContent = formatear(rec);
         if(document.getElementById('acumulado1')) document.getElementById('acumulado1').textContent = formatear(acumu1);
         if(document.getElementById('acumulado2')) document.getElementById('acumulado2').textContent = formatear(acumu2);
-        if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartir75);
-
-        const esMini = (juegoActual === 'mini');
         
+        // El campo "Premio a Repartir" muestra el 75% bruto
+        if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartirTotal75);
+
         const boxDom = document.getElementById('box-domingo');
         const boxAc2 = document.getElementById('box-acumu2');
+        const boxTotal2 = document.getElementById('box-total-2'); // Caja del total premio 2do lugar
         const labelCasa = document.getElementById('label-casa');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
+        if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
         if(labelCasa) labelCasa.textContent = esMini ? "25% Casa" : "20% Casa";
         
-        if(!esMini && document.getElementById('monto-domingo')) {
-            document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
-        }
-        
-        if(document.getElementById('monto-casa')) {
-            document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
-        }
+        // --- CÁLCULO ESPECÍFICO ---
+        if (esMini) {
+            // MINI: Todo el 75% + Acumulado va al 1er lugar
+            if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.25);
+            if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartirTotal75 + acumu1);
+        } else {
+            // DÍA / TARDE: Distribución 80/20
+            const premio1DelDia = repartirTotal75 * 0.80;
+            const premio2DelDia = repartirTotal75 * 0.20;
 
-        if(document.getElementById('total-acumu-premio1')) {
-            document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
-        }
-        if(document.getElementById('total-acumu-premio2') && !esMini) {
-            document.getElementById('total-acumu-premio2').textContent = formatear(acumu2);
+            if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.20);
+            if(document.getElementById('monto-domingo')) document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
+            
+            // TOTAL PREMIO 1er LUGAR (80% del día + acumulado 1)
+            if(document.getElementById('total-acumu-premio1')) {
+                document.getElementById('total-acumu-premio1').textContent = formatear(premio1DelDia + acumu1);
+            }
+            // TOTAL PREMIO 2do LUGAR (20% del día + acumulado 2)
+            if(document.getElementById('total-acumu-premio2')) {
+                document.getElementById('total-acumu-premio2').textContent = formatear(premio2DelDia + acumu2);
+            }
         }
     }
 

@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let numeros = numerosRaw.map(n => {
             let num = n.trim();
             
-            // REGLA SOLICITADA: Solo el 0 sencillo es la letra O
+            // REGLA: Solo el 0 sencillo es la letra O. El 00 se queda igual.
             if (num === "0") return "O";
             if (num === "00") return "00";
             
@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let avisos = [];
         let avisosAlert = [];
 
-        // Regla: Sobrante
         if (numeros.length > tamañoRequerido) {
             let eliminados = [];
             while (numeros.length > tamañoRequerido) {
@@ -100,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
             avisosAlert.push(`⚠️ ${msg}`);
         }
 
-        // Regla: Faltantes
         if (numeros.length < tamañoRequerido) {
             alert(`❌ ERROR en ${nombreParticipante}: Solo tiene ${numeros.length} números de ${tamañoRequerido} requeridos.`);
             return null;
@@ -109,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // GESTIÓN DE DUPLICADOS (La 'O' puede repetirse)
         let counts = {};
         let duplicadosEncontrados = [];
-        // Solo contamos duplicados para lo que NO sea "O"
         numeros.forEach(n => {
             if (n !== "O") counts[n] = (counts[n] || 0) + 1;
         });
@@ -228,17 +225,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- NUEVO CÁLCULO FINANCIERO 80/20 ---
     function calcularPrevisualizacionFinanzas(recaudado, juego) {
         const montoRec = parseFloat(recaudado) || 0;
         const casaVal = document.getElementById('casa-valor');
         const domVal = document.getElementById('domingo-valor');
         if (!casaVal || !domVal) return;
+
         if (juego === 'mini') {
             casaVal.textContent = (montoRec * 0.25).toFixed(2) + " BS";
             domVal.textContent = "0.00 BS";
         } else {
+            // DÍA/TARDE: 20% Casa, 5% Domingo, 75% Premio
             casaVal.textContent = (montoRec * 0.20).toFixed(2) + " BS";
             domVal.textContent = (montoRec * 0.05).toFixed(2) + " BS";
+            
+            const totalPremio = montoRec * 0.75;
+            const p1_80 = totalPremio * 0.80;
+            const p2_20 = totalPremio * 0.20;
+            
+            console.log(`Distribución ${juego}: P1(80%)=${p1_80.toFixed(2)} | P2(20%)=${p2_20.toFixed(2)}`);
         }
     }
 
@@ -300,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let nombre = "CLIENTE", refe = "";
 
         lineas.forEach(l => {
-            // Buscamos números o la letra O/00
             const m = l.match(/\b(\d{1,2}|O)\b/gi);
             if (m && m.length >= tamaño) {
                 for (let i = 0; i < m.length; i += tamaño) {
@@ -363,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const numRaw = document.getElementById('numero-ganador').value.trim();
         
-        // REGLA APLICADA: 0 es O, 00 es 00
+        // REGLA: 0 es O, 00 es 00
         let numFinal;
         if (numRaw === "0") {
             numFinal = "O";
