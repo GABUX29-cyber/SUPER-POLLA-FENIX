@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ----------------------------------------------------------------
     // PARTE 1: Configuración Maestra (Horarios, Ruletas y Reglas)
     // ----------------------------------------------------------------
-    let resultadosAdmin = [];
+    let resultadosAdmin = ""; // Ahora es un String que viene de la columna 'numeros'
     let participantesData = [];
     let finanzasData = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 }; 
     let resultadosDelDiaSet = [];
@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             aciertos: 5,
             size: 5
         },
+        // Cambiado de 'normal' a 'tarde' según lo acordado
         tarde: {
             titulo: "SORTEO TARDE",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
@@ -60,16 +61,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { ruletas, horas } = config;
 
         const mapa = {};
-        resultadosAdmin.forEach(res => {
-            if (res.sorteo) {
-                const partes = res.sorteo.toUpperCase().trim().split(' ');
-                const hora = partes.pop(); 
-                const nombreRuleta = partes.join(' '); 
-                
-                if (!mapa[nombreRuleta]) mapa[nombreRuleta] = {};
-                mapa[nombreRuleta][hora] = res.numero;
-            }
-        });
+
+        // Procesamos la cadena de texto que viene de la columna 'numeros'
+        if (resultadosAdmin && resultadosAdmin.trim() !== "") {
+            const items = resultadosAdmin.split(',');
+            items.forEach(item => {
+                // El formato guardado es "RULETA HORA: NUMERO"
+                const partesSeparadoras = item.split(':');
+                if (partesSeparadoras.length === 2) {
+                    const infoSorteo = partesSeparadoras[0].trim(); // Ej: "GRANJITA 3PM"
+                    const valorNumero = partesSeparadoras[1].trim(); // Ej: "25"
+                    
+                    const partesInfo = infoSorteo.split(' ');
+                    const hora = partesInfo.pop(); // Saca "3PM"
+                    const nombreRuleta = partesInfo.join(' '); // Queda "GRANJITA"
+                    
+                    if (!mapa[nombreRuleta]) mapa[nombreRuleta] = {};
+                    mapa[nombreRuleta][hora] = valorNumero;
+                }
+            });
+        }
 
         let tablaHTML = `
             <div class="tabla-resultados-wrapper">
@@ -117,19 +128,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             if (typeof _supabase === 'undefined') {
                 console.error("Supabase no inicializado.");
-                inicializarSistema();
                 return;
             }
 
+            // Peticiones optimizadas a la nueva estructura de tablas
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
                 _supabase.from('jugadas').select('*').eq('juego', juegoActual),
-                _supabase.from('resultados').select('*').eq('juego', juegoActual),
+                _supabase.from('resultados').select('numeros').eq('juego', juegoActual).single(),
                 _supabase.from('finanzas').select('*').eq('juego', juegoActual).single()
             ]);
 
             participantesData = respJugadas.data || [];
-            resultadosAdmin = respResultados.data || [];
-            resultadosDelDiaSet = resultadosAdmin.map(res => String(res.numero).trim());
+            
+            // Extraemos la cadena de números y creamos el Set para el Ranking
+            if (respResultados.data && respResultados.data.numeros) {
+                resultadosAdmin = respResultados.data.numeros;
+                // Extraer solo los números (después del :) para comparar aciertos
+                resultadosDelDiaSet = resultadosAdmin.split(',').map(item => {
+                    const partes = item.split(':');
+                    return partes[1] ? partes[1].trim() : null;
+                }).filter(n => n !== null);
+            } else {
+                resultadosAdmin = "";
+                resultadosDelDiaSet = [];
+            }
 
             if (respFinanzas.data) finanzasData = respFinanzas.data;
 
@@ -155,10 +177,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const term = filtro.toLowerCase();
         
         const ranking = participantesData.map(p => {
-            const campoJugada = p.numeros_jugados || p.jugadas || "";
+            const campoJugada = p.numeros_jugados || "";
             const jugadas = campoJugada ? campoJugada.split(',') : [];
             let aciertos = 0;
-            jugadas.forEach(n => { if(resultadosDelDiaSet.includes(n.trim())) aciertos++; });
+            jugadas.forEach(n => { 
+                if(resultadosDelDiaSet.includes(n.trim().padStart(2, '0'))) aciertos++; 
+            });
             return { ...p, jugadasArray: jugadas, aciertos };
         }).sort((a, b) => b.aciertos - a.aciertos);
 
@@ -169,9 +193,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 let jugadasHTML = '';
                 for (let i = 0; i < jugadaSize; i++) {
-                    const num = p.jugadasArray[i] ? p.jugadasArray[i].trim() : '--';
-                    const esHit = (num !== '--' && resultadosDelDiaSet.includes(num));
-                    jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${num}</span></td>`;
+                    const numRaw = p.jugadasArray[i] ? p.jugadasArray[i].trim().padStart(2, '0') : '--';
+                    const esHit = (numRaw !== '--' && resultadosDelDiaSet.includes(numRaw));
+                    jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${numRaw}</span></td>`;
                 }
 
                 const tr = document.createElement('tr');
