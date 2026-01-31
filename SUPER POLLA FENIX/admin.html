@@ -21,23 +21,12 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- NUEVO ESTILO PARA EL SELECTOR DE JUEGO --- */
-        .game-selector-container {
-            background: #fdd835;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        #select-juego-admin {
-            width: 100%;
-            max-width: 400px;
-            padding: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border: 2px solid #333;
-            border-radius: 6px;
+        /* --- AJUSTE PARA LA CÁPSULA OSCURA TIPO IMAGEN --- */
+        .tabs-fenix-container.admin-style {
+            background-color: #333 !important; /* Fondo oscuro como la imagen */
+            border: 2px solid #fdd835; /* Borde amarillo resaltado */
+            padding: 8px;
+            margin-top: 10px;
         }
 
         #paste-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
@@ -89,19 +78,23 @@
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
         </header>
 
-        <div class="tabs-fenix-container no-print">
-            <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')">POLLA DÍA</div>
-            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'tarde')">POLLA TARDE</div>
-            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'mini')">MICRO</div>
+        <div class="tabs-fenix-container admin-style no-print">
+            <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')">
+                SUPER POLLA FENIX (DIA)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'tarde')">
+                SUPER POLLA FENIX (TARDE)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'mini')">
+                MINI EXPRES FENIX
+            </div>
         </div>
 
-        <div class="game-selector-container" style="display: none;"> <label for="select-juego-admin" style="display: block; margin-bottom: 5px; font-weight: bold;">SELECCIONE EL JUEGO A GESTIONAR:</label>
-            <select id="select-juego-admin">
-                <option value="dia">SUPER POLLA FENIX DÍA (5 Aciertos)</option>
-                <option value="tarde">SUPER POLLA FENIX TARDE (5 Aciertos)</option>
-                <option value="mini">MINI EXPRES FENIX (3 Aciertos)</option>
-            </select>
-        </div>
+        <select id="select-juego-admin" style="display: none;">
+            <option value="dia">dia</option>
+            <option value="tarde">tarde</option>
+            <option value="mini">mini</option>
+        </select>
 
         <div class="admin-section">
             <h2>💵 Finanzas y Ventas</h2>
@@ -139,8 +132,7 @@
             <h2>🔢 Resultados del Sorteo</h2>
             <form id="form-resultados">
                 <label for="sorteo-hora">Sorteo y Hora (Se actualiza según el juego):</label>
-                <select id="sorteo-hora" required>
-                    </select>
+                <select id="sorteo-hora" required></select>
                 
                 <label for="numero-ganador">Número Ganador:</label>
                 <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
@@ -188,12 +180,11 @@
     </div>
 
     <script>
+        // Función para manejar el cambio visual de las cápsulas
         function seleccionarJuegoAdminPill(elemento, juego) {
-            // Actualizar clase activa visualmente
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
 
-            // Actualizar el select oculto y disparar evento
             const selector = document.getElementById('select-juego-admin');
             if (selector) {
                 selector.value = juego;
