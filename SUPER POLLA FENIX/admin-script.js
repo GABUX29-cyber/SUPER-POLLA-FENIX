@@ -184,23 +184,31 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarInterfazFinanzas(juegoActivo);
 
         try {
-            // CAMBIO: Ahora carga las jugadas ordenadas por nro_ticket del espacio correspondiente
-            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('nro_ticket', { ascending: true });
+            // CAMBIO: Ahora carga las jugadas con conteo incluido
+            const { data: p, count: conteoReal } = await _supabase.from('jugadas').select('*', { count: 'exact' }).eq('juego', juegoActivo).order('nro_ticket', { ascending: true });
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).maybeSingle();
             const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).maybeSingle();
 
             participantes = p || [];
             resultadosActuales = r ? r.numeros : ""; 
             
+            // Asignamos el conteo de la base de datos al campo de ventas (readonly)
+            document.getElementById('input-ventas').value = conteoReal || 0;
+
             if (f) {
                 finanzas = f;
-                document.getElementById('input-ventas').value = f.ventas || 0;
                 document.getElementById('input-recaudado').value = f.recaudado || 0;
                 document.getElementById('input-acumulado1').value = f.acumulado1 || 0;
                 if (document.getElementById('input-acumulado2')) {
                     document.getElementById('input-acumulado2').value = f.acumulado2 || 0;
                 }
                 calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
+            } else {
+                // Reset de campos si no hay finanzas guardadas
+                document.getElementById('input-recaudado').value = 0;
+                document.getElementById('input-acumulado1').value = 0;
+                if (document.getElementById('input-acumulado2')) document.getElementById('input-acumulado2').value = 0;
+                calcularPrevisualizacionFinanzas(0, juegoActivo);
             }
             renderizarListas();
         } catch (e) { console.error(e); }
@@ -210,14 +218,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const contAcumu2 = document.getElementById('container-acumu2');
         const cardDomingo = document.getElementById('card-domingo');
         const labelCasa = document.getElementById('label-porcentaje-casa');
+        const labelAcumu1 = document.getElementById('label-acumu1');
+        const labelAcumu2 = document.getElementById('label-acumu2');
+
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
             if (cardDomingo) cardDomingo.style.display = 'none';
             if (labelCasa) labelCasa.textContent = "25% CASA";
+            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Día Anterior:";
         } else {
             if (contAcumu2) contAcumu2.style.display = 'block';
             if (cardDomingo) cardDomingo.style.display = 'block';
             if (labelCasa) labelCasa.textContent = "20% CASA";
+            if (labelAcumu1) labelAcumu1.textContent = "Acumulado Primer Premio:";
+            if (labelAcumu2) labelAcumu2.textContent = "Acumulado Segundo Premio:";
         }
     }
 
@@ -233,10 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             casaVal.textContent = (montoRec * 0.20).toFixed(2) + " BS";
             domVal.textContent = (montoRec * 0.05).toFixed(2) + " BS";
-            const totalPremio = montoRec * 0.75;
-            const p1_80 = totalPremio * 0.80;
-            const p2_20 = totalPremio * 0.20;
-            console.log(`Distribución ${juego}: P1(80%)=${p1_80.toFixed(2)} | P2(20%)=${p2_20.toFixed(2)}`);
         }
     }
 
@@ -261,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         listaPart.innerHTML = '';
         const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
 
-        // CAMBIO: Ahora mostramos p.nro_ticket para que el número sea fijo por juego
         participantes.filter(p => 
             p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
         ).forEach((p) => {
@@ -320,6 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('form-finanzas').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
+        
+        // Ventas se envía pero es el valor que ya está en el input readonly
         const dataFinanzas = {
             juego: juego,
             ventas: parseInt(document.getElementById('input-ventas').value) || 0,
@@ -332,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else { alert("✅ Finanzas actualizadas."); cargarDatosDesdeNube(); }
     });
 
-    // --- CAMBIO CLAVE: FORMULARIO DE PARTICIPANTE CON NRO_TICKET ---
     document.getElementById('form-participante').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
@@ -343,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(!refeVal) return alert("El REFE es obligatorio");
 
-        // 1. Obtener el último nro_ticket de este juego para seguir la secuencia
         const { data: ultimas } = await _supabase
             .from('jugadas')
             .select('nro_ticket')
@@ -362,16 +371,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     numeros_jugados: proc.numeros, 
                     juego: juego, 
                     notas_correccion: proc.nota,
-                    nro_ticket: proximoTicket // Asignamos el número de este espacio
+                    nro_ticket: proximoTicket
                 }]);
                 
-                if (!error) proximoTicket++; // Aumentamos para la siguiente jugada del mismo cliente
+                if (!error) proximoTicket++;
                 else console.error("Error al insertar:", error.message);
             }
         }
         e.target.reset();
         document.getElementById('input-paste-data').value = "";
-        cargarDatosDesdeNube();
+        cargarDatosDesdeNube(); // Al recargar aquí, el conteo de ventas se actualizará solo
     });
 
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {

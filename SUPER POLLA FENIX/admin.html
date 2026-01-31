@@ -57,6 +57,13 @@
         .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .login-card button { width: 100%; padding: 12px; background: #fdd835; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         #contenido-principal { display: none; }
+        
+        /* Estilo para campo bloqueado de ventas */
+        #input-ventas[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -99,17 +106,17 @@
         <div class="admin-section">
             <h2>💵 Finanzas y Ventas</h2>
             <form id="form-finanzas">
-                <label for="input-ventas">Total Ventas (Tickets):</label>
-                <input type="number" id="input-ventas" min="0" value="0" required>
+                <label for="input-ventas">Total Ventas (Tickets - Automático):</label>
+                <input type="number" id="input-ventas" value="0" readonly>
                 
                 <label for="input-recaudado">Recaudado (Bs.):</label>
                 <input type="number" id="input-recaudado" step="0.01" value="0.00" required>
                 
-                <label for="input-acumulado1" id="label-acumu1">Acumulado Primer Lugar:</label>
+                <label for="input-acumulado1" id="label-acumu1">Acumulado Primer Premio:</label>
                 <input type="number" id="input-acumulado1" step="0.01" value="0.00" required>
 
                 <div id="container-acumu2">
-                    <label for="input-acumulado2">Acumulado Segundo Lugar:</label>
+                    <label for="input-acumulado2" id="label-acumu2">Acumulado Segundo Premio:</label>
                     <input type="number" id="input-acumulado2" step="0.01" value="0.00">
                 </div>
                 
@@ -180,7 +187,7 @@
     </div>
 
     <script>
-        // Función para manejar el cambio visual de las cápsulas
+        // Función para manejar el cambio visual y etiquetas dinámicas en Admin
         function seleccionarJuegoAdminPill(elemento, juego) {
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
@@ -189,6 +196,20 @@
             if (selector) {
                 selector.value = juego;
                 selector.dispatchEvent(new Event('change'));
+            }
+
+            // CAMBIO DINÁMICO DE ETIQUETAS EN EL PANEL
+            const labelAcumu1 = document.getElementById('label-acumu1');
+            const labelAcumu2 = document.getElementById('label-acumu2');
+            const containerAcumu2 = document.getElementById('container-acumu2');
+
+            if (juego === 'mini') {
+                labelAcumu1.textContent = "Acumulado Día Anterior:";
+                containerAcumu2.style.display = "none"; // Mini no usa 2do acumulado
+            } else {
+                labelAcumu1.textContent = "Acumulado Primer Premio:";
+                labelAcumu2.textContent = "Acumulado Segundo Premio:";
+                containerAcumu2.style.display = "block";
             }
         }
     </script>

@@ -142,7 +142,7 @@
                 <div class="est-mini acumulado" id="box-acumu2">
                     <i class="fas fa-medal"></i>
                     <span class="val-mini" id="acumulado2">0.00 BS</span>
-                    <label>Acumu 2do Lugar</label>
+                    <label id="label-acumu2">Acumu 2do Lugar</label>
                 </div>
 
                 <div class="est-mini ganadores-box-item" id="box-total-1" style="grid-column: span 2; background: #fff9c4; color: #333; border: 2px solid #fbc02d;">
@@ -154,7 +154,7 @@
                 <div class="est-mini ganadores-box-item" id="box-total-2" style="grid-column: span 2; background: #e3f2fd; color: #333; border: 2px solid #1976d2;">
                     <i class="fas fa-star-half-alt"></i>
                     <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
-                    <label>TOTAL PREMIO 2DO LUGAR</label>
+                    <label id="label-total2">TOTAL PREMIO 2DO LUGAR</label>
                 </div>
 
                 <div class="est-mini ganadores-box-item" style="background: #e8f5e9; color: #2e7d32;">
@@ -195,7 +195,7 @@
                         </tr>
                     </thead>
                     <tbody id="ranking-body">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -222,6 +222,22 @@
                 selectReal.value = juego;
                 // 4. Disparar evento de cambio para que script.js detecte que debe recargar datos
                 selectReal.dispatchEvent(new Event('change'));
+            }
+
+            // 5. AJUSTE DE ETIQUETAS DINÁMICAS (PÚBLICO)
+            const labelAcumu1 = document.getElementById('label-acumu1');
+            const labelTotal1 = document.getElementById('label-total1');
+            const labelTotal2 = document.getElementById('label-total2');
+            const labelAcumu2 = document.getElementById('label-acumu2');
+
+            if (juego === 'mini') {
+                labelAcumu1.textContent = "Acumu Día Anterior";
+                labelTotal1.textContent = "TOTAL PREMIO ÚNICO";
+            } else {
+                labelAcumu1.textContent = "Acumu 1er Premio";
+                labelAcumu2.textContent = "Acumu 2do Premio";
+                labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
+                labelTotal2.textContent = "TOTAL PREMIO 2DO LUGAR";
             }
         }
     </script>

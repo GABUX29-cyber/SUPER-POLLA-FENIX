@@ -133,14 +133,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
         try {
-            // CAMBIO: Ahora filtramos por juegoActual y ordenamos por nro_ticket
+            // CAMBIO: Ahora contamos tickets automáticamente con count: 'exact'
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
-                _supabase.from('jugadas').select('*').eq('juego', juegoActual).order('nro_ticket', { ascending: true }),
+                _supabase.from('jugadas').select('*', { count: 'exact' }).eq('juego', juegoActual).order('nro_ticket', { ascending: true }),
                 _supabase.from('resultados').select('numeros').eq('juego', juegoActual).maybeSingle(),
                 _supabase.from('finanzas').select('*').eq('juego', juegoActual).maybeSingle()
             ]);
 
             participantesData = respJugadas.data || [];
+            // Guardamos el conteo real de la base de datos
+            const conteoTickets = respJugadas.count || 0;
             
             if (respResultados.data && respResultados.data.numeros) {
                 resultadosAdmin = respResultados.data.numeros;
@@ -153,7 +155,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resultadosDelDiaSet = [];
             }
 
+            // Actualizamos finanzasData inyectando el conteo automático de ventas
             finanzasData = respFinanzas.data || { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
+            finanzasData.ventas = conteoTickets; // Usamos el conteo de registros real
+
             inicializarSistema();
         } catch (error) {
             console.error("Error cargando datos:", error);
@@ -223,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 5: Cálculos Financieros (NUEVA REGLA 80/20)
+    // PARTE 5: Cálculos Financieros y Etiquetas Dinámicas
     // ----------------------------------------------------------------
 
     function actualizarFinanzasYEstadisticas() {
@@ -247,16 +252,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const boxAc2 = document.getElementById('box-acumu2');
         const boxTotal2 = document.getElementById('box-total-2');
         const labelCasa = document.getElementById('label-casa');
+        const labelAcumu1 = document.getElementById('label-acumu1');
+        const labelTotal1 = document.getElementById('label-total1');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
         if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
-        if(labelCasa) labelCasa.textContent = esMini ? "25% Casa" : "20% Casa";
         
+        // AJUSTE DINÁMICO DE ETIQUETAS
         if (esMini) {
+            if(labelCasa) labelCasa.textContent = "25% Casa";
+            if(labelAcumu1) labelAcumu1.textContent = "Acumu Día Anterior";
+            if(labelTotal1) labelTotal1.textContent = "TOTAL PREMIO ÚNICO";
             if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.25);
             if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartirTotal75 + acumu1);
         } else {
+            if(labelCasa) labelCasa.textContent = "20% Casa";
+            if(labelAcumu1) labelAcumu1.textContent = "Acumu 1er Premio";
+            if(labelTotal1) labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
+            
             const premio1DelDia = repartirTotal75 * 0.80;
             const premio2DelDia = repartirTotal75 * 0.20;
 
