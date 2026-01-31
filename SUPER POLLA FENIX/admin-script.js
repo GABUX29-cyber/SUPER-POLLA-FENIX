@@ -41,23 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO ---
     let participantes = [];
     let resultadosActuales = "";
-    // Estructura de finanzas ampliada para soportar el segundo acumulado
     let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
 
     const reglasJuegos = {
         'dia': {
             tamaño: 5,
-            ruletas: ["GRANJITA", "GUACHARO", "SELVA", "LOTTO ACTIVO"],
+            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
         'normal': {
             tamaño: 5,
-            ruletas: ["GRANJITA", "GUACHARO", "SELVA", "LOTTO ACTIVO"],
+            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
         },
         'mini': {
             tamaño: 3,
-            ruletas: ["GRANJITA", "SELVA", "LOTTO ACTIVO"],
+            ruletas: ["GRANJITA", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["5PM", "6PM", "7PM"]
         }
     };
@@ -139,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const nuevaLista = listaArray.join(',');
             const { error } = await _supabase
                 .from('resultados')
-                .update({ numeros: nuevaLista })
+                .update({ numeros: nuevaLista }) // Columna 'numeros' unificada
                 .eq('juego', juego);
 
             if (error) alert("Error: " + error.message);
@@ -162,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).single();
 
             participantes = p || [];
-            resultadosActuales = r ? r.numeros : "";
+            resultadosActuales = r ? r.numeros : ""; // Lee de columna 'numeros'
             
             if (f) {
                 finanzas = f;
@@ -174,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
             } else {
-                document.getElementById('form-finanzas').reset();
+                if(document.getElementById('form-finanzas')) document.getElementById('form-finanzas').reset();
                 calcularPrevisualizacionFinanzas(0, juegoActivo);
             }
 
@@ -206,6 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const casaVal = document.getElementById('casa-valor');
         const domVal = document.getElementById('domingo-valor');
 
+        if (!casaVal || !domVal) return;
+
         if (juego === 'mini') {
             casaVal.textContent = (montoRec * 0.25).toFixed(2) + " BS";
             domVal.textContent = "0.00 BS";
@@ -217,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function actualizarOpcionesSorteo(juego) {
         const selectSorteo = document.getElementById('sorteo-hora');
+        if(!selectSorteo) return;
         selectSorteo.innerHTML = '';
         const conf = reglasJuegos[juego];
         conf.ruletas.forEach(r => {
@@ -231,17 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderizarListas() {
         const listaPart = document.getElementById('lista-participantes');
+        if(!listaPart) return;
         listaPart.innerHTML = '';
         const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
 
         participantes.filter(p => 
             p.nombre.toLowerCase().includes(filtro) || 
-            p.refe.toString().includes(filtro)
+            (p.refe && p.refe.toString().includes(filtro))
         ).forEach(p => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <div style="flex-grow:1;">
-                    <strong>${p.nombre}</strong> (Refe: ${p.refe})<br>
+                    <strong>${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
                     <small>${p.numeros_jugados}</small> 
                     ${p.notas_correccion ? '<br><i style="color:red; font-size: 12px;">'+p.notas_correccion+'</i>' : ''}
                 </div>
@@ -253,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const listaRes = document.getElementById('lista-resultados');
+        if(!listaRes) return;
         listaRes.innerHTML = resultadosActuales ? 
             resultadosActuales.split(',').map(n => `
                 <li>
@@ -341,13 +345,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const num = document.getElementById('numero-ganador').value.trim().padStart(2, '0');
         
-        // Formato: "Ruleta Hora: Numero"
+        // Formato unificado: "RULETA HORA: NUMERO"
         let nuevoItem = `${horaSorteo}: ${num}`;
         let nuevaLista = resultadosActuales ? `${resultadosActuales},${nuevoItem}` : nuevoItem;
         
         const { error } = await _supabase.from('resultados').upsert({ 
             juego: juego, 
-            numeros: nuevaLista 
+            numeros: nuevaLista // Columna 'numeros' unificada
         }, { onConflict: 'juego' });
 
         if (error) alert("Error: " + error.message);
