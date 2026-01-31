@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             aciertos: 5,
             size: 5
         },
-        tarde: {
+        tarde: { // CAMBIO: Antes decía 'normal'
             titulo: "SUPER POLLA FENIX (TARDE)",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["3PM", "4PM", "5PM", "6PM", "7PM"],
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking y Verificación (Lógica 0 -> O corregida)
+    // PARTE 4: Ranking y Verificación (Conteo dinámico aplicado)
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {

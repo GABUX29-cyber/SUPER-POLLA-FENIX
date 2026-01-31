@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
-        'tarde': { 
+        'tarde': { // CAMBIO: Antes decía 'normal'
             tamaño: 5,
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
@@ -269,15 +269,16 @@ document.addEventListener('DOMContentLoaded', () => {
         listaPart.innerHTML = '';
         const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
 
+        // CAMBIO APLICADO: Ahora usa el index para que el NRO sea dinámico y baje al borrar
         participantes.filter(p => 
             p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
-        ).forEach(p => {
+        ).forEach((p, index) => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <div style="flex-grow:1;">
-                    <strong>${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
+                    <strong>#${index + 1} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
                     <small>${p.numeros_jugados}</small> 
-                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
+                    ${p.notes_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
                 </div>
                 <div style="display: flex; gap: 5px;">
                     <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">✏️</button>
