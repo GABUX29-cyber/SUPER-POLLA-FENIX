@@ -17,26 +17,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const CONFIG_JUEGOS = {
         dia: {
             titulo: "SORTEO DÍA",
-            ruletas: ["LOTTO ACTIVO", "LA GRANJITA", "SELVA PLUS", "EL GUACHARO"],
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["8AM", "9AM", "10AM", "11AM", "12PM"],
             aciertos: 5,
             size: 5
         },
         tarde: {
             titulo: "SORTEO TARDE",
-            ruletas: ["LOTTO ACTIVO", "LA GRANJITA", "SELVA PLUS", "EL GUACHARO"],
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["3PM", "4PM", "5PM", "6PM", "7PM"],
             aciertos: 5,
             size: 5
         },
         mini: {
             titulo: "MINI EXPRES",
-            ruletas: ["LOTTO ACTIVO", "LA GRANJITA", "SELVA PLUS"],
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS"],
             horas: ["5PM", "6PM", "7PM"],
             aciertos: 3,
             size: 3
         }
     };
+
+    // --- FUNCIÓN PARA LA FECHA (Ejecución Inmediata) ---
+    function establecerFechaReal() {
+        const headerP = document.getElementById('fecha-actual');
+        if (headerP) {
+            const ahora = new Date();
+            const opciones = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+            headerP.innerHTML = `<i class="fas fa-calendar-alt"></i> ${ahora.toLocaleDateString('es-ES', opciones)}`;
+        }
+    }
 
     // ----------------------------------------------------------------
     // PARTE 2: Renderizado Dinámico del Cuadro de Resultados
@@ -49,14 +59,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const config = CONFIG_JUEGOS[juegoActual];
         const { ruletas, horas } = config;
 
-        // Mapeo: mapa["Nombre Ruleta"]["Hora"] = Numero
         const mapa = {};
         resultadosAdmin.forEach(res => {
-            const partes = res.sorteo.split(' ');
-            const hora = partes.pop(); 
-            const nombreRuleta = partes.join(' ');
-            if (!mapa[nombreRuleta]) mapa[nombreRuleta] = {};
-            mapa[nombreRuleta][hora] = res.numero;
+            if (res.sorteo) {
+                const partes = res.sorteo.toUpperCase().trim().split(' ');
+                const hora = partes.pop(); 
+                const nombreRuleta = partes.join(' '); 
+                
+                if (!mapa[nombreRuleta]) mapa[nombreRuleta] = {};
+                mapa[nombreRuleta][hora] = res.numero;
+            }
         });
 
         let tablaHTML = `
@@ -86,10 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 3: Carga de Datos y Lógica de Negocio
+    // PARTE 3: Carga de Datos
     // ----------------------------------------------------------------
 
     async function cargarDatosDesdeNube() {
+        establecerFechaReal();
+        
         juegoActual = selectorJuego ? selectorJuego.value : 'dia';
         const config = CONFIG_JUEGOS[juegoActual];
         
@@ -101,25 +115,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
         try {
-            // Ajusta los nombres de tus tablas si son diferentes en Supabase ('jugadas' vs 'participantes')
-            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActual);
-            const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActual);
-            const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActual).single();
+            if (typeof _supabase === 'undefined') {
+                console.error("Supabase no inicializado.");
+                inicializarSistema();
+                return;
+            }
 
-            participantesData = p || [];
-            resultadosAdmin = r || [];
-            resultadosDelDiaSet = resultadosAdmin.map(res => String(res.numero));
+            const [respJugadas, respResultados, respFinanzas] = await Promise.all([
+                _supabase.from('jugadas').select('*').eq('juego', juegoActual),
+                _supabase.from('resultados').select('*').eq('juego', juegoActual),
+                _supabase.from('finanzas').select('*').eq('juego', juegoActual).single()
+            ]);
 
-            if (f) finanzasData = f;
+            participantesData = respJugadas.data || [];
+            resultadosAdmin = respResultados.data || [];
+            resultadosDelDiaSet = resultadosAdmin.map(res => String(res.numero).trim());
+
+            if (respFinanzas.data) finanzasData = respFinanzas.data;
 
             inicializarSistema();
         } catch (error) {
-            console.error("Error cargando Supabase:", error);
+            console.error("Error en conexión:", error);
+            inicializarSistema();
         }
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking de Participantes
+    // PARTE 4: Ranking y Finanzas
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {
@@ -133,8 +155,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const term = filtro.toLowerCase();
         
         const ranking = participantesData.map(p => {
-            // Nota: Se usa 'numeros_jugados' basado en tu código previo
-            const jugadas = p.numeros_jugados ? p.numeros_jugados.split(',') : [];
+            const campoJugada = p.numeros_jugados || p.jugadas || "";
+            const jugadas = campoJugada ? campoJugada.split(',') : [];
             let aciertos = 0;
             jugadas.forEach(n => { if(resultadosDelDiaSet.includes(n.trim())) aciertos++; });
             return { ...p, jugadasArray: jugadas, aciertos };
@@ -142,13 +164,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let totalGanadores = 0;
         ranking.forEach((p, index) => {
-            if (p.nombre.toLowerCase().includes(term) || p.refe.toString().includes(term)) {
+            if (p.nombre.toLowerCase().includes(term) || (p.refe && p.refe.toString().includes(term))) {
                 if (p.aciertos >= aciertosObjetivo) totalGanadores++;
 
                 let jugadasHTML = '';
                 for (let i = 0; i < jugadaSize; i++) {
                     const num = p.jugadasArray[i] ? p.jugadasArray[i].trim() : '--';
-                    const esHit = resultadosDelDiaSet.includes(num) && num !== '--';
+                    const esHit = (num !== '--' && resultadosDelDiaSet.includes(num));
                     jugadasHTML += `<td><span class="ranking-box ${esHit ? 'hit' : ''}">${num}</span></td>`;
                 }
 
@@ -156,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td class="nombre-participante">${p.nombre}</td>
-                    <td>${p.refe}</td>
+                    <td>${p.refe || 'N/A'}</td>
                     ${jugadasHTML}
                     <td>${p.aciertos >= aciertosObjetivo ? 
                         '<span class="ganador-final">GANADOR 🏆</span>' : 
@@ -181,19 +203,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartir75);
 
         const esMini = juegoActual === 'mini';
-        
-        // Ajustar visibilidad de cajas de premios adicionales
         const boxDom = document.getElementById('box-domingo');
         const boxAc2 = document.getElementById('box-acumu2');
+        
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
         
         if(!esMini && document.getElementById('monto-domingo')) 
             document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
         
-        document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
-        document.getElementById('label-casa').textContent = esMini ? "25% Casa" : "20% Casa";
-        document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
+        if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(esMini ? rec * 0.25 : rec * 0.20);
+        if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartir75 + acumu1);
     }
 
     function inicializarSistema() {
@@ -202,11 +222,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderRanking();
     }
 
-    // Eventos de usuario
+    // --- EVENTOS ---
     selectorJuego?.addEventListener('change', cargarDatosDesdeNube);
     document.getElementById('filtroParticipantes')?.addEventListener('input', (e) => renderRanking(e.target.value.trim()));
     document.getElementById('btn-descargar-pdf')?.addEventListener('click', () => window.print());
 
-    // Carga inicial al abrir la página
+    // Inicio
+    establecerFechaReal();
     cargarDatosDesdeNube();
 });
