@@ -7,6 +7,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* --- ESTILOS PARA LOS BOTONES OVALADOS (TABS) --- */
+        .tabs-fenix-container {
+            display: flex;
+            background-color: rgba(255, 204, 0, 0.15); /* Fondo amarillento suave estilo cápsula */
+            border-radius: 50px;
+            padding: 6px;
+            width: fit-content;
+            margin: 20px auto;
+            border: 2px solid #fbc02d;
+            gap: 5px;
+        }
+
+        .tab-pill {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 800;
+            color: #5d4037; /* Marrón oscuro para legibilidad */
+            transition: all 0.3s ease;
+            font-size: 13px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Estado activo: Fondo blanco y texto resaltado */
+        .tab-pill.active {
+            background-color: #ffffff;
+            color: #d32f2f; /* Rojo Fénix */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-pill:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (PDF) --- */
+        @media print {
+            .no-print, 
+            .tabs-fenix-container, 
+            #btn-descargar-pdf, 
+            .filtro-container,
+            header h1::after { 
+                display: none !important; 
+            }
+            
+            body { background-color: white !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        }
+    </style>
 </head>
 <body>
 
@@ -15,16 +65,25 @@
         <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
     </header>
 
-    <div class="card-container full-width">
-        <div class="card" style="background-color: #fdd835; padding: 15px;">
-            <label for="select-juego-publico" style="font-weight: 800; color: #333; display: block; margin-bottom: 10px; text-transform: uppercase;">Selecciona el Juego a Consultar:</label>
-            <select id="select-juego-publico" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #333; font-family: 'Montserrat'; font-weight: 700;">
-                <option value="dia">SUPER POLLA FENIX DÍA (5 Aciertos)</option>
-                <option value="tarde" selected>SUPER POLLA FENIX TARDE (5 Aciertos)</option>
-                <option value="mini">MINI EXPRES FENIX (3 Aciertos)</option>
-            </select>
+    <div class="card-container full-width no-print">
+        <div class="tabs-fenix-container">
+            <div class="tab-pill active" onclick="seleccionarJuegoPill(this, 'dia')">
+                SUPER POLLA FENIX (DIA)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'tarde')">
+                SUPER POLLA FENIX (TARDE)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'mini')">
+                MINI EXPRES FENIX
+            </div>
         </div>
     </div>
+
+    <select id="select-juego-publico" style="display: none;">
+        <option value="dia">dia</option>
+        <option value="tarde" selected>tarde</option>
+        <option value="mini">mini</option>
+    </select>
     
     <div class="card-container full-width">
         <div class="card">
@@ -104,13 +163,13 @@
         </div>
     </div>
 
-    <div style="margin-bottom: 20px; text-align: center;">
+    <div style="margin-bottom: 20px; text-align: center;" class="no-print">
         <button id="btn-descargar-pdf">
             <i class="fas fa-file-pdf"></i> Descargar Reporte de Resultados / Imprimir
         </button>
     </div>
 
-    <div class="filtro-container">
+    <div class="filtro-container no-print">
         <div class="filtro-input-wrapper">
             <i class="fas fa-search"></i>
             <input type="text" id="filtroParticipantes" class="filtro-input" placeholder="🔍 Buscar tu nombre o código REFE...">
@@ -145,5 +204,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
+    <script>
+        // FUNCIÓN PARA MANEJAR EL CLIC EN LOS BOTONES OVALADOS
+        function seleccionarJuegoPill(elemento, juego) {
+            // Actualizar interfaz visual
+            document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            elemento.classList.add('active');
+
+            // Cambiar valor en el select oculto
+            const selectReal = document.getElementById('select-juego-publico');
+            if (selectReal) {
+                selectReal.value = juego;
+                // Disparar el evento 'change' para que el script.js original cargue los datos
+                selectReal.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
 </body>
 </html>

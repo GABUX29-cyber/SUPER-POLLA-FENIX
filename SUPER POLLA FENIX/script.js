@@ -14,6 +14,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const selectorJuego = document.getElementById('select-juego-publico');
 
+    // --- NUEVA FUNCIÓN PARA LOS BOTONES OVALADOS ---
+    // Esta función vincula los botones visuales con tu lógica de Supabase
+    window.seleccionarJuegoPill = function(elemento, juego) {
+        // 1. Actualizar apariencia visual de los botones
+        document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+        elemento.classList.add('active');
+
+        // 2. Sincronizar con el select (aunque esté oculto) y disparar la carga
+        if (selectorJuego) {
+            selectorJuego.value = juego;
+            // Disparamos el evento 'change' que ya tienes configurado abajo
+            selectorJuego.dispatchEvent(new Event('change'));
+        }
+    };
+
     const CONFIG_JUEGOS = {
         dia: {
             titulo: "SORTEO DÍA",
@@ -22,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             aciertos: 5,
             size: 5
         },
-        // Cambiado de 'normal' a 'tarde' según lo acordado
+        // Cambiado de 'normal' a 'tarde' según lo acordado [cite: 2026-01-31]
         tarde: {
             titulo: "SORTEO TARDE",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],

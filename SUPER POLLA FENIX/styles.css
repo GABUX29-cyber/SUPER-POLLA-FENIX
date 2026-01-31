@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN) --- */
+/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -58,7 +58,7 @@ header p {
     box-sizing: border-box;
 }
 
-#select-juego-admin {
+#select-juego-admin, #select-juego-publico {
     width: 100%;
     max-width: 500px;
     padding: 12px;
@@ -69,6 +69,44 @@ header p {
     background-color: white;
     font-family: 'Montserrat', sans-serif;
     cursor: pointer;
+}
+
+/* ========================================================= */
+/* NUEVA SECCIÓN: DISEÑO DE CÁPSULA (TABS OVALADOS)          */
+/* ========================================================= */
+.tabs-fenix-container {
+    display: flex;
+    background-color: #fdd835;
+    border-radius: 50px;
+    padding: 6px;
+    width: fit-content;
+    margin: 0 auto 25px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    gap: 5px;
+}
+
+.tab-pill {
+    padding: 12px 28px;
+    cursor: pointer;
+    border-radius: 50px;
+    font-weight: 800;
+    color: #333;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tab-pill.active {
+    background-color: #ffffff;
+    color: #d32f2f;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tab-pill:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* ========================================================= */
@@ -606,13 +644,20 @@ footer {
     }
 
     .tabla-horarios { font-size: 0.65em; }
+
+    /* Ajuste para los botones ovalados en móvil */
+    .tab-pill {
+        padding: 10px 15px;
+        font-size: 11px;
+    }
 }
 
 /* ========================================================= */
 /* 12. ESTILOS DE IMPRESIÓN (PDF)                             */
 /* ========================================================= */
 @media print {
-    #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container {
+    /* Ocultamos los botones ovalados y el selector en el PDF */
+    #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container, .tabs-fenix-container {
         display: none !important;
     }
     
