@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
-        'tarde': { // CAMBIO: Antes decía 'normal'
+        'tarde': { 
             tamaño: 5,
             ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
@@ -76,12 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
         let numeros = numerosRaw.map(n => {
             let num = n.trim();
-            
-            // REGLA: Solo el 0 sencillo es la letra O. El 00 se queda igual.
             if (num === "0") return "O";
             if (num === "00") return "00";
-            
-            // Formatear otros números (ej: 5 -> 05)
             if (num.length === 1 && !isNaN(num)) return num.padStart(2, '0');
             return num.toUpperCase();
         }).filter(n => n !== "");
@@ -104,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
-        // GESTIÓN DE DUPLICADOS (La 'O' puede repetirse)
         let counts = {};
         let duplicadosEncontrados = [];
         numeros.forEach(n => {
@@ -189,7 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarInterfazFinanzas(juegoActivo);
 
         try {
-            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('id', { ascending: true });
+            // CAMBIO: Ahora carga las jugadas ordenadas por nro_ticket del espacio correspondiente
+            const { data: p } = await _supabase.from('jugadas').select('*').eq('juego', juegoActivo).order('nro_ticket', { ascending: true });
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).maybeSingle();
             const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).maybeSingle();
 
@@ -225,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- NUEVO CÁLCULO FINANCIERO 80/20 ---
     function calcularPrevisualizacionFinanzas(recaudado, juego) {
         const montoRec = parseFloat(recaudado) || 0;
         const casaVal = document.getElementById('casa-valor');
@@ -236,14 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
             casaVal.textContent = (montoRec * 0.25).toFixed(2) + " BS";
             domVal.textContent = "0.00 BS";
         } else {
-            // DÍA/TARDE: 20% Casa, 5% Domingo, 75% Premio
             casaVal.textContent = (montoRec * 0.20).toFixed(2) + " BS";
             domVal.textContent = (montoRec * 0.05).toFixed(2) + " BS";
-            
             const totalPremio = montoRec * 0.75;
             const p1_80 = totalPremio * 0.80;
             const p2_20 = totalPremio * 0.20;
-            
             console.log(`Distribución ${juego}: P1(80%)=${p1_80.toFixed(2)} | P2(20%)=${p2_20.toFixed(2)}`);
         }
     }
@@ -269,16 +261,16 @@ document.addEventListener('DOMContentLoaded', () => {
         listaPart.innerHTML = '';
         const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
 
-        // CAMBIO APLICADO: Ahora usa el index para que el NRO sea dinámico y baje al borrar
+        // CAMBIO: Ahora mostramos p.nro_ticket para que el número sea fijo por juego
         participantes.filter(p => 
             p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
-        ).forEach((p, index) => {
+        ).forEach((p) => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <div style="flex-grow:1;">
-                    <strong>#${index + 1} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
+                    <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
                     <small>${p.numeros_jugados}</small> 
-                    ${p.notes_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
+                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
                 </div>
                 <div style="display: flex; gap: 5px;">
                     <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">✏️</button>
@@ -340,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else { alert("✅ Finanzas actualizadas."); cargarDatosDesdeNube(); }
     });
 
+    // --- CAMBIO CLAVE: FORMULARIO DE PARTICIPANTE CON NRO_TICKET ---
     document.getElementById('form-participante').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
@@ -350,12 +343,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(!refeVal) return alert("El REFE es obligatorio");
 
+        // 1. Obtener el último nro_ticket de este juego para seguir la secuencia
+        const { data: ultimas } = await _supabase
+            .from('jugadas')
+            .select('nro_ticket')
+            .eq('juego', juego)
+            .order('nro_ticket', { ascending: false })
+            .limit(1);
+        
+        let proximoTicket = ultimas && ultimas.length > 0 ? ultimas[0].nro_ticket + 1 : 1;
+
         for (let j of jugadasRaw) {
             let proc = procesarYValidarJugada(j.split(','), nombreVal, tamaño);
             if (proc) {
-                await _supabase.from('jugadas').insert([{
-                    nombre: nombreVal, refe: refeVal, numeros_jugados: proc.numeros, juego: juego, notas_correccion: proc.nota
+                const { error } = await _supabase.from('jugadas').insert([{
+                    nombre: nombreVal, 
+                    refe: refeVal, 
+                    numeros_jugados: proc.numeros, 
+                    juego: juego, 
+                    notas_correccion: proc.nota,
+                    nro_ticket: proximoTicket // Asignamos el número de este espacio
                 }]);
+                
+                if (!error) proximoTicket++; // Aumentamos para la siguiente jugada del mismo cliente
+                else console.error("Error al insertar:", error.message);
             }
         }
         e.target.reset();
@@ -369,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const numRaw = document.getElementById('numero-ganador').value.trim();
         
-        // REGLA: 0 es O, 00 es 00
         let numFinal;
         if (numRaw === "0") {
             numFinal = "O";
@@ -388,7 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else { e.target.reset(); cargarDatosDesdeNube(); }
     });
 
-    // --- 7. REINICIO CON DOBLE CANDADO ---
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
         const confirm1 = confirm(`⚠️ ATENCIÓN CRÍTICA:\n¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`);

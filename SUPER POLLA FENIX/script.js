@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             aciertos: 5,
             size: 5
         },
-        tarde: { // CAMBIO: Antes decía 'normal'
+        tarde: {
             titulo: "SUPER POLLA FENIX (TARDE)",
             ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horas: ["3PM", "4PM", "5PM", "6PM", "7PM"],
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 3: Carga de Datos desde Supabase
+    // PARTE 3: Carga de Datos desde Supabase (Filtro por Espacio)
     // ----------------------------------------------------------------
 
     async function cargarDatosDesdeNube() {
@@ -133,8 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
         try {
+            // CAMBIO: Ahora filtramos por juegoActual y ordenamos por nro_ticket
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
-                _supabase.from('jugadas').select('*').eq('juego', juegoActual),
+                _supabase.from('jugadas').select('*').eq('juego', juegoActual).order('nro_ticket', { ascending: true }),
                 _supabase.from('resultados').select('numeros').eq('juego', juegoActual).maybeSingle(),
                 _supabase.from('finanzas').select('*').eq('juego', juegoActual).maybeSingle()
             ]);
@@ -161,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking y Verificación (Conteo dinámico aplicado)
+    // PARTE 4: Ranking y Verificación (Uso de nro_ticket)
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let totalGanadores = 0;
         
-        ranking.forEach((p, index) => {
+        ranking.forEach((p) => {
             if (p.nombre.toLowerCase().includes(term) || (p.refe && p.refe.toString().includes(term))) {
                 if (p.aciertos >= aciertosObjetivo) totalGanadores++;
 
@@ -205,8 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td class="nombre-participante">${p.nombre}</td>
+                    <td>${p.nro_ticket}</td> <td class="nombre-participante">${p.nombre}</td>
                     <td>${p.refe || 'N/A'}</td>
                     ${jugadasHTML}
                     <td>${p.aciertos >= aciertosObjetivo ? 
@@ -231,24 +231,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const acumu1 = parseFloat(finanzasData.acumulado1) || 0;
         const acumu2 = parseFloat(finanzasData.acumulado2) || 0;
         
-        // El 75% es el total a repartir entre 1er y 2do lugar
         const repartirTotal75 = rec * 0.75;
         
         const formatear = (m) => new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2}).format(m) + " BS";
         const esMini = (juegoActual === 'mini');
 
-        // Referencias a elementos UI
         if(document.getElementById('ventas')) document.getElementById('ventas').textContent = finanzasData.ventas || 0;
         if(document.getElementById('recaudado')) document.getElementById('recaudado').textContent = formatear(rec);
         if(document.getElementById('acumulado1')) document.getElementById('acumulado1').textContent = formatear(acumu1);
         if(document.getElementById('acumulado2')) document.getElementById('acumulado2').textContent = formatear(acumu2);
         
-        // El campo "Premio a Repartir" muestra el 75% bruto
         if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartirTotal75);
 
         const boxDom = document.getElementById('box-domingo');
         const boxAc2 = document.getElementById('box-acumu2');
-        const boxTotal2 = document.getElementById('box-total-2'); // Caja del total premio 2do lugar
+        const boxTotal2 = document.getElementById('box-total-2');
         const labelCasa = document.getElementById('label-casa');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
@@ -256,24 +253,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
         if(labelCasa) labelCasa.textContent = esMini ? "25% Casa" : "20% Casa";
         
-        // --- CÁLCULO ESPECÍFICO ---
         if (esMini) {
-            // MINI: Todo el 75% + Acumulado va al 1er lugar
             if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.25);
             if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartirTotal75 + acumu1);
         } else {
-            // DÍA / TARDE: Distribución 80/20
             const premio1DelDia = repartirTotal75 * 0.80;
             const premio2DelDia = repartirTotal75 * 0.20;
 
             if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.20);
             if(document.getElementById('monto-domingo')) document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
             
-            // TOTAL PREMIO 1er LUGAR (80% del día + acumulado 1)
             if(document.getElementById('total-acumu-premio1')) {
                 document.getElementById('total-acumu-premio1').textContent = formatear(premio1DelDia + acumu1);
             }
-            // TOTAL PREMIO 2do LUGAR (20% del día + acumulado 2)
             if(document.getElementById('total-acumu-premio2')) {
                 document.getElementById('total-acumu-premio2').textContent = formatear(premio2DelDia + acumu2);
             }
