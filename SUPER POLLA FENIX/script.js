@@ -15,11 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectorJuego = document.getElementById('select-juego-publico');
 
     window.seleccionarJuegoPill = function(elemento, juego) {
+        // 1. Quitar clase activa de todos los botones
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+        // 2. Agregar clase activa al seleccionado
         elemento.classList.add('active');
 
         if (selectorJuego) {
+            // 3. Cambiar el valor del select oculto
             selectorJuego.value = juego;
+            // 4. Disparar evento de cambio para que cargarDatosDesdeNube se ejecute
             selectorJuego.dispatchEvent(new Event('change'));
         }
     };
@@ -115,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 3: Carga de Datos desde Supabase (Filtro por Espacio)
+    // PARTE 3: Carga de Datos desde Supabase
     // ----------------------------------------------------------------
 
     async function cargarDatosDesdeNube() {
@@ -126,14 +130,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         aciertosObjetivo = config.aciertos;
         jugadaSize = config.size;
 
+        // Actualizar elementos dinámicos de texto
         const tituloSpan = document.getElementById('nombre-juego-titulo');
+        const mainTitle = document.getElementById('main-title'); // ID del H1 en header
+        const footerText = document.getElementById('footer-text'); // ID del P en footer
+
         if (tituloSpan) tituloSpan.textContent = config.titulo;
+        if (mainTitle) mainTitle.textContent = config.titulo;
+        if (footerText) footerText.innerHTML = `&copy; 2026 ${config.titulo} - Sistema Profesional de Gestión de Resultados.`;
         
         const labelGan = document.getElementById('label-ganadores');
         if (labelGan) labelGan.textContent = `Ganadores ${aciertosObjetivo} Aciertos`;
 
         try {
-            // CAMBIO: Ahora contamos tickets automáticamente con count: 'exact'
             const [respJugadas, respResultados, respFinanzas] = await Promise.all([
                 _supabase.from('jugadas').select('*', { count: 'exact' }).eq('juego', juegoActual).order('nro_ticket', { ascending: true }),
                 _supabase.from('resultados').select('numeros').eq('juego', juegoActual).maybeSingle(),
@@ -141,7 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             ]);
 
             participantesData = respJugadas.data || [];
-            // Guardamos el conteo real de la base de datos
             const conteoTickets = respJugadas.count || 0;
             
             if (respResultados.data && respResultados.data.numeros) {
@@ -155,9 +163,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resultadosDelDiaSet = [];
             }
 
-            // Actualizamos finanzasData inyectando el conteo automático de ventas
             finanzasData = respFinanzas.data || { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
-            finanzasData.ventas = conteoTickets; // Usamos el conteo de registros real
+            finanzasData.ventas = conteoTickets; 
 
             inicializarSistema();
         } catch (error) {
@@ -167,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 4: Ranking y Verificación (Uso de nro_ticket)
+    // PARTE 4: Ranking y Verificación
     // ----------------------------------------------------------------
 
     function renderRanking(filtro = "") {
@@ -245,7 +252,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(document.getElementById('recaudado')) document.getElementById('recaudado').textContent = formatear(rec);
         if(document.getElementById('acumulado1')) document.getElementById('acumulado1').textContent = formatear(acumu1);
         if(document.getElementById('acumulado2')) document.getElementById('acumulado2').textContent = formatear(acumu2);
-        
         if(document.getElementById('repartir75')) document.getElementById('repartir75').textContent = formatear(repartirTotal75);
 
         const boxDom = document.getElementById('box-domingo');
@@ -254,12 +260,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const labelCasa = document.getElementById('label-casa');
         const labelAcumu1 = document.getElementById('label-acumu1');
         const labelTotal1 = document.getElementById('label-total1');
+        const labelTotal2 = document.getElementById('label-total2');
+        const labelAcumu2 = document.getElementById('label-acumu2');
         
         if(boxDom) boxDom.style.display = esMini ? "none" : "flex";
         if(boxAc2) boxAc2.style.display = esMini ? "none" : "flex";
         if(boxTotal2) boxTotal2.style.display = esMini ? "none" : "flex";
         
-        // AJUSTE DINÁMICO DE ETIQUETAS
         if (esMini) {
             if(labelCasa) labelCasa.textContent = "25% Casa";
             if(labelAcumu1) labelAcumu1.textContent = "Acumu Día Anterior";
@@ -269,7 +276,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             if(labelCasa) labelCasa.textContent = "20% Casa";
             if(labelAcumu1) labelAcumu1.textContent = "Acumu 1er Premio";
+            if(labelAcumu2) labelAcumu2.textContent = "Acumu 2do Premio";
             if(labelTotal1) labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
+            if(labelTotal2) labelTotal2.textContent = "TOTAL PREMIO 2DO LUGAR";
             
             const premio1DelDia = repartirTotal75 * 0.80;
             const premio2DelDia = repartirTotal75 * 0.20;

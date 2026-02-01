@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEGA POLLA - Resultados Oficiales</title>
+    <title>SUPER POLLA FENIX - Resultados Oficiales</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -65,7 +65,7 @@
 <body>
 
     <header>
-        <h1>MEGA POLLA</h1>
+        <h1 id="main-title">SUPER POLLA FENIX</h1>
         <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
     </header>
 
@@ -202,7 +202,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 MEGA POLLA - Sistema Profesional de Gestión de Resultados.</p>
+        <p id="footer-text">&copy; 2026 SUPER POLLA FENIX - Sistema Profesional de Gestión de Resultados.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -224,20 +224,27 @@
                 selectReal.dispatchEvent(new Event('change'));
             }
 
-            // 5. AJUSTE DE ETIQUETAS DINÁMICAS (PÚBLICO)
+            // 5. AJUSTE DE ETIQUETAS Y TEXTOS DINÁMICOS
             const labelAcumu1 = document.getElementById('label-acumu1');
             const labelTotal1 = document.getElementById('label-total1');
             const labelTotal2 = document.getElementById('label-total2');
             const labelAcumu2 = document.getElementById('label-acumu2');
+            const footerText = document.getElementById('footer-text');
+            const mainTitle = document.getElementById('main-title');
 
             if (juego === 'mini') {
                 labelAcumu1.textContent = "Acumu Día Anterior";
                 labelTotal1.textContent = "TOTAL PREMIO ÚNICO";
+                mainTitle.textContent = "MINI EXPRES FENIX";
+                footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
             } else {
+                const nombreJuego = juego === 'dia' ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
+                mainTitle.textContent = nombreJuego;
                 labelAcumu1.textContent = "Acumu 1er Premio";
                 labelAcumu2.textContent = "Acumu 2do Premio";
                 labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
                 labelTotal2.textContent = "TOTAL PREMIO 2DO LUGAR";
+                footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
             }
         }
     </script>
