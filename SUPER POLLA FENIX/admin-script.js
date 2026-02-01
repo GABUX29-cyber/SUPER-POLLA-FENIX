@@ -184,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarInterfazFinanzas(juegoActivo);
 
         try {
-            // CAMBIO: Ahora carga las jugadas con conteo incluido
             const { data: p, count: conteoReal } = await _supabase.from('jugadas').select('*', { count: 'exact' }).eq('juego', juegoActivo).order('nro_ticket', { ascending: true });
             const { data: r } = await _supabase.from('resultados').select('*').eq('juego', juegoActivo).maybeSingle();
             const { data: f } = await _supabase.from('finanzas').select('*').eq('juego', juegoActivo).maybeSingle();
@@ -192,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             participantes = p || [];
             resultadosActuales = r ? r.numeros : ""; 
             
-            // Asignamos el conteo de la base de datos al campo de ventas (readonly)
             document.getElementById('input-ventas').value = conteoReal || 0;
 
             if (f) {
@@ -204,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 calcularPrevisualizacionFinanzas(f.recaudado, juegoActivo);
             } else {
-                // Reset de campos si no hay finanzas guardadas
                 document.getElementById('input-recaudado').value = 0;
                 document.getElementById('input-acumulado1').value = 0;
                 if (document.getElementById('input-acumulado2')) document.getElementById('input-acumulado2').value = 0;
@@ -220,6 +217,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelCasa = document.getElementById('label-porcentaje-casa');
         const labelAcumu1 = document.getElementById('label-acumu1');
         const labelAcumu2 = document.getElementById('label-acumu2');
+        
+        // --- NUEVA LÓGICA DE NOMBRES DINÁMICOS ---
+        const tituloPrincipal = document.getElementById('titulo-principal');
+        const footerCopy = document.getElementById('footer-copy');
+
+        const nombresJuego = {
+            'dia': 'SUPER POLLA FENIX (DIA)',
+            'tarde': 'SUPER POLLA FENIX (TARDE)',
+            'mini': 'MINI EXPRES FENIX'
+        };
+
+        const nombreActual = nombresJuego[juego] || 'SUPER POLLA FENIX';
+
+        if (tituloPrincipal) tituloPrincipal.textContent = nombreActual;
+        if (footerCopy) footerCopy.textContent = `© 2026 ${nombreActual} - Sistema Profesional de Gestión de Resultados.`;
+        // ------------------------------------------
 
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
@@ -330,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
         
-        // Ventas se envía pero es el valor que ya está en el input readonly
         const dataFinanzas = {
             juego: juego,
             ventas: parseInt(document.getElementById('input-ventas').value) || 0,
@@ -380,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         e.target.reset();
         document.getElementById('input-paste-data').value = "";
-        cargarDatosDesdeNube(); // Al recargar aquí, el conteo de ventas se actualizará solo
+        cargarDatosDesdeNube();
     });
 
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {

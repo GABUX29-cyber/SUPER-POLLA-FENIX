@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - MEGA POLLA</title>
+    <title>Panel de Administración - SUPER POLLA FENIX</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
         /* --- TUS ESTILOS ORIGINALES MANTENIDOS --- */
@@ -64,6 +64,15 @@
             cursor: not-allowed;
             font-weight: bold;
         }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background: #1a1a1a;
+            color: #fff;
+            border-top: 3px solid #fdd835;
+        }
     </style>
 </head>
 <body>
@@ -80,7 +89,7 @@
 
     <div id="contenido-principal">
         <header>
-            <h1>PANEL DE ADMINISTRACIÓN</h1>
+            <h1 id="titulo-principal">PANEL DE ADMINISTRACIÓN</h1>
             <p>Mega Polla - Gestión Multi-Juego</p>
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
         </header>
@@ -184,10 +193,14 @@
                 🔴 REINICIAR DATOS DEL JUEGO SELECCIONADO
             </button>
         </div>
+
+        <footer>
+            <p id="footer-copy">© 2026 SUPER POLLA FENIX - Sistema Profesional de Gestión de Resultados.</p>
+        </footer>
     </div>
 
     <script>
-        // Función para manejar el cambio visual y etiquetas dinámicas en Admin
+        // Esta función ahora está coordinada con admin-script.js
         function seleccionarJuegoAdminPill(elemento, juego) {
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
@@ -196,20 +209,6 @@
             if (selector) {
                 selector.value = juego;
                 selector.dispatchEvent(new Event('change'));
-            }
-
-            // CAMBIO DINÁMICO DE ETIQUETAS EN EL PANEL
-            const labelAcumu1 = document.getElementById('label-acumu1');
-            const labelAcumu2 = document.getElementById('label-acumu2');
-            const containerAcumu2 = document.getElementById('container-acumu2');
-
-            if (juego === 'mini') {
-                labelAcumu1.textContent = "Acumulado Día Anterior:";
-                containerAcumu2.style.display = "none"; // Mini no usa 2do acumulado
-            } else {
-                labelAcumu1.textContent = "Acumulado Primer Premio:";
-                labelAcumu2.textContent = "Acumulado Segundo Premio:";
-                containerAcumu2.style.display = "block";
             }
         }
     </script>
