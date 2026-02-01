@@ -269,15 +269,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (esMini) {
             if(labelCasa) labelCasa.textContent = "25% Casa";
             if(labelAcumu1) labelAcumu1.textContent = "Acumu Día Anterior";
-            if(labelTotal1) labelTotal1.textContent = "TOTAL PREMIO ÚNICO";
+            
+            // CAMBIO APLICADO: ACUMULADO+PREMIO (MINI)
+            if(labelTotal1) labelTotal1.textContent = "ACUMULADO+PREMIO";
+            
             if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.25);
             if(document.getElementById('total-acumu-premio1')) document.getElementById('total-acumu-premio1').textContent = formatear(repartirTotal75 + acumu1);
         } else {
             if(labelCasa) labelCasa.textContent = "20% Casa";
             if(labelAcumu1) labelAcumu1.textContent = "Acumu 1er Premio";
             if(labelAcumu2) labelAcumu2.textContent = "Acumu 2do Premio";
-            if(labelTotal1) labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
-            if(labelTotal2) labelTotal2.textContent = "TOTAL PREMIO 2DO LUGAR";
+            
+            // CAMBIO APLICADO: ACUMULADO+1ER PREMIO / ACUMULADO+2DO PREMIO (DIA/TARDE)
+            if(labelTotal1) labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
+            if(labelTotal2) labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
             
             const premio1DelDia = repartirTotal75 * 0.80;
             const premio2DelDia = repartirTotal75 * 0.20;

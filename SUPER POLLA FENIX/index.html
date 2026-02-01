@@ -148,13 +148,13 @@
                 <div class="est-mini ganadores-box-item" id="box-total-1" style="grid-column: span 2; background: #fff9c4; color: #333; border: 2px solid #fbc02d;">
                     <i class="fas fa-star"></i>
                     <span class="val-mini" id="total-acumu-premio1">0.00 BS</span>
-                    <label id="label-total1">TOTAL PREMIO 1ER LUGAR</label>
+                    <label id="label-total1">ACUMULADO+1ER PREMIO</label>
                 </div>
 
                 <div class="est-mini ganadores-box-item" id="box-total-2" style="grid-column: span 2; background: #e3f2fd; color: #333; border: 2px solid #1976d2;">
                     <i class="fas fa-star-half-alt"></i>
                     <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
-                    <label id="label-total2">TOTAL PREMIO 2DO LUGAR</label>
+                    <label id="label-total2">ACUMULADO+2DO PREMIO</label>
                 </div>
 
                 <div class="est-mini ganadores-box-item" style="background: #e8f5e9; color: #2e7d32;">
@@ -169,7 +169,7 @@
 
     <div style="margin-bottom: 20px; text-align: center;" class="no-print">
         <button id="btn-descargar-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar Reporte de Resultados / Imprimir
+            <i class="fas fa-file-pdf"></i> Descargar Resultados / Imprimir
         </button>
     </div>
 
@@ -234,7 +234,8 @@
 
             if (juego === 'mini') {
                 labelAcumu1.textContent = "Acumu Día Anterior";
-                labelTotal1.textContent = "TOTAL PREMIO ÚNICO";
+                // CAMBIO APLICADO PARA MINI
+                labelTotal1.textContent = "ACUMULADO+PREMIO";
                 mainTitle.textContent = "MINI EXPRES FENIX";
                 footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
             } else {
@@ -242,8 +243,9 @@
                 mainTitle.textContent = nombreJuego;
                 labelAcumu1.textContent = "Acumu 1er Premio";
                 labelAcumu2.textContent = "Acumu 2do Premio";
-                labelTotal1.textContent = "TOTAL PREMIO 1ER LUGAR";
-                labelTotal2.textContent = "TOTAL PREMIO 2DO LUGAR";
+                // CAMBIO APLICADO PARA DIA/TARDE
+                labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
+                labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
                 footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
             }
         }
