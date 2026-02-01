@@ -130,10 +130,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         aciertosObjetivo = config.aciertos;
         jugadaSize = config.size;
 
-        // Actualizar elementos dinámicos de texto
         const tituloSpan = document.getElementById('nombre-juego-titulo');
-        const mainTitle = document.getElementById('main-title'); // ID del H1 en header
-        const footerText = document.getElementById('footer-text'); // ID del P en footer
+        const mainTitle = document.getElementById('main-title'); 
+        const footerText = document.getElementById('footer-text'); 
 
         if (tituloSpan) tituloSpan.textContent = config.titulo;
         if (mainTitle) mainTitle.textContent = config.titulo;
@@ -301,6 +300,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderRanking();
     }
 
+    // ----------------------------------------------------------------
+    // PARTE 6: Eventos y Descarga Dinámica de PDF
+    // ----------------------------------------------------------------
+
     selectorJuego?.addEventListener('change', cargarDatosDesdeNube);
     
     document.getElementById('filtroParticipantes')?.addEventListener('input', (e) => {
@@ -308,7 +311,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('btn-descargar-pdf')?.addEventListener('click', () => {
+        const config = CONFIG_JUEGOS[juegoActual];
+        const fecha = new Date().toLocaleDateString('es-ES', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        }).replace(/\//g, '-');
+
+        const tituloOriginal = document.title;
+        
+        // Formatear nombre: RESULTADOS_SUPER_POLLA_FENIX_DIA_01-02-2026
+        const nombreLimpio = config.titulo.replace(/[()]/g, '').replace(/ /g, '_');
+        const nombreArchivo = `RESULTADOS_${nombreLimpio}_${fecha}`;
+        
+        document.title = nombreArchivo;
         window.print();
+
+        setTimeout(() => {
+            document.title = tituloOriginal;
+        }, 1000);
     });
 
     establecerFechaReal();
