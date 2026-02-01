@@ -88,9 +88,9 @@
     </div>
 
     <div id="contenido-principal">
-        <header>
+        <header class="admin-header">
             <h1 id="titulo-principal">PANEL DE ADMINISTRACIÓN</h1>
-            <p>Mega Polla - Gestión Multi-Juego</p>
+            <p id="subtitulo-admin">Gestión de Resultados y Participantes</p>
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
         </header>
 
@@ -200,7 +200,6 @@
     </div>
 
     <script>
-        // Esta función ahora está coordinada con admin-script.js
         function seleccionarJuegoAdminPill(elemento, juego) {
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
