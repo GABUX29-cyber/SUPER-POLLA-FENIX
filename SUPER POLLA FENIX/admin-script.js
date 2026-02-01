@@ -218,8 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelAcumu1 = document.getElementById('label-acumu1');
         const labelAcumu2 = document.getElementById('label-acumu2');
         
-        // --- NUEVA LÓGICA DE NOMBRES DINÁMICOS ---
+        // --- NUEVA LÓGICA DE NOMBRES DINÁMICOS PARA ADMIN ---
         const tituloPrincipal = document.getElementById('titulo-principal');
+        const subtituloAdmin = document.getElementById('subtitulo-admin'); // Asegúrate que el <p> tenga este ID
         const footerCopy = document.getElementById('footer-copy');
 
         const nombresJuego = {
@@ -230,9 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nombreActual = nombresJuego[juego] || 'SUPER POLLA FENIX';
 
-        if (tituloPrincipal) tituloPrincipal.textContent = nombreActual;
+        // Cambio solicitado: PANEL DE ADMINISTRACIÓN - NOMBRE
+        if (tituloPrincipal) tituloPrincipal.textContent = `PANEL DE ADMINISTRACIÓN - ${nombreActual}`;
+        
+        // Cambio solicitado: Gestión de Resultados y Participantes
+        if (subtituloAdmin) {
+            subtituloAdmin.textContent = "Gestión de Resultados y Participantes";
+        } else {
+            // Si el p no tiene ID, lo buscamos por jerarquía (debajo del h1)
+            const subPorTag = document.querySelector('.admin-header p');
+            if (subPorTag) subPorTag.textContent = "Gestión de Resultados y Participantes";
+        }
+
         if (footerCopy) footerCopy.textContent = `© 2026 ${nombreActual} - Sistema Profesional de Gestión de Resultados.`;
-        // ------------------------------------------
+        // ----------------------------------------------------
 
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
