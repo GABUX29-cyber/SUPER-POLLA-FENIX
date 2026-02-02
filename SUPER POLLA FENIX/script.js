@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <table class="tabla-horarios">
                     <thead>
                         <tr>
-                            <th class="th-ruleta">RULETA/SORTEOS</th>
+                            <th class="th-ruleta">RULETAS/SORTEOS</th>
                             ${horas.map(h => `<th>${h}</th>`).join('')}
                         </tr>
                     </thead>
