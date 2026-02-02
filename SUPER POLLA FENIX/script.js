@@ -108,7 +108,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             horas.forEach(h => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
-                const displayNum = (num === "O") ? '<span style="color:#d32f2f; font-weight:bold;">O</span>' : num;
+                
+                // MODIFICACIÓN: Se eliminó style="color:#d32f2f;" para que la "O" sea negra
+                const displayNum = (num === "O") ? '<span style="font-weight:bold;">O</span>' : num;
+                
                 tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;
             });
             tablaHTML += `</tr>`;
@@ -270,7 +273,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(labelCasa) labelCasa.textContent = "25% Casa";
             if(labelAcumu1) labelAcumu1.textContent = "Acumu Día Anterior";
             
-            // CAMBIO APLICADO: ACUMULADO+PREMIO (MINI)
             if(labelTotal1) labelTotal1.textContent = "ACUMULADO+PREMIO";
             
             if(document.getElementById('monto-casa')) document.getElementById('monto-casa').textContent = formatear(rec * 0.25);
@@ -280,7 +282,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(labelAcumu1) labelAcumu1.textContent = "Acumu 1er Premio";
             if(labelAcumu2) labelAcumu2.textContent = "Acumu 2do Premio";
             
-            // CAMBIO APLICADO: ACUMULADO+1ER PREMIO / ACUMULADO+2DO PREMIO (DIA/TARDE)
             if(labelTotal1) labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
             if(labelTotal2) labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
             
@@ -323,7 +324,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const tituloOriginal = document.title;
         
-        // Formatear nombre: RESULTADOS_SUPER_POLLA_FENIX_DIA_01-02-2026
         const nombreLimpio = config.titulo.replace(/[()]/g, '').replace(/ /g, '_');
         const nombreArchivo = `RESULTADOS_${nombreLimpio}_${fecha}`;
         
