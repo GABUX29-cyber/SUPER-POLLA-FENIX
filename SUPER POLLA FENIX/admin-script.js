@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // --- NUEVA LÓGICA DE NOMBRES DINÁMICOS PARA ADMIN ---
         const tituloPrincipal = document.getElementById('titulo-principal');
-        const subtituloAdmin = document.getElementById('subtitulo-admin'); // Asegúrate que el <p> tenga este ID
+        const subtituloAdmin = document.getElementById('subtitulo-admin'); 
         const footerCopy = document.getElementById('footer-copy');
 
         const nombresJuego = {
@@ -231,20 +231,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nombreActual = nombresJuego[juego] || 'SUPER POLLA FENIX';
 
-        // Cambio solicitado: PANEL DE ADMINISTRACIÓN - NOMBRE
         if (tituloPrincipal) tituloPrincipal.textContent = `PANEL DE ADMINISTRACIÓN - ${nombreActual}`;
         
-        // Cambio solicitado: Gestión de Resultados y Participantes
         if (subtituloAdmin) {
             subtituloAdmin.textContent = "Gestión de Resultados y Participantes";
         } else {
-            // Si el p no tiene ID, lo buscamos por jerarquía (debajo del h1)
             const subPorTag = document.querySelector('.admin-header p');
             if (subPorTag) subPorTag.textContent = "Gestión de Resultados y Participantes";
         }
 
         if (footerCopy) footerCopy.textContent = `© 2026 ${nombreActual} - Sistema Profesional de Gestión de Resultados.`;
-        // ----------------------------------------------------
 
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
@@ -280,13 +276,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!selectSorteo) return;
         selectSorteo.innerHTML = '';
         const conf = reglasJuegos[juego];
+        
         conf.ruletas.forEach(r => {
+            // Creamos un grupo por cada ruleta para el estilo de letra solicitado
+            let grupo = document.createElement('optgroup');
+            grupo.label = r; // Nombre de la ruleta en negrita/itálica por defecto del navegador
+
             conf.horarios.forEach(h => {
                 let opt = document.createElement('option');
                 opt.value = `${r} ${h}`;
-                opt.textContent = `${r} - ${h}`;
-                selectSorteo.appendChild(opt);
+                opt.textContent = h; // El horario aparece debajo del nombre de la ruleta
+                grupo.appendChild(opt);
             });
+            selectSorteo.appendChild(grupo);
         });
     }
 
