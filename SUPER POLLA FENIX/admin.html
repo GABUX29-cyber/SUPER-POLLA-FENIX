@@ -6,43 +6,151 @@
     <title>Panel de Administración - SUPER POLLA FENIX</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
-        /* --- TUS ESTILOS ORIGINALES MANTENIDOS --- */
+        /* --- TUS ESTILOS ORIGINALES CON CORRECCIONES DE ANCHO --- */
+        
+        /* Forzar que todo se calcule correctamente dentro del ancho */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .admin-header {
+            padding: 20px;
+            width: 100%;
+        }
+
+        .admin-section {
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%; /* Asegura ancho completo */
+        }
+
         .btn-editar, .btn-eliminar {
-            padding: 5px 10px; border: none; cursor: pointer; border-radius: 4px;
+            padding: 8px 12px; border: none; cursor: pointer; border-radius: 6px;
             font-weight: bold; font-size: 0.85em; margin-left: 5px;
+            flex-shrink: 0; /* Evita que los botones se achiquen */
         }
         .btn-editar { background-color: #ffc107; color: #333; }
         .btn-eliminar { background-color: #dc3545; color: white; }
         
+        /* CORRECCIÓN: Listados que ocupan todo el espacio sin cortarse */
+        #lista-participantes, #lista-resultados {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            width: 100%;
+        }
+
         #lista-participantes li, #lista-resultados li {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #fff; margin-bottom: 10px; padding: 12px;
-            border-radius: 8px; border-left: 5px solid #fdd835; color: #333;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            background: #fff; 
+            margin-bottom: 12px; 
+            padding: 15px; /* Más espacio interno como en tus fotos de referencia */
+            border-radius: 10px; 
+            border-left: 6px solid #fdd835; 
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
         }
 
-        /* --- AJUSTE PARA LA CÁPSULA OSCURA TIPO IMAGEN --- */
+        /* --- AJUSTE PARA LA CÁPSULA OSCURA --- */
         .tabs-fenix-container.admin-style {
-            background-color: #333 !important; /* Fondo oscuro como la imagen */
-            border: 2px solid #fdd835; /* Borde amarillo resaltado */
-            padding: 8px;
+            background-color: #333 !important;
+            border: 2px solid #fdd835;
+            padding: 10px;
             margin-top: 10px;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 10px;
         }
 
-        #paste-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
-        #paste-section textarea {
-            width: calc(100% - 20px); min-height: 120px; padding: 10px;
-            margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px;
-            box-sizing: border-box; font-family: 'Montserrat', sans-serif; resize: vertical; 
+        .tab-pill {
+            color: white;
+            cursor: pointer;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 0.9em;
         }
+
+        .tab-pill.active {
+            background: #fdd835;
+            color: #333;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* CORRECCIÓN: Textarea y Buscador al 100% real */
+        #paste-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        
+        #paste-section textarea {
+            width: 100%; /* Cambiado de calc a 100% */
+            min-height: 120px; 
+            padding: 12px;
+            margin-bottom: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px;
+            box-sizing: border-box; 
+            font-family: inherit; 
+            resize: vertical; 
+        }
+
         #paste-section button {
-            background-color: #007bff; color: white; padding: 10px 15px; border: none;
-            border-radius: 6px; cursor: pointer; font-size: 1em; font-weight: 600;
+            background-color: #007bff; color: white; padding: 12px; border: none;
+            border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600;
             width: 100%; transition: background-color 0.2s ease;
         }
+
         #input-buscar-participante {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;
-            margin-bottom: 15px; box-sizing: border-box; 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px;
+            margin-bottom: 15px; 
+            box-sizing: border-box; 
+        }
+
+        /* CORRECCIÓN: Formulario de finanzas para que no se corte el último campo */
+        #form-finanzas {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        #form-finanzas label {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        #form-finanzas input, #form-resultados input, #form-resultados select, #form-participante input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        #form-finanzas button, #form-resultados button, #form-participante button {
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
         }
 
         #login-overlay {
@@ -54,11 +162,14 @@
             background: white; padding: 30px; border-radius: 12px;
             width: 90%; max-width: 400px; text-align: center;
         }
-        .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        .login-card button { width: 100%; padding: 12px; background: #fdd835; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        #contenido-principal { display: none; }
         
-        /* Estilo para campo bloqueado de ventas */
+        #contenido-principal { 
+            display: none; 
+            max-width: 900px; /* Ancho máximo para comodidad en PC */
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
         #input-ventas[readonly] {
             background-color: #e9ecef;
             cursor: not-allowed;
@@ -67,11 +178,19 @@
 
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 30px 20px;
             margin-top: 40px;
             background: #1a1a1a;
             color: #fff;
             border-top: 3px solid #fdd835;
+        }
+
+        /* Estilo para las jugadas */
+        .jugadas-texto {
+            display: block;
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -91,7 +210,7 @@
         <header class="admin-header">
             <h1 id="titulo-principal">PANEL DE ADMINISTRACIÓN</h1>
             <p id="subtitulo-admin">Gestión de Resultados y Participantes</p>
-            <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
+            <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; float: right; margin-top: -50px;">Cerrar Sesión</button>
         </header>
 
         <div class="tabs-fenix-container admin-style no-print">
@@ -133,13 +252,13 @@
             </form>
 
             <div class="card-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-                <div class="card" style="padding: 10px; border-radius: 8px; background: #f4f4f4; text-align: center;">
-                    <div id="casa-valor" style="font-weight: bold; color: #607d8b;">0.00 BS</div>
-                    <small id="label-porcentaje-casa" style="text-transform: uppercase; font-size: 0.7em;">20% CASA</small>
+                <div class="card" style="padding: 15px; border-radius: 8px; background: #f8f9fa; text-align: center; border: 1px solid #ddd;">
+                    <div id="casa-valor" style="font-weight: bold; color: #607d8b; font-size: 1.1em;">0.00 BS</div>
+                    <small id="label-porcentaje-casa" style="text-transform: uppercase; font-size: 0.75em; font-weight: bold;">20% CASA</small>
                 </div>
-                <div class="card" id="card-domingo" style="padding: 10px; border-radius: 8px; background: #f4f4f4; text-align: center;">
-                    <div id="domingo-valor" style="font-weight: bold; color: #e91e63;">0.00 BS</div>
-                    <small style="text-transform: uppercase; font-size: 0.7em;">5% DOMINGO</small>
+                <div class="card" id="card-domingo" style="padding: 15px; border-radius: 8px; background: #f8f9fa; text-align: center; border: 1px solid #ddd;">
+                    <div id="domingo-valor" style="font-weight: bold; color: #e91e63; font-size: 1.1em;">0.00 BS</div>
+                    <small style="text-transform: uppercase; font-size: 0.75em; font-weight: bold;">5% DOMINGO</small>
                 </div>
             </div>
         </div>
@@ -183,13 +302,13 @@
                 <button type="submit">REGISTRAR PARTICIPANTE</button>
             </form>
             
-            <h3>Listado de Participantes:</h3>
+            <h3 style="margin-top: 30px;">Listado de Participantes:</h3>
             <input type="text" id="input-buscar-participante" placeholder="🔍 BUSCAR POR NOMBRE O REFE...">
             <ul id="lista-participantes"></ul>
         </div>
         
         <div style="text-align: center; margin: 40px 0;">
-            <button id="btn-reiniciar-datos" style="background-color: #dc3545; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+            <button id="btn-reiniciar-datos" style="background-color: #dc3545; color: white; padding: 15px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(220,53,69,0.2);">
                 🔴 REINICIAR DATOS DEL JUEGO SELECCIONADO
             </button>
         </div>
