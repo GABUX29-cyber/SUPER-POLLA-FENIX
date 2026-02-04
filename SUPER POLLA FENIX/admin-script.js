@@ -46,17 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const reglasJuegos = {
         'dia': {
             tamaño: 5,
-            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
-            horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
+            horarios: ["8AM", "9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM", "7PM"]
         },
         'tarde': { 
             tamaño: 5,
-            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
         },
         'mini': {
             tamaño: 3,
-            ruletas: ["GRANJITA", "SELVA PLUS", "LOTTO ACTIVO"],
+            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS"],
             horarios: ["5PM", "6PM", "7PM"]
         }
     };
@@ -83,16 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }).filter(n => n !== "");
 
         let avisos = [];
-        let avisosAlert = [];
-
         if (numeros.length > tamañoRequerido) {
             let eliminados = [];
             while (numeros.length > tamañoRequerido) {
                 eliminados.push(numeros.pop());
             }
-            let msg = `Sobrante eliminado (${eliminados.join(', ')})`;
-            avisos.push(msg);
-            avisosAlert.push(`⚠️ ${msg}`);
+            avisos.push(`Sobrante eliminado (${eliminados.join(', ')})`);
         }
 
         if (numeros.length < tamañoRequerido) {
@@ -116,16 +112,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!numeros.includes("36")) {
                     let index = numeros.lastIndexOf(dup);
                     numeros[index] = "36";
-                    let msg = `Duplicado (${dup}) reemplazado por 36`;
-                    avisos.push(msg);
-                    avisosAlert.push(`🔄 ${msg}`);
+                    avisos.push(`Duplicado (${dup}) reemplazado por 36`);
                 } else {
                     sePudoCorregir = false;
                 }
             });
 
             if (!sePudoCorregir) {
-                alert(`🚫 JUGADA NULA (${nombreParticipante}): Hay duplicados (${duplicadosEncontrados.join(', ')}) y el 36 ya existe.`);
+                alert(`🚫 JUGADA NULA (${nombreParticipante}): Hay duplicados y el 36 ya existe.`);
                 return null;
             }
         }
@@ -155,6 +149,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (error) alert("Error: " + error.message);
         else cargarDatosDesdeNube();
+    };
+
+    // --- NUEVO: EDITAR RESULTADO ESPECÍFICO ---
+    window.editarResultadoEspecifico = async (itemCompleto) => {
+        const partes = itemCompleto.split(':');
+        const sorteoInfo = partes[0].trim();
+        const valorActual = partes[1].trim();
+        
+        const nuevoValor = prompt(`Editar resultado para ${sorteoInfo}:`, valorActual);
+        if (nuevoValor === null || nuevoValor.trim() === "") return;
+
+        let numFinal = nuevoValor === "0" ? "O" : (nuevoValor === "00" ? "00" : nuevoValor.padStart(2, '0'));
+
+        const juego = document.getElementById('select-juego-admin').value;
+        let listaArray = resultadosActuales.split(',').filter(x => x.trim() !== "");
+        const index = listaArray.indexOf(itemCompleto);
+        
+        if (index > -1) {
+            listaArray[index] = `${sorteoInfo}: ${numFinal}`;
+            const { error } = await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
+            if (error) alert("Error: " + error.message);
+            else cargarDatosDesdeNube();
+        }
     };
 
     window.removerResultadoEspecifico = async (itemCompleto) => {
@@ -218,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelAcumu1 = document.getElementById('label-acumu1');
         const labelAcumu2 = document.getElementById('label-acumu2');
         
-        // --- NUEVA LÓGICA DE NOMBRES DINÁMICOS PARA ADMIN ---
         const tituloPrincipal = document.getElementById('titulo-principal');
         const subtituloAdmin = document.getElementById('subtitulo-admin'); 
         const footerCopy = document.getElementById('footer-copy');
@@ -274,18 +290,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function actualizarOpcionesSorteo(juego) {
         const selectSorteo = document.getElementById('sorteo-hora');
         if(!selectSorteo) return;
-        selectSorteo.innerHTML = '';
+        selectSorteo.innerHTML = '<option value="">Seleccione Sorteo</option>';
         const conf = reglasJuegos[juego];
         
         conf.ruletas.forEach(r => {
-            // Creamos un grupo por cada ruleta para el estilo de letra solicitado
             let grupo = document.createElement('optgroup');
-            grupo.label = r; // Nombre de la ruleta en negrita/itálica por defecto del navegador
-
+            grupo.label = r;
             conf.horarios.forEach(h => {
                 let opt = document.createElement('option');
                 opt.value = `${r} ${h}`;
-                opt.textContent = h; // El horario aparece debajo del nombre de la ruleta
+                opt.textContent = h;
                 grupo.appendChild(opt);
             });
             selectSorteo.appendChild(grupo);
@@ -293,36 +307,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarListas() {
+        // --- LISTA DE PARTICIPANTES ---
         const listaPart = document.getElementById('lista-participantes');
-        if(!listaPart) return;
-        listaPart.innerHTML = '';
-        const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
+        if(listaPart) {
+            const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
+            listaPart.innerHTML = participantes.filter(p => 
+                p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
+            ).map(p => `
+                <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 8px; padding: 10px; border-radius: 8px; border-left: 4px solid #ffc107; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="flex-grow:1;">
+                        <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
+                        <small style="color: #666;">${p.numeros_jugados}</small> 
+                        ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button style="background:#ffc107; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">Editar</button>
+                        <button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="eliminarJugada(${p.id})">Eliminar</button>
+                    </div>
+                </li>`).join('');
+        }
 
-        participantes.filter(p => 
-            p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
-        ).forEach((p) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div style="flex-grow:1;">
-                    <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
-                    <small>${p.numeros_jugados}</small> 
-                    ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
-                </div>
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">✏️</button>
-                    <button class="btn-eliminar" onclick="eliminarJugada(${p.id})">🗑️</button>
-                </div>`;
-            listaPart.appendChild(li);
-        });
-
+        // --- LISTA DE RESULTADOS (DISEÑO SOLICITADO) ---
         const listaRes = document.getElementById('lista-resultados');
-        if(!listaRes) return;
-        listaRes.innerHTML = resultadosActuales ? 
-            resultadosActuales.split(',').filter(x => x.trim() !== "").map(n => `
-                <li>
-                    <span>${n}</span>
-                    <button class="btn-eliminar" onclick="removerResultadoEspecifico('${n}')">×</button>
-                </li>`).join('') : "<li>Sin resultados</li>";
+        if(listaRes) {
+            if (!resultadosActuales || resultadosActuales.trim() === "") {
+                listaRes.innerHTML = "<li style='text-align:center; color:#999;'>Sin resultados</li>";
+            } else {
+                listaRes.innerHTML = resultadosActuales.split(',').filter(x => x.trim() !== "").map(n => `
+                    <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 8px; padding: 12px; border-radius: 10px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
+                        <span style="font-weight: bold; color: #333; font-size: 15px;">${n}</span>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="background:#ffc107; color:#212529; border:none; padding:6px 15px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:13px;" onclick="editarResultadoEspecifico('${n}')">Editar</button>
+                            <button style="background:#dc3545; color:white; border:none; padding:6px 15px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:13px;" onclick="removerResultadoEspecifico('${n}')">Eliminar</button>
+                        </div>
+                    </li>`).join('');
+            }
+        }
     }
 
     // --- 6. GESTIÓN DE FORMULARIOS ---
@@ -356,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('form-finanzas').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
-        
         const dataFinanzas = {
             juego: juego,
             ventas: parseInt(document.getElementById('input-ventas').value) || 0,
@@ -379,29 +398,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(!refeVal) return alert("El REFE es obligatorio");
 
-        const { data: ultimas } = await _supabase
-            .from('jugadas')
-            .select('nro_ticket')
-            .eq('juego', juego)
-            .order('nro_ticket', { ascending: false })
-            .limit(1);
-        
+        const { data: ultimas } = await _supabase.from('jugadas').select('nro_ticket').eq('juego', juego).order('nro_ticket', { ascending: false }).limit(1);
         let proximoTicket = ultimas && ultimas.length > 0 ? ultimas[0].nro_ticket + 1 : 1;
 
         for (let j of jugadasRaw) {
             let proc = procesarYValidarJugada(j.split(','), nombreVal, tamaño);
             if (proc) {
-                const { error } = await _supabase.from('jugadas').insert([{
-                    nombre: nombreVal, 
-                    refe: refeVal, 
-                    numeros_jugados: proc.numeros, 
-                    juego: juego, 
-                    notas_correccion: proc.nota,
-                    nro_ticket: proximoTicket
+                await _supabase.from('jugadas').insert([{
+                    nombre: nombreVal, refe: refeVal, numeros_jugados: proc.numeros, juego: juego, notas_correccion: proc.nota, nro_ticket: proximoTicket
                 }]);
-                
-                if (!error) proximoTicket++;
-                else console.error("Error al insertar:", error.message);
+                proximoTicket++;
             }
         }
         e.target.reset();
@@ -409,24 +415,26 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDatosDesdeNube();
     });
 
+    // --- GUARDAR RESULTADO (CON BLOQUEO DE DUPLICADOS) ---
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const numRaw = document.getElementById('numero-ganador').value.trim();
+
+        if(!horaSorteo) return alert("Seleccione un sorteo");
         
-        let numFinal;
-        if (numRaw === "0") {
-            numFinal = "O";
-        } else if (numRaw === "00") {
-            numFinal = "00";
-        } else {
-            numFinal = numRaw.padStart(2, '0');
-        }
-        
-        let nuevoItem = `${horaSorteo}: ${numFinal}`;
         let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
-        listaArray.push(nuevoItem);
+        
+        // VALIDACIÓN DE DUPLICADO
+        const yaExiste = listaArray.some(item => item.startsWith(horaSorteo + ":"));
+        if (yaExiste) {
+            alert(`🚫 Ya ingresaste un resultado para ${horaSorteo}. \n\nPara cambiarlo, usa el botón "Editar" en la lista de abajo.`);
+            return;
+        }
+
+        let numFinal = numRaw === "0" ? "O" : (numRaw === "00" ? "00" : numRaw.padStart(2, '0'));
+        listaArray.push(`${horaSorteo}: ${numFinal}`);
         
         const { error } = await _supabase.from('resultados').upsert({ juego: juego, numeros: listaArray.join(',') }, { onConflict: 'juego' });
         if (error) alert("Error: " + error.message);
@@ -435,17 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
-        const confirm1 = confirm(`⚠️ ATENCIÓN CRÍTICA:\n¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`);
-        
-        if (confirm1) {
-            const confirmTexto = prompt("Para confirmar la eliminación permanente, escribe la palabra: BORRAR");
-            if (confirmTexto === "BORRAR") {
+        if (confirm(`¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`)) {
+            if (prompt("Escribe BORRAR para confirmar") === "BORRAR") {
                 await _supabase.from('jugadas').delete().eq('juego', juego);
                 await _supabase.from('resultados').upsert({ juego: juego, numeros: "" }, { onConflict: 'juego' });
-                alert("✅ Sistema reiniciado con éxito.");
                 cargarDatosDesdeNube();
-            } else {
-                alert("❌ Palabra incorrecta. Acción cancelada.");
             }
         }
     });
