@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO ---
+    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO (RESPETANDO TUS HORARIOS) ---
     let participantes = [];
     let resultadosActuales = "";
     let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
@@ -46,17 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const reglasJuegos = {
         'dia': {
             tamaño: 5,
-            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
-            horarios: ["8AM", "9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM", "7PM"]
+            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
+            horarios: ["8AM", "9AM", "10AM", "11AM", "12PM"]
         },
         'tarde': { 
             tamaño: 5,
-            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS", "GUACHARO"],
+            ruletas: ["GRANJITA", "GUACHARO", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["3PM", "4PM", "5PM", "6PM", "7PM"]
         },
         'mini': {
             tamaño: 3,
-            ruletas: ["LOTTO ACTIVO", "GRANJITA", "SELVA PLUS"],
+            ruletas: ["GRANJITA", "SELVA PLUS", "LOTTO ACTIVO"],
             horarios: ["5PM", "6PM", "7PM"]
         }
     };
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else cargarDatosDesdeNube();
     };
 
-    // --- NUEVO: EDITAR RESULTADO ESPECÍFICO ---
+    // EDITAR RESULTADO INDIVIDUAL
     window.editarResultadoEspecifico = async (itemCompleto) => {
         const partes = itemCompleto.split(':');
         const sorteoInfo = partes[0].trim();
@@ -168,9 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (index > -1) {
             listaArray[index] = `${sorteoInfo}: ${numFinal}`;
-            const { error } = await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
-            if (error) alert("Error: " + error.message);
-            else cargarDatosDesdeNube();
+            await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
+            cargarDatosDesdeNube();
         }
     };
 
@@ -181,9 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const index = listaArray.indexOf(itemCompleto);
         if (index > -1) {
             listaArray.splice(index, 1);
-            const { error } = await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
-            if (error) alert("Error: " + error.message);
-            else cargarDatosDesdeNube();
+            await _supabase.from('resultados').update({ numeros: listaArray.join(',') }).eq('juego', juego);
+            cargarDatosDesdeNube();
         }
     };
 
@@ -307,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarListas() {
-        // --- LISTA DE PARTICIPANTES ---
+        // --- LISTA PARTICIPANTES (BOTONES SOLICITADOS) ---
         const listaPart = document.getElementById('lista-participantes');
         if(listaPart) {
             const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
@@ -318,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="flex-grow:1;">
                         <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
                         <small style="color: #666;">${p.numeros_jugados}</small> 
-                        ${p.notas_correccion ? '<br><i style="color:red; font-size: 11px;">'+p.notas_correccion+'</i>' : ''}
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button style="background:#ffc107; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">Editar</button>
@@ -327,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </li>`).join('');
         }
 
-        // --- LISTA DE RESULTADOS (DISEÑO SOLICITADO) ---
+        // --- LISTA RESULTADOS (BOTONES SOLICITADOS) ---
         const listaRes = document.getElementById('lista-resultados');
         if(listaRes) {
             if (!resultadosActuales || resultadosActuales.trim() === "") {
@@ -415,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDatosDesdeNube();
     });
 
-    // --- GUARDAR RESULTADO (CON BLOQUEO DE DUPLICADOS) ---
+    // --- GUARDAR RESULTADO (BLOQUEO DE DUPLICADOS INTEGRADO) ---
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
@@ -426,10 +423,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
         
-        // VALIDACIÓN DE DUPLICADO
+        // REGLA: No permitir duplicados para la misma ruleta y hora
         const yaExiste = listaArray.some(item => item.startsWith(horaSorteo + ":"));
         if (yaExiste) {
-            alert(`🚫 Ya ingresaste un resultado para ${horaSorteo}. \n\nPara cambiarlo, usa el botón "Editar" en la lista de abajo.`);
+            alert(`🚫 Ya ingresaste un resultado para ${horaSorteo}. \n\nPara cambiarlo, búscalo abajo y dale a Editar o Eliminar.`);
             return;
         }
 
