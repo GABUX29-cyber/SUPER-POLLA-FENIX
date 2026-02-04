@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO (RESPETANDO TUS HORARIOS) ---
+    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO (RESPETANDO TUS HORARIOS ORIGINALES) ---
     let participantes = [];
     let resultadosActuales = "";
     let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 4. FUNCIONES DE EDICIÓN Y ELIMINACIÓN ---
     window.editarParticipanteNube = async (id, nombreAct, refeAct, jugadasAct) => {
-        const nuevoNombre = prompt("Nombre:", nombreAct);
+        const nuevoNombre = prompt("Nombre/Alias:", nombreAct);
         if (nuevoNombre === null) return;
         const nuevaRefe = prompt("Referencia (REFE):", refeAct);
         if (nuevaRefe === null) return;
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarListas() {
-        // --- LISTA PARTICIPANTES (BOTONES SOLICITADOS) ---
+        // --- LISTA PARTICIPANTES (TEXTOS ACTUALIZADOS) ---
         const listaPart = document.getElementById('lista-participantes');
         if(listaPart) {
             const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </li>`).join('');
         }
 
-        // --- LISTA RESULTADOS (BOTONES SOLICITADOS) ---
+        // --- LISTA RESULTADOS ---
         const listaRes = document.getElementById('lista-resultados');
         if(listaRes) {
             if (!resultadosActuales || resultadosActuales.trim() === "") {
@@ -423,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
         
-        // REGLA: No permitir duplicados para la misma ruleta y hora
         const yaExiste = listaArray.some(item => item.startsWith(horaSorteo + ":"));
         if (yaExiste) {
             alert(`🚫 Ya ingresaste un resultado para ${horaSorteo}. \n\nPara cambiarlo, búscalo abajo y dale a Editar o Eliminar.`);

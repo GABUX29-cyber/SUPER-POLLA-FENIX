@@ -113,12 +113,12 @@
         </select>
 
         <div class="admin-section">
-            <h2>💵 Finanzas y Ventas</h2>
+            <h2>💵 Ingresar Montos Financieros y Ventas</h2>
             <form id="form-finanzas">
                 <label for="input-ventas">Total Ventas (Tickets - Automático):</label>
                 <input type="number" id="input-ventas" value="0" readonly>
                 
-                <label for="input-recaudado">Recaudado (Bs.):</label>
+                <label for="input-recaudado">Recaudado del Día (Bs.):</label>
                 <input type="number" id="input-recaudado" step="0.01" value="0.00" required>
                 
                 <label for="input-acumulado1" id="label-acumu1">Acumulado Primer Premio:</label>
@@ -145,12 +145,12 @@
         </div>
 
         <div class="admin-section">
-            <h2>🔢 Resultados del Sorteo</h2>
+            <h2>🔢 Ingresar Resultados del Sorteo</h2>
             <form id="form-resultados">
                 <label for="sorteo-hora">Sorteo y Hora (Se actualiza según el juego):</label>
                 <select id="sorteo-hora" required></select>
                 
-                <label for="numero-ganador">Número Ganador:</label>
+                <label for="numero-ganador">Número Ganador (00-99):</label>
                 <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
                 
                 <button type="submit">Guardar Resultado</button>
@@ -160,16 +160,16 @@
         </div>
 
         <div class="admin-section">
-            <h2>👥 Registro de Participantes</h2>
+            <h2>👥 Ingresar Nuevo Participante</h2>
             
             <div id="paste-section">
-                <label for="input-paste-data"><strong>WhatsApp Paste:</strong></label>
-                <textarea id="input-paste-data" placeholder="Pega el mensaje aquí..."></textarea>
-                <button type="button" id="btn-procesar-pegado">Procesar al Formulario</button>
+                <label for="input-paste-data"><strong>Opción Rápida: Pega el mensaje de WhatsApp aquí.</strong></label>
+                <textarea id="input-paste-data" placeholder="PEGA AQUI EL TEXTO..."></textarea>
+                <button type="button" id="btn-procesar-pegado">PROCESAR TEXTO AL RECUADRO</button>
             </div>
             
             <form id="form-participante" style="margin-top: 20px;">
-                <label for="nombre">Nombre:</label>
+                <label for="nombre">Nombre/Alias:</label>
                 <input type="text" id="nombre" required>
                 
                 <label for="refe">Código REFE:</label>
@@ -180,11 +180,11 @@
                        style="background-color: #fffde7; border: 2px solid #fdd835; font-weight: bold;" 
                        placeholder="Números separados por comas..." required>
                 
-                <button type="submit">Registrar en el Sistema</button>
+                <button type="submit">REGISTRAR PARTICIPANTE</button>
             </form>
             
-            <h3>Listado:</h3>
-            <input type="text" id="input-buscar-participante" placeholder="🔍 Filtrar por nombre o REFE...">
+            <h3>Listado de Participantes:</h3>
+            <input type="text" id="input-buscar-participante" placeholder="🔍 BUSCAR POR NOMBRE O REFE...">
             <ul id="lista-participantes"></ul>
         </div>
         
