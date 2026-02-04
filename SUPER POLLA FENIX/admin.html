@@ -10,7 +10,6 @@
         .btn-editar, .btn-eliminar {
             padding: 5px 10px; border: none; cursor: pointer; border-radius: 4px;
             font-weight: bold; font-size: 0.85em; margin-left: 5px;
-            flex-shrink: 0; /* Cambio: evita que el botón se aplaste */
         }
         .btn-editar { background-color: #ffc107; color: #333; }
         .btn-eliminar { background-color: #dc3545; color: white; }
@@ -20,25 +19,19 @@
             background: #fff; margin-bottom: 10px; padding: 12px;
             border-radius: 8px; border-left: 5px solid #fdd835; color: #333;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%; /* Cambio: asegura ancho completo */
-            box-sizing: border-box; /* Cambio: evita que el padding desborde */
         }
 
         /* --- AJUSTE PARA LA CÁPSULA OSCURA TIPO IMAGEN --- */
         .tabs-fenix-container.admin-style {
-            background-color: #333 !important;
-            border: 2px solid #fdd835;
+            background-color: #333 !important; /* Fondo oscuro como la imagen */
+            border: 2px solid #fdd835; /* Borde amarillo resaltado */
             padding: 8px;
             margin-top: 10px;
-            display: flex; /* Cambio: alinea las pestañas */
-            justify-content: space-around;
-            border-radius: 8px;
         }
 
         #paste-section { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
         #paste-section textarea {
-            width: 100%; /* Cambio: de calc a 100% para evitar cortes */
-            min-height: 120px; padding: 10px;
+            width: calc(100% - 20px); min-height: 120px; padding: 10px;
             margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px;
             box-sizing: border-box; font-family: 'Montserrat', sans-serif; resize: vertical; 
         }
@@ -63,42 +56,13 @@
         }
         .login-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .login-card button { width: 100%; padding: 12px; background: #fdd835; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        
-        /* Cambio: Añadido max-width para que el contenido no se pegue a los bordes en PC */
-        #contenido-principal { 
-            display: none; 
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 10px; 
-        }
+        #contenido-principal { display: none; }
         
         /* Estilo para campo bloqueado de ventas */
         #input-ventas[readonly] {
             background-color: #e9ecef;
             cursor: not-allowed;
             font-weight: bold;
-        }
-
-        /* Cambio: Ajuste en formulario de finanzas para que se lea completo el último campo */
-        #form-finanzas {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-bottom: 15px;
-        }
-        #form-finanzas input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px;
-        }
-        #form-finanzas button {
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
         }
 
         footer {
@@ -108,13 +72,6 @@
             background: #1a1a1a;
             color: #fff;
             border-top: 3px solid #fdd835;
-        }
-        
-        /* Garantiza que los formularios no se corten */
-        .admin-section {
-            width: 100%;
-            box-sizing: border-box;
-            overflow: hidden;
         }
     </style>
 </head>
@@ -138,13 +95,13 @@
         </header>
 
         <div class="tabs-fenix-container admin-style no-print">
-            <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')" style="cursor:pointer; color:white;">
+            <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')">
                 SUPER POLLA FENIX (DIA)
             </div>
-            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'tarde')" style="cursor:pointer; color:white;">
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'tarde')">
                 SUPER POLLA FENIX (TARDE)
             </div>
-            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'mini')" style="cursor:pointer; color:white;">
+            <div class="tab-pill" onclick="seleccionarJuegoAdminPill(this, 'mini')">
                 MINI EXPRES FENIX
             </div>
         </div>
@@ -189,14 +146,14 @@
 
         <div class="admin-section">
             <h2>🔢 Ingresar Resultados del Sorteo</h2>
-            <form id="form-resultados" style="display: flex; flex-direction: column; gap: 10px;">
+            <form id="form-resultados">
                 <label for="sorteo-hora">Sorteo y Hora (Se actualiza según el juego):</label>
-                <select id="sorteo-hora" style="padding: 10px; border-radius: 6px;" required></select>
+                <select id="sorteo-hora" required></select>
                 
                 <label for="numero-ganador">Número Ganador (00-99):</label>
-                <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" style="padding: 10px; border-radius: 6px;" required>
+                <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
                 
-                <button type="submit" style="padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Guardar Resultado</button>
+                <button type="submit">Guardar Resultado</button>
             </form>
             <h3>Resultados Registrados:</h3>
             <ul id="lista-resultados"></ul>
@@ -211,19 +168,19 @@
                 <button type="button" id="btn-procesar-pegado">PROCESAR TEXTO AL RECUADRO</button>
             </div>
             
-            <form id="form-participante" style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <form id="form-participante" style="margin-top: 20px;">
                 <label for="nombre">Nombre/Alias:</label>
-                <input type="text" id="nombre" style="padding: 10px; border-radius: 6px;" required>
+                <input type="text" id="nombre" required>
                 
                 <label for="refe">Código REFE:</label>
-                <input type="number" id="refe" style="padding: 10px; border-radius: 6px;" required>
+                <input type="number" id="refe" required>
                 
                 <label>Jugadas (Verifique cantidad según el juego):</label>
                 <input type="text" id="jugadas-procesadas" 
-                       style="background-color: #fffde7; border: 2px solid #fdd835; font-weight: bold; padding: 10px; border-radius: 6px;" 
+                       style="background-color: #fffde7; border: 2px solid #fdd835; font-weight: bold;" 
                        placeholder="Números separados por comas..." required>
                 
-                <button type="submit" style="padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">REGISTRAR PARTICIPANTE</button>
+                <button type="submit">REGISTRAR PARTICIPANTE</button>
             </form>
             
             <h3>Listado de Participantes:</h3>
