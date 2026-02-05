@@ -72,8 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 3. CEREBRO DE VALIDACIÓN (REGLA 0 -> O) ---
+    // --- 3. CEREBRO DE VALIDACIÓN GLOBAL (ERRORES Y CAMBIOS) ---
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
+        // Normalización inicial
         let numeros = numerosRaw.map(n => {
             let num = n.trim();
             if (num === "0") return "O";
@@ -83,19 +84,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }).filter(n => n !== "");
 
         let avisos = [];
+
+        // 1. Detectar Sobrantes (Cualquier número de más se elimina)
         if (numeros.length > tamañoRequerido) {
             let eliminados = [];
             while (numeros.length > tamañoRequerido) {
                 eliminados.push(numeros.pop());
             }
-            avisos.push(`Sobrante eliminado (${eliminados.join(', ')})`);
+            avisos.push(`Sobrante eliminado: (${eliminados.join(', ')})`);
         }
 
+        // 2. Detectar Faltantes (Error crítico - No permite guardar)
         if (numeros.length < tamañoRequerido) {
-            alert(`❌ ERROR en ${nombreParticipante}: Solo tiene ${numeros.length} números de ${tamañoRequerido} requeridos.`);
+            alert(`❌ ERROR CRÍTICO EN ${nombreParticipante}:\nLa jugada solo tiene ${numeros.length} números. Se requieren ${tamañoRequerido}. Corrija antes de guardar.`);
             return null;
         }
 
+        // 3. Detectar Duplicados
         let counts = {};
         let duplicadosEncontrados = [];
         numeros.forEach(n => {
@@ -119,9 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!sePudoCorregir) {
-                alert(`🚫 JUGADA NULA (${nombreParticipante}): Hay duplicados y el 36 ya existe.`);
+                alert(`🚫 JUGADA NULA (${nombreParticipante}):\nHay duplicados y el número de emergencia (36) ya existe en la jugada.`);
                 return null;
             }
+        }
+
+        // MOSTRAR RESUMEN DE CAMBIOS SI EXISTE CUALQUIERA
+        if (avisos.length > 0) {
+            alert(`📝 CAMBIOS AUTOMÁTICOS EN ${nombreParticipante}:\n\n${avisos.map(a => "• " + a).join('\n')}`);
         }
 
         return { 
@@ -305,17 +315,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderizarListas() {
-        // --- LISTA PARTICIPANTES (TEXTOS ACTUALIZADOS) ---
         const listaPart = document.getElementById('lista-participantes');
         if(listaPart) {
             const filtro = document.getElementById('input-buscar-participante').value.toLowerCase();
             listaPart.innerHTML = participantes.filter(p => 
                 p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
             ).map(p => `
-                <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 8px; padding: 10px; border-radius: 8px; border-left: 4px solid #ffc107; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box;">
                     <div style="flex-grow:1;">
                         <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
-                        <small style="color: #666;">${p.numeros_jugados}</small> 
+                        <span style="font-weight: bold; color: #333;">${p.numeros_jugados}</span>
+                        ${p.notas_correccion ? `<br><small style="color: #dc3545; font-weight: bold; font-size: 0.85em;">${p.notas_correccion}</small>` : ''}
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button style="background:#ffc107; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">Editar</button>
@@ -324,14 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 </li>`).join('');
         }
 
-        // --- LISTA RESULTADOS ---
         const listaRes = document.getElementById('lista-resultados');
         if(listaRes) {
             if (!resultadosActuales || resultadosActuales.trim() === "") {
-                listaRes.innerHTML = "<li style='text-align:center; color:#999;'>Sin resultados</li>";
+                listaRes.innerHTML = "<li style='text-align:center; color:#999; width: 100%;'>Sin resultados</li>";
             } else {
                 listaRes.innerHTML = resultadosActuales.split(',').filter(x => x.trim() !== "").map(n => `
-                    <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 8px; padding: 12px; border-radius: 10px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
+                    <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box;">
                         <span style="font-weight: bold; color: #333; font-size: 15px;">${n}</span>
                         <div style="display: flex; gap: 10px;">
                             <button style="background:#ffc107; color:#212529; border:none; padding:6px 15px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:13px;" onclick="editarResultadoEspecifico('${n}')">Editar</button>
@@ -402,7 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let proc = procesarYValidarJugada(j.split(','), nombreVal, tamaño);
             if (proc) {
                 await _supabase.from('jugadas').insert([{
-                    nombre: nombreVal, refe: refeVal, numeros_jugados: proc.numeros, juego: juego, notas_correccion: proc.nota, nro_ticket: proximoTicket
+                    nombre: nombreVal, 
+                    refe: refeVal, 
+                    numeros_jugados: proc.numeros, 
+                    juego: juego, 
+                    notas_correccion: proc.nota, 
+                    nro_ticket: proximoTicket
                 }]);
                 proximoTicket++;
             }
@@ -412,7 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarDatosDesdeNube();
     });
 
-    // --- GUARDAR RESULTADO (BLOQUEO DE DUPLICADOS INTEGRADO) ---
     document.getElementById('form-resultados').addEventListener('submit', async (e) => {
         e.preventDefault();
         const juego = document.getElementById('select-juego-admin').value;
