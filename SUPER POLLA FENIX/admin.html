@@ -6,7 +6,7 @@
     <title>Panel de Administración - SUPER POLLA FENIX</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
-        /* --- TUS ESTILOS ORIGINALES MANTENIDOS --- */
+        /* --- TUS ESTILOS ORIGINALES CON AJUSTES DE ANCHO --- */
         .btn-editar, .btn-eliminar {
             padding: 5px 10px; border: none; cursor: pointer; border-radius: 4px;
             font-weight: bold; font-size: 0.85em; margin-left: 5px;
@@ -14,11 +14,27 @@
         .btn-editar { background-color: #ffc107; color: #333; }
         .btn-eliminar { background-color: #dc3545; color: white; }
         
+        /* Ajuste para que las listas ocupen todo el ancho disponible */
+        #lista-participantes, #lista-resultados {
+            width: 100%;
+            padding: 0;
+            margin: 15px 0;
+            list-style: none;
+        }
+
         #lista-participantes li, #lista-resultados li {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #fff; margin-bottom: 10px; padding: 12px;
-            border-radius: 8px; border-left: 5px solid #fdd835; color: #333;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            background: #fff; 
+            margin-bottom: 10px; 
+            padding: 15px; /* Padding ajustado para mejor visual por el ancho */
+            border-radius: 8px; 
+            border-left: 5px solid #fdd835; 
+            color: #333;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%; /* Forzar ancho total */
+            box-sizing: border-box; /* Evitar que el padding rompa el diseño */
         }
 
         .tabs-fenix-container.admin-style {
@@ -40,7 +56,7 @@
             width: 100%; transition: background-color 0.2s ease;
         }
         #input-buscar-participante {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px;
             margin-bottom: 15px; box-sizing: border-box; 
         }
 
@@ -70,6 +86,13 @@
             background: #1a1a1a;
             color: #fff;
             border-top: 3px solid #fdd835;
+        }
+
+        /* Forzamos que las secciones ocupen todo el ancho del contenedor */
+        .admin-section {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
         }
     </style>
 </head>
@@ -151,9 +174,9 @@
                 <label for="numero-ganador">Número Ganador (00-99):</label>
                 <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
                 
-                <button type="submit">Guardar Resultado</button>
+                <button type="submit" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;">GUARDAR RESULTADO</button>
             </form>
-            <h3>Resultados Registrados:</h3>
+            <h3 style="margin-top: 25px;">Resultados Registrados:</h3>
             <ul id="lista-resultados"></ul>
         </div>
 
@@ -170,18 +193,18 @@
                 <label for="nombre">Nombre/Alias:</label>
                 <input type="text" id="nombre" required>
                 
-                <label for="refe">Código REFE:</label>
+                <label for="refe" style="display: block; margin-top: 10px;">Código REFE:</label>
                 <input type="number" id="refe" required>
                 
-                <label>Jugadas (Verifique cantidad según el juego):</label>
+                <label style="display: block; margin-top: 10px;">Jugadas (Verifique cantidad según el juego):</label>
                 <input type="text" id="jugadas-procesadas" 
                        style="background-color: #fffde7; border: 2px solid #fdd835; font-weight: bold;" 
                        placeholder="Números separados por comas..." required>
                 
-                <button type="submit">REGISTRAR PARTICIPANTE</button>
+                <button type="submit" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px;">REGISTRAR PARTICIPANTE</button>
             </form>
             
-            <h3>Listado de Participantes:</h3>
+            <h3 style="margin-top: 30px;">Listado de Participantes:</h3>
             <input type="text" id="input-buscar-participante" placeholder="🔍 BUSCAR POR NOMBRE O REFE...">
             <ul id="lista-participantes"></ul>
         </div>
