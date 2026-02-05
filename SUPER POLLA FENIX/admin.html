@@ -21,10 +21,9 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- AJUSTE PARA LA CÁPSULA OSCURA TIPO IMAGEN --- */
         .tabs-fenix-container.admin-style {
-            background-color: #333 !important; /* Fondo oscuro como la imagen */
-            border: 2px solid #fdd835; /* Borde amarillo resaltado */
+            background-color: #333 !important;
+            border: 2px solid #fdd835;
             padding: 8px;
             margin-top: 10px;
         }
@@ -58,18 +57,10 @@
         .login-card button { width: 100%; padding: 12px; background: #fdd835; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         #contenido-principal { display: none; }
         
-        /* Estilo para campo bloqueado de ventas */
         #input-ventas[readonly] {
             background-color: #e9ecef;
             cursor: not-allowed;
             font-weight: bold;
-        }
-
-        /* --- ÚNICO CAMBIO SOLICITADO: AJUSTE PARA VER EL TÍTULO DEL SEGUNDO ACUMULADO --- */
-        #container-acumu2 {
-            margin-top: 15px; /* Crea espacio suficiente para que el título sea visible */
-            display: block;
-            clear: both;
         }
 
         footer {
@@ -121,22 +112,22 @@
 
         <div class="admin-section">
             <h2>💵 Ingresar Montos Financieros y Ventas</h2>
-            <form id="form-finanzas">
+            <form id="form-finanzas" style="display: flex; flex-direction: column;">
                 <label for="input-ventas">Total Ventas (Tickets - Automático):</label>
                 <input type="number" id="input-ventas" value="0" readonly>
                 
-                <label for="input-recaudado">Recaudado del Día (Bs.):</label>
+                <label for="input-recaudado" style="margin-top: 15px;">Recaudado del Día (Bs.):</label>
                 <input type="number" id="input-recaudado" step="0.01" value="0.00" required>
                 
-                <label for="input-acumulado1" id="label-acumu1">Acumulado Primer Premio:</label>
+                <label for="input-acumulado1" id="label-acumu1" style="margin-top: 15px;">Acumulado Primer Premio:</label>
                 <input type="number" id="input-acumulado1" step="0.01" value="0.00" required>
 
-                <div id="container-acumu2">
-                    <label for="input-acumulado2" id="label-acumu2">Acumulado Segundo Premio:</label>
-                    <input type="number" id="input-acumulado2" step="0.01" value="0.00">
+                <div id="container-acumu2" style="margin-top: 15px; display: block; clear: both;">
+                    <label for="input-acumulado2" id="label-acumu2" style="display: block; margin-bottom: 5px;">Acumulado Segundo Premio:</label>
+                    <input type="number" id="input-acumulado2" step="0.01" value="0.00" style="width: 100%;">
                 </div>
                 
-                <button type="submit" style="margin-top: 10px;">Guardar Finanzas</button>
+                <button type="submit" style="margin-top: 20px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold;">Guardar Finanzas</button>
             </form>
 
             <div class="card-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
