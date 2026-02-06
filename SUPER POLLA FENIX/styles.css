@@ -680,6 +680,16 @@ footer {
         color: #333 !important;
     }
 
+    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
+    thead th {
+        background-color: #333 !important;
+        color: #fdd835 !important;
+        padding: 16px 8px !important; /* Grosor aumentado */
+        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
+        border: 1px solid #444 !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
     .stats-grid-ultra {
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
         gap: 2px !important;
