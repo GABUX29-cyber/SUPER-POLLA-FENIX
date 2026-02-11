@@ -208,7 +208,17 @@ header p {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 12px;
+    
+    /* CAMBIO APLICADO: Sombra forzada mediante bordes para que sea visible en PDF */
+    /* Esto crea el efecto de profundidad negra en la esquina inferior derecha */
+    border-right: 6px solid #000000;
+    border-bottom: 6px solid #000000;
+    border-left: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    
+    /* Mantenemos la sombra normal para la web */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    
     text-align: center;
     width: 100%;
     box-sizing: border-box;
@@ -673,21 +683,19 @@ footer {
     header {
         background-color: #fdd835 !important;
         color: #333 !important;
-        /* Simulación de profundidad con borde oscuro grueso */
-        border-right: 4px solid #000 !important;
-        border-bottom: 4px solid #000 !important;
     }
 
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
-        /* ESTO SIMULA LA SOMBRA SIN ACTIVAR GRÁFICOS DE FONDO */
-        border-right: 5px solid #111 !important;
-        border-bottom: 5px solid #111 !important;
-        border-left: 1px solid #ccc !important;
-        border-top: 1px solid #ccc !important;
-        border-radius: 12px !important;
-        margin-bottom: 25px !important;
+        /* APLICACIÓN DEL SOMBRADO DE FONDO MEDIANTE BORDES SOLIDOS */
+        border-right: 6px solid #111111 !important;
+        border-bottom: 6px solid #111111 !important;
+        border-left: 1px solid #ddd !important;
+        border-top: 1px solid #ddd !important;
+        /* ------------------------------------------------------ */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
@@ -719,5 +727,5 @@ footer {
         break-inside: avoid !important;
     }
 
-    @page { margin: 5mm; }
+    @page { margin: 10mm 0; }
 }
