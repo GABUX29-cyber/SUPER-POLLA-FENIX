@@ -189,44 +189,38 @@ header p {
 .ganadores-box-item i { color: #f44336; }
 
 /* ========================================================= */
-/* 3. CONTENEDORES Y TARJETAS (RECUADROS BLANCOS)             */
+/* 3. CONTENEDORES Y TARJETAS                                 */
 /* ========================================================= */
 .card-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 25px;
 }
 
 .card-container.full-width {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    
-    /* ESTO GENERA EL SOMBREADO QUE PEDISTE (VISIBLE EN TODO MOMENTO) */
-    border-right: 6px solid #111111;
-    border-bottom: 6px solid #111111;
-    border-left: 1px solid #ccc;
-    border-top: 1px solid #ccc;
-    
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    border-bottom: 2px solid #fdd835;
-    padding-bottom: 8px;
-    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    border-bottom: 2px solid #fdd835;
+    padding-bottom: 8px;
+    display: inline-block;
 }
 
 /* ========================================================= */
@@ -679,20 +673,35 @@ footer {
     header {
         background-color: #fdd835 !important;
         color: #333 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
+        /* SOMBRA DE FONDO SOLICITADA (Solo en cuadros grandes) */
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.6) !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
-    thead th {
+    /* --- TABLA DE PARTICIPANTES (SI MANTIENE EL GROSOR) --- */
+    #tabla-participantes-publica thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
         padding: 16px 8px !important; /* Grosor aumentado */
-        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
+        font-size: 10pt !important;
         border: 1px solid #444 !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    /* --- TABLA DE RESULTADOS (NO SE FUERZA EL GROSOR) --- */
+    /* Esto evita que las horas (8AM, 9AM...) se vean gordas */
+    .numeros-ganadores table thead th {
+        padding: 4px 2px !important; 
+        font-size: 9pt !important;
+        background-color: #333 !important;
         -webkit-print-color-adjust: exact !important;
     }
 
@@ -705,6 +714,8 @@ footer {
         border: 1px solid #ddd !important;
         padding: 4px 1px !important;
         min-height: auto !important;
+        /* Sin sombra para los cuadritos de info extra */
+        box-shadow: none !important;
     }
 
     .val-mini { font-size: 0.75em !important; }
@@ -715,5 +726,5 @@ footer {
         break-inside: avoid !important;
     }
 
-    @page { margin: 0; }
+    @page { margin: 10mm 5mm; }
 }
