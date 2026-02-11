@@ -53,45 +53,12 @@
                 display: none !important; 
             }
             
-            body { 
-                background-color: #212121 !important; 
-                color: #eee !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                margin: 0;
-                padding: 0;
-            }
-
-            /* APLICACIÓN DE SOMBREADO DE FONDO EN LOS RECUADROS GRANDES */
-            .card { 
-                background-color: #ffffff !important;
-                color: #333 !important;
-                /* Simulación de sombra con bordes sólidos para PDF */
-                border-right: 7px solid #000000 !important;
-                border-bottom: 7px solid #000000 !important;
-                border-left: 1px solid #ddd !important;
-                border-top: 1px solid #ddd !important;
-                border-radius: 12px !important;
-                margin-bottom: 30px !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            body { background-color: white !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
             
-            /* FORZAR GROSOR DE LA BARRA DE ENCABEZADOS */
-            thead th {
-                background-color: #333 !important;
-                color: #fdd835 !important;
-                padding: 16px 8px !important; 
-                font-size: 10pt !important;
-                border: 1px solid #444 !important;
-                -webkit-print-color-adjust: exact !important;
-            }
-
             /* Asegurar que la tabla sea legible en PDF */
             table { width: 100% !important; font-size: 10pt; }
             th, td { padding: 4px !important; }
-
-            @page { margin: 10mm 5mm; }
         }
     </style>
 </head>
