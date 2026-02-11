@@ -677,11 +677,12 @@ footer {
         print-color-adjust: exact !important;
     }
 
+    /* RECUADROS GRANDES BLANCOS CON LA SOMBRA SOLICITADA */
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
-        /* APLICACIÓN DE SOMBREADO SOLO A LOS RECUADROS GRANDES */
-        box-shadow: 10px 10px 25px rgba(0, 0, 0, 0.7) !important;
+        /* ESTA ES LA SOMBRA QUE DA PROFUNDIDAD */
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.7) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -715,7 +716,8 @@ footer {
         break-inside: avoid !important;
     }
 
+    /* Ajustamos el margen para que la sombra no se corte al final del papel */
     @page { 
-        margin: 10mm 0; /* Margen para que se vea la sombra al imprimir */
+        margin: 10mm 0; 
     }
 }
