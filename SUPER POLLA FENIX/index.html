@@ -1,254 +1,254 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUPER POLLA FENIX - Resultados Oficiales</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        /* --- ESTILOS PARA LOS BOTONES OVALADOS (TABS) --- */
-        .tabs-fenix-container {
-            display: flex;
-            background-color: rgba(255, 204, 0, 0.15); /* Fondo amarillento suave estilo cápsula */
-            border-radius: 50px;
-            padding: 6px;
-            width: fit-content;
-            margin: 20px auto;
-            border: 2px solid #fbc02d;
-            gap: 5px;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUPER POLLA FENIX - Resultados Oficiales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* --- ESTILOS PARA LOS BOTONES OVALADOS (TABS) --- */
+        .tabs-fenix-container {
+            display: flex;
+            background-color: rgba(255, 204, 0, 0.15); /* Fondo amarillento suave estilo cápsula */
+            border-radius: 50px;
+            padding: 6px;
+            width: fit-content;
+            margin: 20px auto;
+            border: 2px solid #fbc02d;
+            gap: 5px;
+        }
 
-        .tab-pill {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 50px;
-            font-weight: 800;
-            color: #5d4037; /* Marrón oscuro para legibilidad */
-            transition: all 0.3s ease;
-            font-size: 13px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
+        .tab-pill {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 50px;
+            font-weight: 800;
+            color: #5d4037; /* Marrón oscuro para legibilidad */
+            transition: all 0.3s ease;
+            font-size: 13px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
 
-        /* Estado activo: Fondo blanco y texto resaltado */
-        .tab-pill.active {
-            background-color: #ffffff;
-            color: #d32f2f; /* Rojo Fénix */
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-        }
+        /* Estado activo: Fondo blanco y texto resaltado */
+        .tab-pill.active {
+            background-color: #ffffff;
+            color: #d32f2f; /* Rojo Fénix */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
-        .tab-pill:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.5);
-        }
+        .tab-pill:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
 
-        /* --- CONFIGURACIÓN DE IMPRESIÓN (PDF) --- */
-        @media print {
-            .no-print, 
-            .tabs-fenix-container, 
-            #btn-descargar-pdf, 
-            .filtro-container,
-            header h1::after { 
-                display: none !important; 
-            }
-            
-            body { background-color: white !important; }
-            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
-            
-            /* Asegurar que la tabla sea legible en PDF */
-            table { width: 100% !important; font-size: 10pt; }
-            th, td { padding: 4px !important; }
-        }
-    </style>
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (PDF) --- */
+        @media print {
+            .no-print, 
+            .tabs-fenix-container, 
+            #btn-descargar-pdf, 
+            .filtro-container,
+            header h1::after { 
+                display: none !important; 
+            }
+            
+            body { background-color: white !important; }
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+            
+            /* Asegurar que la tabla sea legible en PDF */
+            table { width: 100% !important; font-size: 10pt; }
+            th, td { padding: 4px !important; }
+        }
+    </style>
 </head>
 <body>
 
-    <header>
-        <h1 id="main-title">SUPER POLLA FENIX</h1>
-        <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
-    </header>
+    <header>
+        <h1 id="main-title">SUPER POLLA FENIX</h1>
+        <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
+    </header>
 
-    <div class="card-container full-width no-print">
-        <div class="tabs-fenix-container">
-            <div class="tab-pill active" onclick="seleccionarJuegoPill(this, 'dia')">
-                SUPER POLLA FENIX (DIA)
-            </div>
-            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'tarde')">
-                SUPER POLLA FENIX (TARDE)
-            </div>
-            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'mini')">
-                MINI EXPRES FENIX
-            </div>
-        </div>
-    </div>
+    <div class="card-container full-width no-print">
+        <div class="tabs-fenix-container">
+            <div class="tab-pill active" onclick="seleccionarJuegoPill(this, 'dia')">
+                SUPER POLLA FENIX (DIA)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'tarde')">
+                SUPER POLLA FENIX (TARDE)
+            </div>
+            <div class="tab-pill" onclick="seleccionarJuegoPill(this, 'mini')">
+                MINI EXPRES FENIX
+            </div>
+        </div>
+    </div>
 
-    <select id="select-juego-publico" style="display: none;">
-        <option value="dia">dia</option>
-        <option value="tarde">tarde</option>
-        <option value="mini">mini</option>
-    </select>
-    
-    <div class="card-container full-width">
-        <div class="card">
-            <h2><i class="fas fa-clock"></i> Cuadro de Resultados - <span id="nombre-juego-titulo">CARGANDO...</span></h2>
-            <div id="numeros-ganadores-display" class="numeros-ganadores">
-                <p>Cargando resultados oficiales...</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card-container full-width">
-        <div class="card compact-resumen">
-            <h2><i class="fas fa-chart-line"></i> Info Extra</h2>
-            <div class="stats-grid-ultra" id="grid-finanzas">
-                
-                <div class="est-mini ventas">
-                    <i class="fas fa-ticket-alt"></i>
-                    <span class="val-mini" id="ventas">0</span>
-                    <label>Tickets Vendidos</label>
-                </div>
+    <select id="select-juego-publico" style="display: none;">
+        <option value="dia">dia</option>
+        <option value="tarde">tarde</option>
+        <option value="mini">mini</option>
+    </select>
+    
+    <div class="card-container full-width">
+        <div class="card">
+            <h2><i class="fas fa-clock"></i> Cuadro de Resultados - <span id="nombre-juego-titulo">CARGANDO...</span></h2>
+            <div id="numeros-ganadores-display" class="numeros-ganadores">
+                <p>Cargando resultados oficiales...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-container full-width">
+        <div class="card compact-resumen">
+            <h2><i class="fas fa-chart-line"></i> Info Extra</h2>
+            <div class="stats-grid-ultra" id="grid-finanzas">
+                
+                <div class="est-mini ventas">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span class="val-mini" id="ventas">0</span>
+                    <label>Tickets Vendidos</label>
+                </div>
 
-                <div class="est-mini recaudado">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <span class="val-mini" id="recaudado">0.00 BS</span>
-                    <label>Total Recaudado</label>
-                </div>
+                <div class="est-mini recaudado">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="val-mini" id="recaudado">0.00 BS</span>
+                    <label>Total Recaudado</label>
+                </div>
 
-                <div class="est-mini casa" id="box-casa">
-                    <i class="fas fa-university"></i>
-                    <span class="val-mini" id="monto-casa">0.00 BS</span>
-                    <label id="label-casa">20% Casa</label>
-                </div>
+                <div class="est-mini casa" id="box-casa">
+                    <i class="fas fa-university"></i>
+                    <span class="val-mini" id="monto-casa">0.00 BS</span>
+                    <label id="label-casa">20% Casa</label>
+                </div>
 
-                <div class="est-mini domingo" id="box-domingo">
-                    <i class="fas fa-calendar-day"></i>
-                    <span class="val-mini" id="monto-domingo">0.00 BS</span>
-                    <label>5% Día Domingo</label>
-                </div>
+                <div class="est-mini domingo" id="box-domingo">
+                    <i class="fas fa-calendar-day"></i>
+                    <span class="val-mini" id="monto-domingo">0.00 BS</span>
+                    <label>5% Día Domingo</label>
+                </div>
 
-                <div class="est-mini repartir">
-                    <i class="fas fa-hand-holding-usd"></i>
-                    <span class="val-mini" id="repartir75">0.00 BS</span>
-                    <label id="label-repartir">Premio a Repartir</label>
-                </div>
+                <div class="est-mini repartir">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span class="val-mini" id="repartir75">0.00 BS</span>
+                    <label id="label-repartir">Premio a Repartir</label>
+                </div>
 
-                <div class="est-mini acumulado" id="box-acumu1">
-                    <i class="fas fa-trophy"></i>
-                    <span class="val-mini" id="acumulado1">0.00 BS</span>
-                    <label id="label-acumu1">Acumu Anterior</label>
-                </div>
+                <div class="est-mini acumulado" id="box-acumu1">
+                    <i class="fas fa-trophy"></i>
+                    <span class="val-mini" id="acumulado1">0.00 BS</span>
+                    <label id="label-acumu1">Acumu Anterior</label>
+                </div>
 
-                <div class="est-mini acumulado" id="box-acumu2">
-                    <i class="fas fa-medal"></i>
-                    <span class="val-mini" id="acumulado2">0.00 BS</span>
-                    <label id="label-acumu2">Acumu 2do Lugar</label>
-                </div>
+                <div class="est-mini acumulado" id="box-acumu2">
+                    <i class="fas fa-medal"></i>
+                    <span class="val-mini" id="acumulado2">0.00 BS</span>
+                    <label id="label-acumu2">Acumu 2do Lugar</label>
+                </div>
 
-                <div class="est-mini ganadores-box-item" id="box-total-1" style="grid-column: span 2; background: #fff9c4; color: #333; border: 2px solid #fbc02d;">
-                    <i class="fas fa-star"></i>
-                    <span class="val-mini" id="total-acumu-premio1">0.00 BS</span>
-                    <label id="label-total1">ACUMULADO+1ER PREMIO</label>
-                </div>
+                <div class="est-mini ganadores-box-item" id="box-total-1" style="grid-column: span 2; background: #fff9c4; color: #333; border: 2px solid #fbc02d;">
+                    <i class="fas fa-star"></i>
+                    <span class="val-mini" id="total-acumu-premio1">0.00 BS</span>
+                    <label id="label-total1">ACUMULADO+1ER PREMIO</label>
+                </div>
 
-                <div class="est-mini ganadores-box-item" id="box-total-2" style="grid-column: span 2; background: #e3f2fd; color: #333; border: 2px solid #1976d2;">
-                    <i class="fas fa-star-half-alt"></i>
-                    <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
-                    <label id="label-total2">ACUMULADO+2DO PREMIO</label>
-                </div>
+                <div class="est-mini ganadores-box-item" id="box-total-2" style="grid-column: span 2; background: #e3f2fd; color: #333; border: 2px solid #1976d2;">
+                    <i class="fas fa-star-half-alt"></i>
+                    <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
+                    <label id="label-total2">ACUMULADO+2DO PREMIO</label>
+                </div>
 
-                <div class="est-mini ganadores-box-item" style="background: #e8f5e9; color: #2e7d32;">
-                    <i class="fas fa-users"></i>
-                    <span class="val-mini" id="total-ganadores">0</span>
-                    <label id="label-ganadores">Ganadores Totales</label>
-                </div>
+                <div class="est-mini ganadores-box-item" style="background: #e8f5e9; color: #2e7d32;">
+                    <i class="fas fa-users"></i>
+                    <span class="val-mini" id="total-ganadores">0</span>
+                    <label id="label-ganadores">Ganadores Totales</label>
+                </div>
 
-            </div>
-        </div>
-    </div>
+            </div>
+        </div>
+    </div>
 
-    <div style="margin-bottom: 20px; text-align: center;" class="no-print">
-        <button id="btn-descargar-pdf">
-            <i class="fas fa-file-pdf"></i> Descargar Resultados / Imprimir
-        </button>
-    </div>
+    <div style="margin-bottom: 20px; text-align: center;" class="no-print">
+        <button id="btn-descargar-pdf">
+            <i class="fas fa-file-pdf"></i> Descargar Resultados / Imprimir
+        </button>
+    </div>
 
-    <div class="filtro-container no-print">
-        <div class="filtro-input-wrapper">
-            <i class="fas fa-search"></i>
-            <input type="text" id="filtroParticipantes" class="filtro-input" placeholder="🔍 Buscar por Nombre o REFE...">
-        </div>
-    </div>
+    <div class="filtro-container no-print">
+        <div class="filtro-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="filtroParticipantes" class="filtro-input" placeholder="🔍 Buscar por Nombre o REFE...">
+        </div>
+    </div>
 
-    <div class="card-container full-width">
-        <div class="card ranking">
-            <h2><i class="fas fa-list-ol"></i> Participantes y Aciertos</h2>
-            <div style="overflow-x: auto;">
-                <table id="tabla-participantes-publica">
-                    <thead>
-                        <tr id="header-tabla">
-                            <th>NRO</th>
-                            <th>PARTICIPANTE</th>
-                            <th>REFE</th>
-                            <th id="jugada-header-col">JUGADA</th> 
-                            <th>ACIERTOS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ranking-body">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <div class="card-container full-width">
+        <div class="card ranking">
+            <h2><i class="fas fa-list-ol"></i> Participantes y Aciertos</h2>
+            <div style="overflow-x: auto;">
+                <table id="tabla-participantes-publica">
+                    <thead>
+                        <tr id="header-tabla">
+                            <th>NRO</th>
+                            <th>PARTICIPANTE</th>
+                            <th>REFE</th>
+                            <th id="jugada-header-col">JUGADA</th> 
+                            <th>ACIERTOS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    <footer>
-        <p id="footer-text">&copy; 2026 SUPER POLLA FENIX - Sistema Profesional de Gestión de Resultados.</p>
-    </footer>
+    <footer>
+        <p id="footer-text">&copy; 2026 SUPER POLLA FENIX - Sistema Profesional de Gestión de Resultados.</p>
+    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="script.js"></script>
-    <script>
-        // Función para sincronizar los botones ovalados con la lógica de carga de datos
-        function seleccionarJuegoPill(elemento, juego) {
-            // 1. Quitar clase activa de todos los botones
-            document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
-            // 2. Agregar clase activa al seleccionado
-            elemento.classList.add('active');
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Función para sincronizar los botones ovalados con la lógica de carga de datos
+        function seleccionarJuegoPill(elemento, juego) {
+            // 1. Quitar clase activa de todos los botones
+            document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            // 2. Agregar clase activa al seleccionado
+            elemento.classList.add('active');
 
-            // 3. Cambiar el valor del select oculto
-            const selectReal = document.getElementById('select-juego-publico');
-            if (selectReal) {
-                selectReal.value = juego;
-                // 4. Disparar evento de cambio para que script.js detecte que debe recargar datos
-                selectReal.dispatchEvent(new Event('change'));
-            }
+            // 3. Cambiar el valor del select oculto
+            const selectReal = document.getElementById('select-juego-publico');
+            if (selectReal) {
+                selectReal.value = juego;
+                // 4. Disparar evento de cambio para que script.js detecte que debe recargar datos
+                selectReal.dispatchEvent(new Event('change'));
+            }
 
-            // 5. AJUSTE DE ETIQUETAS Y TEXTOS DINÁMICOS
-            const labelAcumu1 = document.getElementById('label-acumu1');
-            const labelTotal1 = document.getElementById('label-total1');
-            const labelTotal2 = document.getElementById('label-total2');
-            const labelAcumu2 = document.getElementById('label-acumu2');
-            const footerText = document.getElementById('footer-text');
-            const mainTitle = document.getElementById('main-title');
+            // 5. AJUSTE DE ETIQUETAS Y TEXTOS DINÁMICOS
+            const labelAcumu1 = document.getElementById('label-acumu1');
+            const labelTotal1 = document.getElementById('label-total1');
+            const labelTotal2 = document.getElementById('label-total2');
+            const labelAcumu2 = document.getElementById('label-acumu2');
+            const footerText = document.getElementById('footer-text');
+            const mainTitle = document.getElementById('main-title');
 
-            if (juego === 'mini') {
-                labelAcumu1.textContent = "Acumu Día Anterior";
-                // CAMBIO APLICADO PARA MINI
-                labelTotal1.textContent = "ACUMULADO+PREMIO";
-                mainTitle.textContent = "MINI EXPRES FENIX";
-                footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
-            } else {
-                const nombreJuego = juego === 'dia' ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
-                mainTitle.textContent = nombreJuego;
-                labelAcumu1.textContent = "Acumu 1er Premio";
-                labelAcumu2.textContent = "Acumu 2do Premio";
-                // CAMBIO APLICADO PARA DIA/TARDE
-                labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
-                labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
-                footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
-            }
-        }
-    </script>
+            if (juego === 'mini') {
+                labelAcumu1.textContent = "Acumu Día Anterior";
+                // CAMBIO APLICADO PARA MINI
+                labelTotal1.textContent = "ACUMULADO+PREMIO";
+                mainTitle.textContent = "MINI EXPRES FENIX";
+                footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
+            } else {
+                const nombreJuego = juego === 'dia' ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
+                mainTitle.textContent = nombreJuego;
+                labelAcumu1.textContent = "Acumu 1er Premio";
+                labelAcumu2.textContent = "Acumu 2do Premio";
+                // CAMBIO APLICADO PARA DIA/TARDE
+                labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
+                labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
+                footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
+            }
+        }
+    </script>
 </body>
 </html>
