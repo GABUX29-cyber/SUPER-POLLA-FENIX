@@ -189,38 +189,44 @@ header p {
 .ganadores-box-item i { color: #f44336; }
 
 /* ========================================================= */
-/* 3. CONTENEDORES Y TARJETAS                                 */
+/* 3. CONTENEDORES Y TARJETAS (RECUADROS BLANCOS)             */
 /* ========================================================= */
 .card-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 25px;
 }
 
 .card-container.full-width {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    
+    /* ESTO GENERA EL SOMBREADO QUE PEDISTE (VISIBLE EN TODO MOMENTO) */
+    border-right: 6px solid #111111;
+    border-bottom: 6px solid #111111;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    border-bottom: 2px solid #fdd835;
-    padding-bottom: 8px;
-    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    border-bottom: 2px solid #fdd835;
+    padding-bottom: 8px;
+    display: inline-block;
 }
 
 /* ========================================================= */
