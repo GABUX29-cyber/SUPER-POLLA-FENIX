@@ -673,20 +673,27 @@ footer {
     header {
         background-color: #fdd835 !important;
         color: #333 !important;
+        /* Se añade sombra al header para profundidad */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+        -webkit-print-color-adjust: exact !important;
     }
 
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
+        -webkit-print-color-adjust: exact !important;
     }
 
-    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
+    /* BARRA DE ENCABEZADOS CON DEGRADADO Y SOMBRA INTERNA (RELIEVE) */
     thead th {
-        background-color: #333 !important;
+        /* Se cambia color plano por degradado para el efecto visual solicitado */
+        background: linear-gradient(to bottom, #4a4a4a, #2a2a2a) !important; 
         color: #fdd835 !important;
-        padding: 16px 8px !important; /* Grosor aumentado */
-        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
-        border: 1px solid #444 !important;
+        padding: 18px 8px !important; /* Grosor optimizado para que luzca como la referencia */
+        font-size: 10pt !important;
+        border: 1px solid #111 !important;
+        /* Sombra interna para dar efecto de profundidad */
+        box-shadow: inset 0 -2px 4px rgba(0,0,0,0.5) !important;
         -webkit-print-color-adjust: exact !important;
     }
 
@@ -695,14 +702,28 @@ footer {
         gap: 2px !important;
     }
 
+    /* CUADROS FINANCIEROS CON SOMBRA PROYECTADA (EFECTO FLOTANTE) */
     .est-mini {
-        border: 1px solid #ddd !important;
-        padding: 4px 1px !important;
+        background-color: white !important;
+        border: 1px solid #ccc !important;
+        /* Sombra que genera el efecto visual de "sombreado de fondo" */
+        box-shadow: 3px 3px 6px rgba(0,0,0,0.3) !important;
+        padding: 8px 4px !important;
         min-height: auto !important;
+        border-radius: 8px !important;
+        -webkit-print-color-adjust: exact !important;
     }
 
     .val-mini { font-size: 0.75em !important; }
     .est-mini label { font-size: 0.45em !important; }
+
+    /* MANTENER COLORES DE BORDES INFERIORES EN IMPRESIÓN */
+    .ventas { border-bottom: 4px solid #2196f3 !important; }
+    .recaudado { border-bottom: 4px solid #4caf50 !important; }
+    .acumulado { border-bottom: 4px solid #fbc02d !important; }
+    .casa { border-bottom: 4px solid #9c27b0 !important; }
+    .domingo { border-bottom: 4px solid #009688 !important; }
+    .repartir { border-bottom: 4px solid #ff9800 !important; }
 
     tbody tr, tr {
         page-break-inside: avoid !important;
