@@ -673,35 +673,20 @@ footer {
     header {
         background-color: #fdd835 !important;
         color: #333 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
-        /* SOMBRA DE FONDO SOLICITADA (Solo en cuadros grandes) */
-        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.6) !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
-    /* --- TABLA DE PARTICIPANTES (SI MANTIENE EL GROSOR) --- */
-    #tabla-participantes-publica thead th {
+    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
+    thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
         padding: 16px 8px !important; /* Grosor aumentado */
-        font-size: 10pt !important;
+        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
         border: 1px solid #444 !important;
-        -webkit-print-color-adjust: exact !important;
-    }
-
-    /* --- TABLA DE RESULTADOS (NO SE FUERZA EL GROSOR) --- */
-    /* Esto evita que las horas (8AM, 9AM...) se vean gordas */
-    .numeros-ganadores table thead th {
-        padding: 4px 2px !important; 
-        font-size: 9pt !important;
-        background-color: #333 !important;
         -webkit-print-color-adjust: exact !important;
     }
 
@@ -714,8 +699,6 @@ footer {
         border: 1px solid #ddd !important;
         padding: 4px 1px !important;
         min-height: auto !important;
-        /* Sin sombra para los cuadritos de info extra */
-        box-shadow: none !important;
     }
 
     .val-mini { font-size: 0.75em !important; }
@@ -726,5 +709,5 @@ footer {
         break-inside: avoid !important;
     }
 
-    @page { margin: 10mm 5mm; }
+    @page { margin: 0; }
 }
