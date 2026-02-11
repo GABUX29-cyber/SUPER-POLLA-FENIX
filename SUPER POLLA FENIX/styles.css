@@ -189,48 +189,38 @@ header p {
 .ganadores-box-item i { color: #f44336; }
 
 /* ========================================================= */
-/* 3. CONTENEDORES Y TARJETAS                                 */
+/* 3. CONTENEDORES Y TARJETAS                                 */
 /* ========================================================= */
 .card-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 25px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 25px;
 }
 
 .card-container.full-width {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    
-    /* CAMBIO APLICADO: Sombra forzada mediante bordes para que sea visible en PDF */
-    /* Esto crea el efecto de profundidad negra en la esquina inferior derecha */
-    border-right: 6px solid #000000;
-    border-bottom: 6px solid #000000;
-    border-left: 1px solid #ddd;
-    border-top: 1px solid #ddd;
-    
-    /* Mantenemos la sombra normal para la web */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    border-bottom: 2px solid #fdd835;
-    padding-bottom: 8px;
-    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    border-bottom: 2px solid #fdd835;
+    padding-bottom: 8px;
+    display: inline-block;
 }
 
 /* ========================================================= */
@@ -688,14 +678,6 @@ footer {
     .card {
         background-color: #ffffff !important;
         color: #333 !important;
-        /* APLICACIÓN DEL SOMBRADO DE FONDO MEDIANTE BORDES SOLIDOS */
-        border-right: 6px solid #111111 !important;
-        border-bottom: 6px solid #111111 !important;
-        border-left: 1px solid #ddd !important;
-        border-top: 1px solid #ddd !important;
-        /* ------------------------------------------------------ */
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
     /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
@@ -727,5 +709,5 @@ footer {
         break-inside: avoid !important;
     }
 
-    @page { margin: 10mm 0; }
+    @page { margin: 0; }
 }
