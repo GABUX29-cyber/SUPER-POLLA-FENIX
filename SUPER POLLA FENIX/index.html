@@ -49,16 +49,63 @@
             .tabs-fenix-container, 
             #btn-descargar-pdf, 
             .filtro-container,
-            header h1::after { 
+            header h1::after,
+            footer { 
                 display: none !important; 
             }
             
-            body { background-color: white !important; }
-            .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+            /* FONDO NEGRO Y TEXTO CLARO */
+            body { 
+                background-color: #212121 !important; 
+                color: #eeeeee !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                margin: 0;
+                padding: 0;
+            }
+
+            header {
+                background-color: #fdd835 !important;
+                color: #333333 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* RECUADROS CON SOMBREADO EN LAS ORILLAS (Relieve) */
+            .card { 
+                background-color: #ffffff !important;
+                color: #333333 !important;
+                box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.7) !important; /* El sombreado solicitado */
+                border: 1px solid #444 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                margin-bottom: 20px !important;
+            }
+
+            /* TABLA DE RESULTADOS (LAS HORAS): SE MANTIENE FINA */
+            .numeros-ganadores table thead th {
+                padding: 4px 2px !important; 
+                font-size: 8pt !important;
+                background-color: #333 !important;
+                color: #fdd835 !important;
+                -webkit-print-color-adjust: exact !important;
+            }
             
-            /* Asegurar que la tabla sea legible en PDF */
-            table { width: 100% !important; font-size: 10pt; }
-            th, td { padding: 4px !important; }
+            /* TABLA DE PARTICIPANTES: GROSOR FUERTE */
+            #tabla-participantes-publica thead th { 
+                background-color: #333 !important;
+                color: #fdd835 !important;
+                padding: 16px 8px !important; 
+                font-size: 10pt !important;
+                border: 1px solid #444 !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+
+            /* Ajustes menores para que todo quepa */
+            table { width: 100% !important; }
+            .est-mini { box-shadow: none !important; border: 1px solid #ddd !important; }
+            
+            @page { margin: 10mm 5mm; }
         }
     </style>
 </head>
@@ -234,7 +281,6 @@
 
             if (juego === 'mini') {
                 labelAcumu1.textContent = "Acumu Día Anterior";
-                // CAMBIO APLICADO PARA MINI
                 labelTotal1.textContent = "ACUMULADO+PREMIO";
                 mainTitle.textContent = "MINI EXPRES FENIX";
                 footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
@@ -243,7 +289,6 @@
                 mainTitle.textContent = nombreJuego;
                 labelAcumu1.textContent = "Acumu 1er Premio";
                 labelAcumu2.textContent = "Acumu 2do Premio";
-                // CAMBIO APLICADO PARA DIA/TARDE
                 labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
                 labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
                 footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
