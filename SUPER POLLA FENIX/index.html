@@ -43,7 +43,7 @@
             background-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* --- CONFIGURACIÓN DE IMPRESIÓN (PDF) --- */
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (FONDO OSCURO + SOMBRA SUAVE) --- */
         @media print {
             .no-print, 
             .tabs-fenix-container, 
@@ -54,10 +54,10 @@
                 display: none !important; 
             }
             
-            /* FONDO NEGRO Y TEXTO CLARO */
+            /* Mantenemos el fondo oscuro general */
             body { 
-                background-color: #212121 !important; 
-                color: #eeeeee !important;
+                background-color: #1a1a1a !important; 
+                color: #ffffff !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 margin: 0;
@@ -68,42 +68,46 @@
                 background-color: #fdd835 !important;
                 color: #333333 !important;
                 -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
             }
 
-            /* RECUADROS CON SOMBREADO EN LAS ORILLAS (Relieve) */
+            /* CUADROS BLANCOS CON SOMBRA LIMPIA (SIN EFECTO SUCIO) */
             .card { 
                 background-color: #ffffff !important;
                 color: #333333 !important;
-                box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.7) !important; /* El sombreado solicitado */
-                border: 1px solid #444 !important;
+                border-radius: 12px !important;
+                border: none !important;
+                /* Sombra muy sutil y expandida para que se vea limpio sobre el negro */
+                box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.25) !important; 
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                margin-bottom: 20px !important;
+                margin-bottom: 25px !important;
             }
 
-            /* TABLA DE RESULTADOS (LAS HORAS): SE MANTIENE FINA */
+            /* TABLA DE RESULTADOS (HORAS): FINA Y LEGIBLE */
             .numeros-ganadores table thead th {
-                padding: 4px 2px !important; 
-                font-size: 8pt !important;
                 background-color: #333 !important;
                 color: #fdd835 !important;
+                padding: 4px 2px !important; 
+                font-size: 8pt !important;
                 -webkit-print-color-adjust: exact !important;
             }
             
-            /* TABLA DE PARTICIPANTES: GROSOR FUERTE */
+            /* TABLA DE PARTICIPANTES (ABAJO): ENCABEZADO FUERTE */
             #tabla-participantes-publica thead th { 
-                background-color: #333 !important;
+                background-color: #222 !important;
                 color: #fdd835 !important;
-                padding: 16px 8px !important; 
+                padding: 14px 8px !important; 
                 font-size: 10pt !important;
-                border: 1px solid #444 !important;
                 -webkit-print-color-adjust: exact !important;
             }
 
-            /* Ajustes menores para que todo quepa */
-            table { width: 100% !important; }
-            .est-mini { box-shadow: none !important; border: 1px solid #ddd !important; }
+            /* Asegurar que las cajas pequeñas se vean bien */
+            .est-mini { 
+                box-shadow: none !important; 
+                border: 1px solid #ddd !important;
+                background-color: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact !important;
+            }
             
             @page { margin: 10mm 5mm; }
         }
