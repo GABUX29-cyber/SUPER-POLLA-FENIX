@@ -108,6 +108,11 @@
             box-sizing: border-box;
             padding: 20px;
         }
+
+        /* Transiciones para cambios de color */
+        header.admin-header, footer, .tab-pill.active {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -123,13 +128,13 @@
     </div>
 
     <div id="contenido-principal">
-        <header class="admin-header">
+        <header class="admin-header" id="header-admin-main">
             <h1 id="titulo-principal">PANEL DE ADMINISTRACIÓN</h1>
             <p id="subtitulo-admin">Gestión de Resultados y Participantes</p>
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
         </header>
 
-        <div class="tabs-fenix-container admin-style no-print">
+        <div class="tabs-fenix-container admin-style no-print" id="tabs-admin-container">
             <div class="tab-pill active" onclick="seleccionarJuegoAdminPill(this, 'dia')">
                 SUPER POLLA FENIX (DIA)
             </div>
@@ -148,7 +153,7 @@
         </select>
 
         <div class="admin-section">
-            <h2>💵 Ingresar Montos Financieros y Ventas</h2>
+            <h2 id="titulo-finanzas">💵 Ingresar Montos Financieros y Ventas</h2>
             <form id="form-finanzas" style="display: flex; flex-direction: column;">
                 <label for="input-ventas">Total Ventas (Tickets - Automático):</label>
                 <input type="number" id="input-ventas" value="0" readonly>
@@ -164,7 +169,7 @@
                     <input type="number" id="input-acumulado2" step="0.01" value="0.00" style="width: 100%;">
                 </div>
                 
-                <button type="submit" style="margin-top: 20px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold;">Guardar Finanzas</button>
+                <button type="submit" id="btn-guardar-finanzas" style="margin-top: 20px; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold;">Guardar Finanzas</button>
             </form>
 
             <div class="card-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
@@ -180,7 +185,7 @@
         </div>
 
         <div class="admin-section">
-            <h2>🔢 Ingresar Resultados del Sorteo</h2>
+            <h2 id="titulo-resultados-head">🔢 Ingresar Resultados del Sorteo</h2>
             <form id="form-resultados">
                 <label for="sorteo-hora">Sorteo y Hora (Se actualiza según el juego):</label>
                 <select id="sorteo-hora" required></select>
@@ -188,14 +193,14 @@
                 <label for="numero-ganador">Número Ganador (00-99):</label>
                 <input type="text" id="numero-ganador" placeholder="Ej: 05 o 0" required>
                 
-                <button type="submit" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;">GUARDAR RESULTADO</button>
+                <button type="submit" id="btn-guardar-resultado" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;">GUARDAR RESULTADO</button>
             </form>
             <h3 style="margin-top: 25px;">Resultados Registrados:</h3>
             <ul id="lista-resultados"></ul>
         </div>
 
         <div class="admin-section">
-            <h2>👥 Ingresar Nuevo Participante</h2>
+            <h2 id="titulo-participantes-head">👥 Ingresar Nuevo Participante</h2>
             
             <div id="paste-section">
                 <label for="input-paste-data"><strong>Opción Rápida: Pega el mensaje de WhatsApp aquí.</strong></label>
@@ -215,7 +220,7 @@
                        style="background-color: #fffde7; border: 2px solid #fdd835; font-weight: bold;" 
                        placeholder="Números separados por comas..." required>
                 
-                <button type="submit" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px;">REGISTRAR PARTICIPANTE</button>
+                <button type="submit" id="btn-registrar-participante" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px;">REGISTRAR PARTICIPANTE</button>
             </form>
             
             <h3 style="margin-top: 30px;">Listado de Participantes:</h3>
@@ -229,20 +234,65 @@
             </button>
         </div>
 
-        <footer>
+        <footer id="footer-admin">
             <p id="footer-copy">© 2026 SUPER POLLA FENIX - Sistema Profesional de Gestión de Resultados.</p>
         </footer>
     </div>
 
     <script>
         function seleccionarJuegoAdminPill(elemento, juego) {
+            // 1. Manejo de pestañas
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
 
+            // 2. Sincronizar con el selector oculto
             const selector = document.getElementById('select-juego-admin');
             if (selector) {
                 selector.value = juego;
                 selector.dispatchEvent(new Event('change'));
+            }
+
+            // 3. CAMBIO DE COLORES SEGÚN EL JUEGO (SOLO "DIA" ES AZUL)
+            const header = document.getElementById('header-admin-main');
+            const footer = document.getElementById('footer-admin');
+            const tabsContainer = document.getElementById('tabs-admin-container');
+            const colorAzulFenix = "#073763";
+
+            if (juego === 'dia') {
+                // Aplicar azul profundo
+                header.style.backgroundColor = colorAzulFenix;
+                footer.style.backgroundColor = colorAzulFenix;
+                footer.style.borderTopColor = "#ffffff";
+                tabsContainer.style.borderColor = "#ffffff";
+                
+                // Cambiar el color de los títulos de sección para combinar
+                document.querySelectorAll('.admin-section h2').forEach(h2 => h2.style.color = colorAzulFenix);
+            } else {
+                // Revertir a colores originales (negro/dorado) para TARDE y MINI
+                header.style.backgroundColor = ""; 
+                footer.style.backgroundColor = "";
+                footer.style.borderTopColor = "";
+                tabsContainer.style.borderColor = "";
+                
+                document.querySelectorAll('.admin-section h2').forEach(h2 => h2.style.color = "");
+            }
+
+            // 4. Ajuste de etiquetas de texto dinámicas
+            const labelAcumu1 = document.getElementById('label-acumu1');
+            const labelAcumu2 = document.getElementById('label-acumu2');
+            const containerAcumu2 = document.getElementById('container-acumu2');
+            const footerCopy = document.getElementById('footer-copy');
+
+            if (juego === 'mini') {
+                labelAcumu1.textContent = "Acumulado Día Anterior:";
+                containerAcumu2.style.display = "none";
+                footerCopy.textContent = "© 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
+            } else {
+                labelAcumu1.textContent = "Acumulado Primer Premio:";
+                labelAcumu2.textContent = "Acumulado Segundo Premio:";
+                containerAcumu2.style.display = "block";
+                const nombreFull = (juego === 'dia') ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
+                footerCopy.textContent = `© 2026 ${nombreFull} - Sistema Profesional de Gestión de Resultados.`;
             }
         }
     </script>
