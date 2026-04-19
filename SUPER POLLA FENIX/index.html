@@ -43,7 +43,7 @@
             background-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* --- CONFIGURACIÓN DE IMPRESIÓN --- */
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (FONDO OSCURO + SOMBRA SUAVE) --- */
         @media print {
             .no-print, 
             .tabs-fenix-container, 
@@ -54,6 +54,7 @@
                 display: none !important; 
             }
             
+            /* Mantenemos el fondo oscuro general */
             body { 
                 background-color: #1a1a1a !important; 
                 color: #ffffff !important;
@@ -63,24 +64,26 @@
                 padding: 0;
             }
 
-            /* Estilos base para impresión (se sobreescriben dinámicamente por JS para "DIA") */
             header {
                 background-color: #fdd835 !important;
                 color: #333333 !important;
                 -webkit-print-color-adjust: exact !important;
             }
 
+            /* CUADROS BLANCOS CON SOMBRA LIMPIA (SIN EFECTO SUCIO) */
             .card { 
                 background-color: #ffffff !important;
                 color: #333333 !important;
                 border-radius: 12px !important;
                 border: none !important;
+                /* Sombra muy sutil y expandida para que se vea limpio sobre el negro */
                 box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.25) !important; 
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 margin-bottom: 25px !important;
             }
 
+            /* TABLA DE RESULTADOS (HORAS): FINA Y LEGIBLE */
             .numeros-ganadores table thead th {
                 background-color: #333 !important;
                 color: #fdd835 !important;
@@ -89,6 +92,7 @@
                 -webkit-print-color-adjust: exact !important;
             }
             
+            /* TABLA DE PARTICIPANTES (ABAJO): ENCABEZADO FUERTE */
             #tabla-participantes-publica thead th { 
                 background-color: #222 !important;
                 color: #fdd835 !important;
@@ -97,6 +101,7 @@
                 -webkit-print-color-adjust: exact !important;
             }
 
+            /* Asegurar que las cajas pequeñas se vean bien */
             .est-mini { 
                 box-shadow: none !important; 
                 border: 1px solid #ddd !important;
@@ -106,16 +111,11 @@
             
             @page { margin: 10mm 5mm; }
         }
-
-        /* Transiciones suaves para cambios de color dinámicos */
-        header, #header-tabla, #btn-descargar-pdf, .card h2, .fa-search {
-            transition: color 0.3s ease, background-color 0.3s ease;
-        }
     </style>
 </head>
 <body>
 
-    <header id="main-header">
+    <header id="header-principal">
         <h1 id="main-title">SUPER POLLA FENIX</h1>
         <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
     </header>
@@ -142,7 +142,7 @@
     
     <div class="card-container full-width">
         <div class="card">
-            <h2 class="dynamic-title"><i class="fas fa-clock"></i> Cuadro de Resultados - <span id="nombre-juego-titulo">CARGANDO...</span></h2>
+            <h2><i class="fas fa-clock"></i> Cuadro de Resultados - <span id="nombre-juego-titulo">CARGANDO...</span></h2>
             <div id="numeros-ganadores-display" class="numeros-ganadores">
                 <p>Cargando resultados oficiales...</p>
             </div>
@@ -151,7 +151,7 @@
     
     <div class="card-container full-width">
         <div class="card compact-resumen">
-            <h2 class="dynamic-title"><i class="fas fa-chart-line"></i> Info Extra</h2>
+            <h2><i class="fas fa-chart-line"></i> Info Extra</h2>
             <div class="stats-grid-ultra" id="grid-finanzas">
                 
                 <div class="est-mini ventas">
@@ -226,14 +226,14 @@
 
     <div class="filtro-container no-print">
         <div class="filtro-input-wrapper">
-            <i class="fas fa-search" id="search-icon-dynamic"></i>
+            <i class="fas fa-search"></i>
             <input type="text" id="filtroParticipantes" class="filtro-input" placeholder="🔍 Buscar por Nombre o REFE...">
         </div>
     </div>
 
     <div class="card-container full-width">
         <div class="card ranking">
-            <h2 class="dynamic-title"><i class="fas fa-list-ol"></i> Participantes y Aciertos</h2>
+            <h2><i class="fas fa-list-ol"></i> Participantes y Aciertos</h2>
             <div style="overflow-x: auto;">
                 <table id="tabla-participantes-publica">
                     <thead>
@@ -260,77 +260,65 @@
     <script src="supabase-config.js"></script>
     <script src="script.js"></script>
     <script>
+        // Función para sincronizar los botones ovalados con la lógica de carga de datos
         function seleccionarJuegoPill(elemento, juego) {
+            // 1. Quitar clase activa de todos los botones
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
+            // 2. Agregar clase activa al seleccionado
             elemento.classList.add('active');
 
+            // 3. Cambiar el valor del select oculto
             const selectReal = document.getElementById('select-juego-publico');
             if (selectReal) {
                 selectReal.value = juego;
+                // 4. Disparar evento de cambio para que script.js detecte que debe recargar datos
                 selectReal.dispatchEvent(new Event('change'));
             }
 
+            // 5. AJUSTE DE ETIQUETAS Y TEXTOS DINÁMICOS
             const labelAcumu1 = document.getElementById('label-acumu1');
             const labelTotal1 = document.getElementById('label-total1');
             const labelTotal2 = document.getElementById('label-total2');
             const labelAcumu2 = document.getElementById('label-acumu2');
             const footerText = document.getElementById('footer-text');
             const mainTitle = document.getElementById('main-title');
+            const headerPrincipal = document.getElementById('header-principal');
 
-            // Elementos para el cambio de color
-            const header = document.getElementById('main-header');
-            const headerTabla = document.getElementById('header-tabla');
-            const btnPdf = document.getElementById('btn-descargar-pdf');
-            const searchIcon = document.getElementById('search-icon-dynamic');
-            const dynamicTitles = document.querySelectorAll('.dynamic-title');
-
-            // VARIABLE DEL COLOR SOLICITADO
-            const colorAzulDia = "#073763";
-
+            // --- LÓGICA DE CAMBIO DE COLOR (AZUL DEGRADADO A NEGRO) ---
             if (juego === 'dia') {
-                // APLICAR AZUL SOLO SI ES DÍA
-                header.style.backgroundColor = colorAzulDia;
-                header.style.color = "white";
-                headerTabla.style.backgroundColor = colorAzulDia;
-                btnPdf.style.backgroundColor = colorAzulDia;
-                btnPdf.style.color = "white";
-                searchIcon.style.color = colorAzulDia;
-                dynamicTitles.forEach(title => title.style.color = colorAzulDia);
+                // Aplicamos el degradado azul a negro para el DIA
+                headerPrincipal.style.background = "linear-gradient(180deg, #073763 0%, #000000 100%)";
+                headerPrincipal.style.color = "#ffffff";
+            } else {
+                // Restauramos el amarillo original para TARDE y MINI (o el color por defecto de tu CSS)
+                headerPrincipal.style.background = "#ffcc00"; 
+                headerPrincipal.style.color = "#333333";
+            }
 
-                // Textos
+            if (juego === 'mini') {
+                labelAcumu1.textContent = "Acumu Día Anterior";
+                labelTotal1.textContent = "ACUMULADO+PREMIO";
+                mainTitle.textContent = "MINI EXPRES FENIX";
+                footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
+            } else {
+                const nombreJuego = juego === 'dia' ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
+                mainTitle.textContent = nombreJuego;
                 labelAcumu1.textContent = "Acumu 1er Premio";
                 labelAcumu2.textContent = "Acumu 2do Premio";
                 labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
                 labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
-                mainTitle.textContent = "SUPER POLLA FENIX (DIA)";
-                footerText.innerHTML = `&copy; 2026 SUPER POLLA FENIX (DIA) - Sistema Profesional de Gestión de Resultados.`;
-
-            } else {
-                // RESETEAR A COLORES ORIGINALES PARA TARDE O MINI
-                header.style.backgroundColor = "";
-                header.style.color = "";
-                headerTabla.style.backgroundColor = "";
-                btnPdf.style.backgroundColor = "";
-                btnPdf.style.color = "";
-                searchIcon.style.color = "";
-                dynamicTitles.forEach(title => title.style.color = "");
-
-                if (juego === 'mini') {
-                    labelAcumu1.textContent = "Acumu Día Anterior";
-                    labelTotal1.textContent = "ACUMULADO+PREMIO";
-                    mainTitle.textContent = "MINI EXPRES FENIX";
-                    footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
-                } else {
-                    const nombreJuego = "SUPER POLLA FENIX (TARDE)";
-                    mainTitle.textContent = nombreJuego;
-                    labelAcumu1.textContent = "Acumu 1er Premio";
-                    labelAcumu2.textContent = "Acumu 2do Premio";
-                    labelTotal1.textContent = "ACUMULADO+1ER PREMIO";
-                    labelTotal2.textContent = "ACUMULADO+2DO PREMIO";
-                    footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
-                }
+                footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
             }
         }
+
+        // Ejecutar al cargar para asegurar que el color sea correcto si empieza en DIA
+        window.onload = function() {
+            const activePill = document.querySelector('.tab-pill.active');
+            if (activePill && activePill.innerText.includes("DIA")) {
+                document.getElementById('header-principal').style.background = "linear-gradient(180deg, #073763 0%, #000000 100%)";
+                document.getElementById('header-principal').style.color = "#ffffff";
+            }
+        };
     </script>
 </body>
 </html>
