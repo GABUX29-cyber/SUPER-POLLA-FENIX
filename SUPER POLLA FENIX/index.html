@@ -115,7 +115,7 @@
 </head>
 <body>
 
-    <header id="header-principal">
+    <header>
         <h1 id="main-title">SUPER POLLA FENIX</h1>
         <p id="fecha-actual"><i class="fas fa-calendar-alt"></i> Cargando fecha...</p>
     </header>
@@ -282,18 +282,6 @@
             const labelAcumu2 = document.getElementById('label-acumu2');
             const footerText = document.getElementById('footer-text');
             const mainTitle = document.getElementById('main-title');
-            const headerPrincipal = document.getElementById('header-principal');
-
-            // --- LÓGICA DE CAMBIO DE COLOR (AZUL DEGRADADO A NEGRO) ---
-            if (juego === 'dia') {
-                // Aplicamos el degradado azul a negro para el DIA
-                headerPrincipal.style.background = "linear-gradient(180deg, #073763 0%, #000000 100%)";
-                headerPrincipal.style.color = "#ffffff";
-            } else {
-                // Restauramos el amarillo original para TARDE y MINI (o el color por defecto de tu CSS)
-                headerPrincipal.style.background = "#ffcc00"; 
-                headerPrincipal.style.color = "#333333";
-            }
 
             if (juego === 'mini') {
                 labelAcumu1.textContent = "Acumu Día Anterior";
@@ -310,15 +298,6 @@
                 footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
             }
         }
-
-        // Ejecutar al cargar para asegurar que el color sea correcto si empieza en DIA
-        window.onload = function() {
-            const activePill = document.querySelector('.tab-pill.active');
-            if (activePill && activePill.innerText.includes("DIA")) {
-                document.getElementById('header-principal').style.background = "linear-gradient(180deg, #073763 0%, #000000 100%)";
-                document.getElementById('header-principal').style.color = "#ffffff";
-            }
-        };
     </script>
 </body>
 </html>

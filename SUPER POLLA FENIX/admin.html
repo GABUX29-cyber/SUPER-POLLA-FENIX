@@ -108,12 +108,6 @@
             box-sizing: border-box;
             padding: 20px;
         }
-
-        /* Clase para el degradado del DIA */
-        .header-dia-gradient {
-            background: linear-gradient(180deg, #073763 0%, #000000 100%) !important;
-            color: #ffffff !important;
-        }
     </style>
 </head>
 <body>
@@ -129,7 +123,7 @@
     </div>
 
     <div id="contenido-principal">
-        <header class="admin-header" id="header-admin-principal">
+        <header class="admin-header">
             <h1 id="titulo-principal">PANEL DE ADMINISTRACIÓN</h1>
             <p id="subtitulo-admin">Gestión de Resultados y Participantes</p>
             <button id="btn-cerrar-sesion" style="background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: right; margin-top: -40px;">Cerrar Sesión</button>
@@ -246,28 +240,11 @@
             elemento.classList.add('active');
 
             const selector = document.getElementById('select-juego-admin');
-            const headerAdmin = document.getElementById('header-admin-principal');
-
-            // --- APLICACIÓN DEL CAMBIO DE COLOR ---
-            if (juego === 'dia') {
-                headerAdmin.classList.add('header-dia-gradient');
-            } else {
-                headerAdmin.classList.remove('header-dia-gradient');
-            }
-
             if (selector) {
                 selector.value = juego;
                 selector.dispatchEvent(new Event('change'));
             }
         }
-
-        // Aseguramos que si inicia en DIA al entrar, tenga el color
-        window.addEventListener('DOMContentLoaded', (event) => {
-             const activePill = document.querySelector('.tab-pill.active');
-             if(activePill && activePill.innerText.includes("DIA")) {
-                 document.getElementById('header-admin-principal').classList.add('header-dia-gradient');
-             }
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
