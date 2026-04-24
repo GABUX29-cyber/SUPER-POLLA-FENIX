@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
+/* --- ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -680,7 +680,7 @@ footer {
         color: #333 !important;
     }
 
-    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
+    /* --- FORZAR GROSOR DE LA BARRA DE ENCABEZADOS EN IMPRESIÓN --- */
     thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
