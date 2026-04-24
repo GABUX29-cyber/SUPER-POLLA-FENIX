@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
+/* --- ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -72,26 +72,31 @@ header p {
 }
 
 /* ========================================================= */
-/* NUEVA SECCIÓN: DISEÑO DE CÁPSULA (TABS OVALADOS)           */
+/* SECCIÓN CORREGIDA: DISEÑO DE CÁPSULA CON SCROLL Y MÁRGENES */
 /* ========================================================= */
 .tabs-fenix-container {
     display: flex;
     background-color: #fdd835;
     border-radius: 50px;
-    padding: 6px;
-    width: 100%; /* Ocupa el ancho disponible */
-    max-width: 500px; /* Evita que se estire demasiado en PC */
+    padding: 5px;
+    width: 95%; /* Límite de margen para que no toque los bordes laterales del celular */
+    max-width: 450px; /* Evita que se estire demasiado en PC */
     margin: 0 auto 25px auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     gap: 5px;
+    
+    /* Control de desbordamiento */
     overflow-x: auto; /* Permite scroll horizontal si los botones no caben */
     white-space: nowrap; /* Mantiene los botones en una sola línea */
+    
+    /* Estética de scroll */
     scrollbar-width: none; /* Oculta scroll en Firefox */
     -ms-overflow-style: none; /* Oculta scroll en IE/Edge */
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en dispositivos iOS */
 }
 
-/* Ocultar barra de scroll en Chrome/Safari */
+/* Ocultar barra de scroll en Chrome, Safari y navegadores basados en Chromium */
 .tabs-fenix-container::-webkit-scrollbar {
     display: none;
 }
@@ -109,7 +114,7 @@ header p {
     text-align: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    min-width: 80px; /* Evita que el texto se amontone */
+    min-width: 90px; /* Evita que el texto se amontone y facilita el toque */
 }
 
 .tab-pill.active {
@@ -501,7 +506,7 @@ tbody tr:hover {
 
 #form-finanzas input {
     width: 100%;
-    margin-bottom: 0; /* Espaciado manejado por el gap */
+    margin-bottom: 0; 
 }
 
 #form-finanzas button {
@@ -624,7 +629,7 @@ footer {
 }
 
 /* ========================================================= */
-/* 11. MEDIA QUERIES (RESPONSIVE)                             */
+/* 11. MEDIA QUERIES (RESPONSIVE)                            */
 /* ========================================================= */
 @media (max-width: 600px) {
     .stats-grid-ultra {
@@ -662,7 +667,7 @@ footer {
     .tab-pill {
         padding: 10px 12px;
         font-size: 11px;
-        min-width: 70px;
+        min-width: 80px;
     }
 }
 
