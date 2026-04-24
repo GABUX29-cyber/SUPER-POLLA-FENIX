@@ -42,42 +42,14 @@
             background-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* --- NUEVOS ESTILOS PARA LOS DOS RECUADROS DE INFO EXTRA --- */
-        .contenedor-bloques-info {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-        }
-
-        .bloque-estadistica {
-            background: #f9f9f9;
-            border-radius: 15px;
-            padding: 15px;
-            border: 1px solid #ddd;
-        }
-
-        .bloque-titulo {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            color: #333;
-            border-bottom: 2px solid #fbc02d;
-            display: inline-block;
-            padding-bottom: 3px;
-        }
-
-        .stats-grid-nuevo {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            justify-content: center;
-        }
-
-        /* Centrado para impresión */
+        /* --- CONFIGURACIÓN DE IMPRESIÓN (CENTRADO Y LIMPIO) --- */
         @media print {
-            .no-print, .tabs-fenix-container, #btn-descargar-pdf, .filtro-container, header h1::after, footer { 
+            .no-print, 
+            .tabs-fenix-container, 
+            #btn-descargar-pdf, 
+            .filtro-container,
+            header h1::after,
+            footer { 
                 display: none !important; 
             }
             
@@ -86,11 +58,24 @@
                 color: #ffffff !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                margin: 0;
+                padding: 0;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
             }
 
             header {
                 background-color: #fdd835 !important;
                 color: #333333 !important;
+                width: 100% !important;
+                text-align: center !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+
+            .card-container {
+                width: 95% !important;
+                margin: 0 auto !important;
             }
 
             .card { 
@@ -98,28 +83,22 @@
                 color: #333333 !important;
                 border-radius: 12px !important;
                 box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.25) !important; 
-                margin-bottom: 25px !important;
-                padding: 20px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                margin-bottom: 20px !important;
+                width: 100% !important;
             }
 
-            .bloque-estadistica {
-                background-color: #ffffff !important;
-                border: 1px solid #eee !important;
-                page-break-inside: avoid;
-            }
-
-            .stats-grid-nuevo {
+            .stats-grid-ultra {
                 display: flex !important;
-                flex-wrap: wrap !important;
                 justify-content: center !important;
                 gap: 10px !important;
             }
 
             .est-mini {
-                flex: 1 1 120px !important;
-                min-width: 120px !important;
-                max-width: 160px !important;
                 border: 1px solid #ddd !important;
+                background-color: #f9f9f9 !important;
+                min-width: 100px !important;
             }
             
             @page { margin: 10mm 5mm; }
@@ -162,72 +141,65 @@
         </div>
     </div>
     
-    <div class="card-container full-width">
+    <div id="stats-container" class="card-container full-width">
+        
         <div class="card compact-resumen">
-            <h2><i class="fas fa-chart-line"></i> Info Extra</h2>
-            
-            <div class="contenedor-bloques-info">
-                
-                <div class="bloque-estadistica">
-                    <div class="bloque-titulo" id="titulo-bloque-1">Datos del Sorteo</div>
-                    <div class="stats-grid-nuevo">
-                        <div class="est-mini ventas">
-                            <i class="fas fa-ticket-alt"></i>
-                            <span class="val-mini" id="ventas">0</span>
-                            <label>Tickets Vendidos</label>
-                        </div>
-
-                        <div class="est-mini recaudado">
-                            <i class="fas fa-money-bill-wave"></i>
-                            <span class="val-mini" id="recaudado">0.00 BS</span>
-                            <label>Total Recaudado</label>
-                        </div>
-
-                        <div class="est-mini acumulado" id="box-acumu1">
-                            <i class="fas fa-trophy"></i>
-                            <span class="val-mini" id="acumulado1">0.00 BS</span>
-                            <label id="label-acumu1">Acumulado 1</label>
-                        </div>
-
-                        <div class="est-mini acumulado" id="box-acumu2">
-                            <i class="fas fa-medal"></i>
-                            <span class="val-mini" id="acumulado2">0.00 BS</span>
-                            <label id="label-acumu2">Acumulado 2</label>
-                        </div>
-                    </div>
+            <h2 id="titulo-cuadro-1"><i class="fas fa-chart-line"></i> Info Extra</h2>
+            <div class="stats-grid-ultra">
+                <div class="est-mini ventas">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span class="val-mini" id="ventas">0</span>
+                    <label>Tickets Vendidos</label>
                 </div>
 
-                <div class="bloque-estadistica">
-                    <div class="bloque-titulo" id="titulo-bloque-2">Distribución de Premios</div>
-                    <div class="stats-grid-nuevo">
-                        
-                        <div class="est-mini ganadores-box-item" id="box-total-1" style="background: #fff9c4; color: #333; border: 1px solid #fbc02d;">
-                            <i class="fas fa-star"></i>
-                            <span class="val-mini" id="total-acumu-premio1">0.00 BS</span>
-                            <label id="label-total1">Primer Premio</label>
-                        </div>
-
-                        <div class="est-mini ganadores-box-item" id="box-total-2" style="background: #e3f2fd; color: #333; border: 1px solid #1976d2;">
-                            <i class="fas fa-star-half-alt"></i>
-                            <span class="val-mini" id="total-acumu-premio2">0.00 BS</span>
-                            <label id="label-total2">Segundo Premio</label>
-                        </div>
-
-                        <div class="est-mini domingo" id="box-domingo">
-                            <i class="fas fa-calendar-day"></i>
-                            <span class="val-mini" id="monto-domingo">0.00 BS</span>
-                            <label>5% Día Domingo</label>
-                        </div>
-
-                        <div class="est-mini ganadores-box-item" id="box-ganadores-final" style="background: #e8f5e9; color: #2e7d32;">
-                            <i class="fas fa-users"></i>
-                            <span class="val-mini" id="total-ganadores">0</span>
-                            <label id="label-ganadores">Ganadores</label>
-                        </div>
-                    </div>
+                <div class="est-mini recaudado">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="val-mini" id="recaudado">0,00 BS</span>
+                    <label>Total Recaudado</label>
                 </div>
 
-            </div> </div>
+                <div class="est-mini acumulado" id="box-acumu1">
+                    <i class="fas fa-trophy"></i>
+                    <span class="val-mini" id="acumulado1">0,00 BS</span>
+                    <label id="label-acumu1">Acumulado 1</label>
+                </div>
+
+                <div class="est-mini acumulado" id="box-acumu2">
+                    <i class="fas fa-medal"></i>
+                    <span class="val-mini" id="acumulado2">0,00 BS</span>
+                    <label id="label-acumu2">Acumulado 2</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card compact-resumen">
+            <h2><i class="fas fa-gift"></i> Premios / Ganadores</h2>
+            <div class="stats-grid-ultra">
+                <div class="est-mini repartir" id="box-total-1" style="background: #fff9c4;">
+                    <i class="fas fa-star" style="color: #fbc02d;"></i>
+                    <span class="val-mini" id="total-acumu-premio1">0,00 BS</span>
+                    <label id="label-total1">Primer Premio</label>
+                </div>
+
+                <div class="est-mini ganadores-box-item" id="box-total-2" style="background: #e3f2fd;">
+                    <i class="fas fa-star-half-alt" style="color: #1976d2;"></i>
+                    <span class="val-mini" id="total-acumu-premio2">0,00 BS</span>
+                    <label id="label-total2">Segundo Premio</label>
+                </div>
+
+                <div class="est-mini domingo" id="box-domingo">
+                    <i class="fas fa-calendar-day"></i>
+                    <span class="val-mini" id="monto-domingo">0,00 BS</span>
+                    <label>5% Día Domingo</label>
+                </div>
+
+                <div class="est-mini ganadores-box-item" style="background: #e8f5e9;">
+                    <i class="fas fa-users" style="color: #2e7d32;"></i>
+                    <span class="val-mini" id="total-ganadores">0</span>
+                    <label>Ganadores</label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div style="margin-bottom: 20px; text-align: center;" class="no-print">
@@ -282,45 +254,31 @@
                 selectReal.dispatchEvent(new Event('change'));
             }
 
-            // REFERENCIAS DOM
+            // REFERENCIAS DE ETIQUETAS
             const labelAcumu1 = document.getElementById('label-acumu1');
-            const labelAcumu2 = document.getElementById('label-acumu2');
             const boxAcumu2 = document.getElementById('box-acumu2');
-            
             const labelTotal1 = document.getElementById('label-total1');
-            const labelTotal2 = document.getElementById('label-total2');
             const boxTotal2 = document.getElementById('box-total-2');
-            
             const boxDomingo = document.getElementById('box-domingo');
-            const footerText = document.getElementById('footer-text');
             const mainTitle = document.getElementById('main-title');
 
             if (juego === 'mini') {
-                // CONFIGURACIÓN MINI
                 mainTitle.textContent = "MINI EXPRES FENIX";
                 labelAcumu1.textContent = "Acumulado";
-                boxAcumu2.style.display = "none"; // Ocultar Acumulado 2 en Mini
+                boxAcumu2.style.display = 'none'; // Ocultar Acumu 2
                 
                 labelTotal1.textContent = "PREMIO + ACUMULADO";
-                boxTotal2.style.display = "none"; // Ocultar Segundo Premio en Mini
-                boxDomingo.style.display = "none"; // Ocultar Domingo en Mini
-                
-                footerText.innerHTML = "&copy; 2026 MINI EXPRES FENIX - Sistema Profesional de Gestión de Resultados.";
+                boxTotal2.style.display = 'none'; // Ocultar 2do Premio
+                boxDomingo.style.display = 'none'; // Ocultar Domingo
             } else {
-                // CONFIGURACIÓN DÍA / TARDE
                 const nombreJuego = juego === 'dia' ? "SUPER POLLA FENIX (DIA)" : "SUPER POLLA FENIX (TARDE)";
                 mainTitle.textContent = nombreJuego;
-                
                 labelAcumu1.textContent = "Acumulado 1";
-                labelAcumu2.textContent = "Acumulado 2";
-                boxAcumu2.style.display = "flex";
+                boxAcumu2.style.display = 'flex';
                 
-                labelTotal1.textContent = "PRIMER PREMIO";
-                labelTotal2.textContent = "SEGUNDO PREMIO";
-                boxTotal2.style.display = "flex";
-                boxDomingo.style.display = "flex";
-                
-                footerText.innerHTML = `&copy; 2026 ${nombreJuego} - Sistema Profesional de Gestión de Resultados.`;
+                labelTotal1.textContent = "Primer Premio";
+                boxTotal2.style.display = 'flex';
+                boxDomingo.style.display = 'flex';
             }
         }
     </script>

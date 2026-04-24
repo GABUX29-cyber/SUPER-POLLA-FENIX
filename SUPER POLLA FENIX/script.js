@@ -108,7 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             horas.forEach(h => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
+                
                 const displayNum = (num === "O") ? '<span style="font-weight:bold;">O</span>' : num;
+                
                 tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;
             });
             tablaHTML += `</tr>`;
@@ -234,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ----------------------------------------------------------------
-    // PARTE 5: Cálculos Financieros y Etiquetas Dinámicas (MODIFICADA)
+    // PARTE 5: Cálculos Financieros y Etiquetas Dinámicas (REORGANIZADO)
     // ----------------------------------------------------------------
 
     function actualizarFinanzasYEstadisticas() {
@@ -244,60 +246,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const repartirTotal75 = rec * 0.75;
         
-        const formatear = (m) => new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2}).format(m) + " BS";
+        const formatear = (m) => new Intl.NumberFormat('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(m) + " BS";
         const esMini = (juegoActual === 'mini');
 
-        // ELEMENTOS BLOQUE 1
+        // ELEMENTOS COMUNES (CUADRO 1)
         if(document.getElementById('ventas')) document.getElementById('ventas').textContent = finanzasData.ventas || 0;
         if(document.getElementById('recaudado')) document.getElementById('recaudado').textContent = formatear(rec);
         if(document.getElementById('acumulado1')) document.getElementById('acumulado1').textContent = formatear(acumu1);
         if(document.getElementById('acumulado2')) document.getElementById('acumulado2').textContent = formatear(acumu2);
 
-        // ELEMENTOS BLOQUE 2 Y VISIBILIDAD
-        const boxDom = document.getElementById('box-domingo');
-        const boxAc2 = document.getElementById('box-acumu2');
+        // ELEMENTOS DE CONTROL DE VISIBILIDAD
+        const boxAcumu2 = document.getElementById('box-acumu2');
+        const boxDomingo = document.getElementById('box-domingo');
         const boxTotal2 = document.getElementById('box-total-2');
+        
         const labelAcumu1 = document.getElementById('label-acumu1');
         const labelTotal1 = document.getElementById('label-total1');
-        const labelTotal2 = document.getElementById('label-total2');
-        
-        // Títulos de bloques
-        const tituloB1 = document.getElementById('titulo-bloque-1');
-        const tituloB2 = document.getElementById('titulo-bloque-2');
-        
+
         if (esMini) {
-            if(tituloB1) tituloB1.textContent = "Datos del Sorteo";
-            if(tituloB2) tituloB2.textContent = "Premios y Ganadores";
+            // AJUSTES MODO MINI
+            if(boxAcumu2) boxAcumu2.style.display = "none";
+            if(boxDomingo) boxDomingo.style.display = "none";
+            if(boxTotal2) boxTotal2.style.display = "none";
+            
             if(labelAcumu1) labelAcumu1.textContent = "Acumulado";
             if(labelTotal1) labelTotal1.textContent = "PREMIO + ACUMULADO";
             
-            if(boxAc2) boxAc2.style.display = "none";
-            if(boxTotal2) boxTotal2.style.display = "none";
-            if(boxDom) boxDom.style.display = "none";
-
+            // Cálculo: En Mini es 75% + Acumulado directo
             if(document.getElementById('total-acumu-premio1')) {
                 document.getElementById('total-acumu-premio1').textContent = formatear(repartirTotal75 + acumu1);
             }
         } else {
-            if(tituloB1) tituloB1.textContent = "Datos del Sorteo";
-            if(tituloB2) tituloB2.textContent = "Distribución de Premios";
+            // AJUSTES MODO DÍA/TARDE
+            if(boxAcumu2) boxAcumu2.style.display = "flex";
+            if(boxDomingo) boxDomingo.style.display = "flex";
+            if(boxTotal2) boxTotal2.style.display = "flex";
+            
             if(labelAcumu1) labelAcumu1.textContent = "Acumulado 1";
             if(labelTotal1) labelTotal1.textContent = "Primer Premio";
-            if(labelTotal2) labelTotal2.textContent = "Segundo Premio";
             
-            if(boxAc2) boxAc2.style.display = "flex";
-            if(boxTotal2) boxTotal2.style.display = "flex";
-            if(boxDom) boxDom.style.display = "flex";
-            
+            // Cálculos Originales 80/20
             const premio1DelDia = repartirTotal75 * 0.80;
             const premio2DelDia = repartirTotal75 * 0.20;
+            const montoDom = rec * 0.05;
 
-            if(document.getElementById('monto-domingo')) {
-                document.getElementById('monto-domingo').textContent = formatear(rec * 0.05);
-            }
+            if(document.getElementById('monto-domingo')) document.getElementById('monto-domingo').textContent = formatear(montoDom);
+            
+            // Primer Premio + Acumulado 1
             if(document.getElementById('total-acumu-premio1')) {
                 document.getElementById('total-acumu-premio1').textContent = formatear(premio1DelDia + acumu1);
             }
+            // Segundo Premio + Acumulado 2
             if(document.getElementById('total-acumu-premio2')) {
                 document.getElementById('total-acumu-premio2').textContent = formatear(premio2DelDia + acumu2);
             }
