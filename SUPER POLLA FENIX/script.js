@@ -14,11 +14,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const selectorJuego = document.getElementById('select-juego-publico');
 
+    // FUNCIÓN ACTUALIZADA CON CLASES DE ÁMBITO
     window.seleccionarJuegoPill = function(elemento, juego) {
         // 1. Quitar clase activa de todos los botones
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
         // 2. Agregar clase activa al seleccionado
         elemento.classList.add('active');
+
+        // --- NUEVO: CAMBIO DE CLASE DE ÁMBITO EN EL BODY PARA COLORES INDEPENDIENTES ---
+        document.body.classList.remove('tema-dia', 'tema-tarde', 'tema-mini');
+        document.body.classList.add('tema-' + juego);
 
         if (selectorJuego) {
             // 3. Cambiar el valor del select oculto
@@ -109,7 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const num = (mapa[ruleta] && mapa[ruleta][h]) ? mapa[ruleta][h] : "--";
                 const claseNum = (num === "--") ? "sin-resultado" : "celda-numero";
                 
-                // MODIFICACIÓN: Se eliminó style="color:#d32f2f;" para que la "O" sea negra
                 const displayNum = (num === "O") ? '<span style="font-weight:bold;">O</span>' : num;
                 
                 tablaHTML += `<td class="${claseNum}">${displayNum}</td>`;

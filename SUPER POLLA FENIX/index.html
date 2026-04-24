@@ -113,7 +113,7 @@
         }
     </style>
 </head>
-<body>
+<body class="tema-dia">
 
     <header>
         <h1 id="main-title">SUPER POLLA FENIX</h1>
@@ -266,6 +266,10 @@
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             // 2. Agregar clase activa al seleccionado
             elemento.classList.add('active');
+
+            // --- NUEVO: CAMBIO DE CLASE DE ÁMBITO EN EL BODY ---
+            document.body.classList.remove('tema-dia', 'tema-tarde', 'tema-mini');
+            document.body.classList.add('tema-' + juego);
 
             // 3. Cambiar el valor del select oculto
             const selectReal = document.getElementById('select-juego-publico');

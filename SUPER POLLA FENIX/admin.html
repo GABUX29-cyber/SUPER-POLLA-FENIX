@@ -110,9 +110,7 @@
         }
     </style>
 </head>
-<body>
-
-    <div id="login-overlay">
+<body class="tema-dia"> <div id="login-overlay">
         <div class="login-card">
             <h2>Acceso Administrador</h2>
             <input type="email" id="login-email" placeholder="Correo Electrónico">
@@ -235,10 +233,17 @@
     </div>
 
     <script>
+        // Lógica de cambio de Pills con gestión de temas en el Body
         function seleccionarJuegoAdminPill(elemento, juego) {
+            // 1. Manejo visual de las pills
             document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
             elemento.classList.add('active');
 
+            // 2. Cambio de tema visual en el body
+            document.body.classList.remove('tema-dia', 'tema-tarde', 'tema-mini');
+            document.body.classList.add('tema-' + juego);
+
+            // 3. Sincronización con el selector oculto y disparo de eventos
             const selector = document.getElementById('select-juego-admin');
             if (selector) {
                 selector.value = juego;
