@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
+/* --- ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -72,23 +72,25 @@ header p {
 }
 
 /* ========================================================= */
-/* NUEVA SECCIÓN: DISEÑO DE CÁPSULA (TABS OVALADOS)           */
+/* SECCIÓN CORREGIDA: TABS OVALADOS CON TAMAÑO UNIFORME      */
 /* ========================================================= */
 .tabs-fenix-container {
     display: flex;
     background-color: #fdd835;
     border-radius: 50px;
     padding: 6px;
-    width: 100%; /* Ocupa el ancho disponible */
-    max-width: 500px; /* Evita que se estire demasiado en PC */
+    width: 100%; 
+    max-width: 500px; 
     margin: 0 auto 25px auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    gap: 5px;
-    overflow-x: auto; /* Permite scroll horizontal si los botones no caben */
-    white-space: nowrap; /* Mantiene los botones en una sola línea */
-    scrollbar-width: none; /* Oculta scroll en Firefox */
-    -ms-overflow-style: none; /* Oculta scroll en IE/Edge */
+    gap: 8px;
+    /* --- CONFIGURACIÓN DE SCROLL --- */
+    overflow-x: auto; 
+    white-space: nowrap; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
     box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; 
 }
 
 /* Ocultar barra de scroll en Chrome/Safari */
@@ -97,19 +99,23 @@ header p {
 }
 
 .tab-pill {
-    flex: 1; /* Distribuye el espacio entre los botones */
-    padding: 12px 20px;
+    /* CORRECCIÓN: flex-grow: 1, flex-shrink: 0, flex-basis: 120px */
+    /* El flex-basis '120px' asegura que todos los recuadros midan igual */
+    flex: 1 0 120px; 
+    padding: 12px 10px;
     cursor: pointer;
     border-radius: 50px;
     font-weight: 800;
     color: #333;
     transition: all 0.3s ease;
-    font-size: 13px;
+    font-size: 11px; 
     text-transform: uppercase;
     text-align: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    min-width: 80px; /* Evita que el texto se amontone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tab-pill.active {
@@ -139,7 +145,6 @@ header p {
 
 .stats-grid-ultra {
     display: grid;
-    /* Ajuste para soportar más columnas según el juego */
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 5px;
 }
@@ -182,22 +187,16 @@ header p {
 /* Colores de las tarjetas financieras */
 .ventas { background-color: #e3f2fd; border-bottom: 3px solid #2196f3; }
 .ventas i { color: #2196f3; }
-
 .recaudado { background-color: #e8f5e9; border-bottom: 3px solid #4caf50; }
 .recaudado i { color: #4caf50; }
-
 .acumulado { background-color: #fffde7; border-bottom: 3px solid #fbc02d; }
 .acumulado i { color: #fbc02d; }
-
 .casa { background-color: #f3e5f5; border-bottom: 3px solid #9c27b0; }
 .casa i { color: #9c27b0; }
-
 .domingo { background-color: #e0f2f1; border-bottom: 3px solid #009688; }
 .domingo i { color: #009688; }
-
 .repartir { background-color: #fff3e0; border-bottom: 3px solid #ff9800; }
 .repartir i { color: #ff9800; }
-
 .ganadores-box-item { background-color: #ffebee; border-bottom: 3px solid #f44336; }
 .ganadores-box-item i { color: #f44336; }
 
@@ -377,7 +376,7 @@ tbody tr:hover {
 }
 
 .ranking-box.hit {
-    background-color: #4caf50 !important; /* Verde vibrante */
+    background-color: #4caf50 !important;
     color: white !important;
     border-color: #388e3c !important;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
@@ -395,7 +394,6 @@ tbody tr:hover {
     font-size: 1em;
 }
 
-/* Efecto de Ganador Destacado */
 .ganador-final {
     background: linear-gradient(45deg, #d32f2f, #f44336);
     color: white;
@@ -486,7 +484,6 @@ tbody tr:hover {
     box-sizing: border-box;
 }
 
-/* Grid para el Formulario de Finanzas Admin */
 #form-finanzas {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -499,22 +496,9 @@ tbody tr:hover {
     font-size: 0.95em;
 }
 
-#form-finanzas input {
-    width: 100%;
-    margin-bottom: 0; /* Espaciado manejado por el gap */
-}
-
 #form-finanzas button {
     grid-column: span 2;
     margin-top: 10px;
-}
-
-/* Contenedor del Acumulado 2 en Admin */
-#container-acumu2 {
-    grid-column: span 2;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
 }
 
 #paste-section {
@@ -547,10 +531,6 @@ tbody tr:hover {
     font-weight: 700;
     width: 100%;
     transition: background-color 0.2s ease;
-}
-
-#btn-procesar-pegado:hover {
-    background-color: #0056b3;
 }
 
 form label {
@@ -598,17 +578,6 @@ form button {
     align-items: center;
 }
 
-.btn-editar, .btn-eliminar {
-    padding: 6px 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-weight: 700;
-    font-family: 'Montserrat', sans-serif;
-    margin-left: 5px;
-    transition: 0.2s;
-}
-
 .btn-editar { background-color: #ffc107; color: #333; }
 .btn-eliminar { background-color: #dc3545; color: white; }
 
@@ -632,7 +601,7 @@ footer {
     }
     
     #form-finanzas {
-        grid-template-columns: 1fr; /* Una columna en móvil para el formulario */
+        grid-template-columns: 1fr;
     }
 
     .card-container {
@@ -640,15 +609,6 @@ footer {
     }
     
     h1 { font-size: 1.4em; }
-    
-    .ranking table { font-size: 0.75em; }
-    
-    .ranking-box {
-        width: 22px;
-        height: 22px;
-        line-height: 22px;
-        font-size: 0.75em;
-    }
     
     #lista-participantes li, #lista-resultados li {
         flex-direction: column;
@@ -658,11 +618,10 @@ footer {
 
     .tabla-horarios { font-size: 0.65em; }
 
-    /* Ajuste para los botones ovalados en móvil */
+    /* Forzar que cada botón mida lo mismo en móviles para que aparezca el scroll */
     .tab-pill {
-        padding: 10px 12px;
-        font-size: 11px;
-        min-width: 70px;
+        flex: 0 0 120px; 
+        font-size: 10px;
     }
 }
 
@@ -670,7 +629,6 @@ footer {
 /* 12. ESTILOS DE IMPRESIÓN (PDF)                             */
 /* ========================================================= */
 @media print {
-    /* Ocultamos los botones ovalados y el selector en el PDF */
     #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container, .tabs-fenix-container {
         display: none !important;
     }
@@ -694,12 +652,11 @@ footer {
         color: #333 !important;
     }
 
-    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
     thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
-        padding: 16px 8px !important; /* Grosor aumentado */
-        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
+        padding: 16px 8px !important;
+        font-size: 10pt !important;
         border: 1px solid #444 !important;
         -webkit-print-color-adjust: exact !important;
     }
@@ -707,20 +664,6 @@ footer {
     .stats-grid-ultra {
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
         gap: 2px !important;
-    }
-
-    .est-mini {
-        border: 1px solid #ddd !important;
-        padding: 4px 1px !important;
-        min-height: auto !important;
-    }
-
-    .val-mini { font-size: 0.75em !important; }
-    .est-mini label { font-size: 0.45em !important; }
-
-    tbody tr, tr {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
     }
 
     @page { margin: 0; }
