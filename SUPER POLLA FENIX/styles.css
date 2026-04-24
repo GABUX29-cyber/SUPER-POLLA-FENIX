@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
+/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -72,25 +72,24 @@ header p {
 }
 
 /* ========================================================= */
-/* SECCIÓN: DISEÑO DE CÁPSULA (TABS) - TAMAÑO ULTRA REDUCIDO  */
+/* NUEVA SECCIÓN: DISEÑO DE CÁPSULA (TABS OVALADOS)           */
 /* ========================================================= */
 .tabs-fenix-container {
     display: flex;
     background-color: #fdd835;
     border-radius: 50px;
-    padding: 3px; /* Más estrecho para reducir el tamaño total */
-    /* Ajuste para que el cuadro sea pequeño y solo ocupe lo necesario */
-    width: fit-content; 
+    padding: 3px; /* Cambiado a 3px para que sea una cápsula fina */
+    width: fit-content; /* Se ajusta al contenido */
     max-width: 95%; 
-    margin: 0 auto 20px auto;
+    margin: 0 auto 25px auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    gap: 3px;
-    overflow-x: auto; 
-    white-space: nowrap; 
-    scrollbar-width: none; 
-    -ms-overflow-style: none; 
+    gap: 4px;
+    overflow-x: auto; /* Permite scroll horizontal si los botones no caben */
+    white-space: nowrap; /* Mantiene los botones en una sola línea */
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+    -ms-overflow-style: none; /* Oculta scroll en IE/Edge */
     box-sizing: border-box;
-    -webkit-overflow-scrolling: touch; 
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Ocultar barra de scroll en Chrome/Safari */
@@ -99,27 +98,25 @@ header p {
 }
 
 .tab-pill {
-    flex: 0 1 auto; 
-    padding: 6px 12px; /* Padding reducido: similar al tamaño del botón PDF */
+    flex: 0 1 auto; /* No estira forzosamente, mantiene forma de pastilla */
+    padding: 6px 14px; /* Padding reducido para diseño fino */
     cursor: pointer;
     border-radius: 50px;
-    font-weight: 700;
+    font-weight: 800;
     color: #333;
     transition: all 0.3s ease;
-    font-size: 10px; /* Letras pequeñas y finas para que no choquen */
+    font-size: 10px; /* Letra pequeña como pediste */
     text-transform: uppercase;
     text-align: center;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-width: 65px; 
 }
 
 .tab-pill.active {
     background-color: #ffffff;
     color: #d32f2f;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .tab-pill:hover:not(.active) {
@@ -127,7 +124,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 2. ÁREA FINANCIERA ULTRA COMPACTA                          */
+/* 2. ÁREA FINANCIERA ULTRA COMPACTA (CON COLORES Y EMOJIS)   */
 /* ========================================================= */
 .compact-resumen {
     padding: 8px !important;
@@ -143,6 +140,7 @@ header p {
 
 .stats-grid-ultra {
     display: grid;
+    /* Ajuste para soportar más columnas según el juego */
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 5px;
 }
@@ -240,7 +238,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 4. TABLA DE RESULTADOS (CUADRÍCULA POR HORAS)             */
+/* 4. TABLA DE RESULTADOS (CUADRÍCULA POR HORAS)              */
 /* ========================================================= */
 .tabla-resultados-wrapper {
     width: 100%;
@@ -288,7 +286,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 5. RESULTADOS DEL DÍA (BOLAS DE LOTERÍA)                  */
+/* 5. RESULTADOS DEL DÍA (BOLAS DE LOTERÍA)                   */
 /* ========================================================= */
 .numeros-ganadores {
     display: flex;
@@ -380,7 +378,7 @@ tbody tr:hover {
 }
 
 .ranking-box.hit {
-    background-color: #4caf50 !important;
+    background-color: #4caf50 !important; /* Verde vibrante */
     color: white !important;
     border-color: #388e3c !important;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
@@ -398,6 +396,7 @@ tbody tr:hover {
     font-size: 1em;
 }
 
+/* Efecto de Ganador Destacado */
 .ganador-final {
     background: linear-gradient(45deg, #d32f2f, #f44336);
     color: white;
@@ -488,6 +487,7 @@ tbody tr:hover {
     box-sizing: border-box;
 }
 
+/* Grid para el Formulario de Finanzas Admin */
 #form-finanzas {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -502,7 +502,7 @@ tbody tr:hover {
 
 #form-finanzas input {
     width: 100%;
-    margin-bottom: 0;
+    margin-bottom: 0; /* Espaciado manejado por el gap */
 }
 
 #form-finanzas button {
@@ -510,6 +510,7 @@ tbody tr:hover {
     margin-top: 10px;
 }
 
+/* Contenedor del Acumulado 2 en Admin */
 #container-acumu2 {
     grid-column: span 2;
     display: grid;
@@ -632,7 +633,7 @@ footer {
     }
     
     #form-finanzas {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Una columna en móvil para el formulario */
     }
 
     .card-container {
@@ -658,7 +659,7 @@ footer {
 
     .tabla-horarios { font-size: 0.65em; }
 
-    /* Ajuste para que las letras no choquen y la cápsula sea pequeña */
+    /* Ajuste para los botones ovalados finos en móvil */
     .tab-pill {
         padding: 6px 10px;
         font-size: 9px;
@@ -670,6 +671,7 @@ footer {
 /* 12. ESTILOS DE IMPRESIÓN (PDF)                             */
 /* ========================================================= */
 @media print {
+    /* Ocultamos los botones ovalados y el selector en el PDF */
     #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container, .tabs-fenix-container {
         display: none !important;
     }
@@ -693,11 +695,12 @@ footer {
         color: #333 !important;
     }
 
+    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
     thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
-        padding: 16px 8px !important;
-        font-size: 10pt !important;
+        padding: 16px 8px !important; /* Grosor aumentado */
+        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
         border: 1px solid #444 !important;
         -webkit-print-color-adjust: exact !important;
     }
