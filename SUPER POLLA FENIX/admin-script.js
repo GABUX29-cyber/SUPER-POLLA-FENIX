@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO ---
+    // --- 2. CONFIGURACIÓN DE REGLAS POR JUEGO (RESPETANDO TUS HORARIOS ORIGINALES) ---
     let participantes = [];
     let resultadosActuales = "";
     let finanzas = { ventas: 0, recaudado: 0.00, acumulado1: 0.00, acumulado2: 0.00 };
@@ -62,15 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- 2.1 LÓGICA DE BOTONES OVALADOS (PILLS) ---
-    // Esta función debe ser global para el HTML
     window.seleccionarJuegoAdminPill = function(elemento, juego) {
         document.querySelectorAll('.tab-pill').forEach(pill => pill.classList.remove('active'));
         elemento.classList.add('active');
-        
-        // Cambiamos el tema visual del body para reflejar el juego
-        document.body.classList.remove('tema-dia', 'tema-tarde', 'tema-mini');
-        document.body.classList.add('tema-' + juego);
-
         const selector = document.getElementById('select-juego-admin');
         if (selector) {
             selector.value = juego;
@@ -78,8 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- 3. CEREBRO DE VALIDACIÓN GLOBAL ---
+    // --- 3. CEREBRO DE VALIDACIÓN GLOBAL (ERRORES Y CAMBIOS) ---
     function procesarYValidarJugada(numerosRaw, nombreParticipante, tamañoRequerido) {
+        // Normalización inicial
         let numeros = numerosRaw.map(n => {
             let num = n.trim();
             if (num === "0") return "O";
@@ -90,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let avisos = [];
 
-        // 1. Detectar Sobrantes
+        // 1. Detectar Sobrantes (Cualquier número de más se elimina)
         if (numeros.length > tamañoRequerido) {
             let eliminados = [];
             while (numeros.length > tamañoRequerido) {
@@ -99,9 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
             avisos.push(`Sobrante eliminado: (${eliminados.join(', ')})`);
         }
 
-        // 2. Detectar Faltantes
+        // 2. Detectar Faltantes (Error crítico - No permite guardar)
         if (numeros.length < tamañoRequerido) {
-            alert(`❌ ERROR CRÍTICO EN ${nombreParticipante}:\nLa jugada tiene ${numeros.length} números. Se requieren ${tamañoRequerido}.`);
+            alert(`❌ ERROR CRÍTICO EN ${nombreParticipante}:\nLa jugada solo tiene ${numeros.length} números. Se requieren ${tamañoRequerido}. Corrija antes de guardar.`);
             return null;
         }
 
@@ -129,18 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!sePudoCorregir) {
-                alert(`🚫 JUGADA NULA (${nombreParticipante}): Duplicados sin opción a reemplazo.`);
+                alert(`🚫 JUGADA NULA (${nombreParticipante}):\nHay duplicados y el número de emergencia (36) ya existe en la jugada.`);
                 return null;
             }
         }
 
+        // MOSTRAR RESUMEN DE CAMBIOS SI EXISTE CUALQUIERA
         if (avisos.length > 0) {
-            alert(`📝 AUTO-CORRECCIÓN EN ${nombreParticipante}:\n${avisos.join('\n')}`);
+            alert(`📝 CAMBIOS AUTOMÁTICOS EN ${nombreParticipante}:\n\n${avisos.map(a => "• " + a).join('\n')}`);
         }
 
         return { 
             numeros: numeros.join(','), 
-            nota: avisos.length > 0 ? `📝 Auto-corregido: ${avisos.join('. ')}` : "" 
+            nota: avisos.length > 0 ? `📝 Auto-corrección: ${avisos.join('. ')}` : "" 
         };
     }
 
@@ -152,18 +148,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nuevaRefe === null) return;
         const nuevasJugadasStr = prompt("Jugadas (separadas por coma):", jugadasAct);
         if (nuevasJugadasStr === null) return;
+        const motivo = prompt("Motivo de la edición:", "Manual");
 
         const { error } = await _supabase.from('jugadas').update({ 
             nombre: nuevoNombre.toUpperCase(), 
             refe: nuevaRefe,
             numeros_jugados: nuevasJugadasStr,
-            notas_correccion: `⚠️ Editado Manualmente`
+            notas_correccion: `⚠️ Editado: ${motivo}`
         }).eq('id', id);
 
         if (error) alert("Error: " + error.message);
         else cargarDatosDesdeNube();
     };
 
+    // EDITAR RESULTADO INDIVIDUAL
     window.editarResultadoEspecifico = async (itemCompleto) => {
         const partes = itemCompleto.split(':');
         const sorteoInfo = partes[0].trim();
@@ -186,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.removerResultadoEspecifico = async (itemCompleto) => {
-        if (!confirm(`¿Eliminar "${itemCompleto}"?`)) return;
+        if (!confirm(`¿Eliminar resultado "${itemCompleto}"?`)) return;
         const juego = document.getElementById('select-juego-admin').value;
         let listaArray = resultadosActuales.split(',').filter(x => x.trim() !== "");
         const index = listaArray.indexOf(itemCompleto);
@@ -243,8 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardDomingo = document.getElementById('card-domingo');
         const labelCasa = document.getElementById('label-porcentaje-casa');
         const labelAcumu1 = document.getElementById('label-acumu1');
-
+        const labelAcumu2 = document.getElementById('label-acumu2');
+        
         const tituloPrincipal = document.getElementById('titulo-principal');
+        const subtituloAdmin = document.getElementById('subtitulo-admin'); 
         const footerCopy = document.getElementById('footer-copy');
 
         const nombresJuego = {
@@ -254,8 +254,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const nombreActual = nombresJuego[juego] || 'SUPER POLLA FENIX';
+
         if (tituloPrincipal) tituloPrincipal.textContent = `PANEL DE ADMINISTRACIÓN - ${nombreActual}`;
-        if (footerCopy) footerCopy.textContent = `© 2026 ${nombreActual} - Gestión Profesional.`;
+        
+        if (subtituloAdmin) {
+            subtituloAdmin.textContent = "Gestión de Resultados y Participantes";
+        } else {
+            const subPorTag = document.querySelector('.admin-header p');
+            if (subPorTag) subPorTag.textContent = "Gestión de Resultados y Participantes";
+        }
+
+        if (footerCopy) footerCopy.textContent = `© 2026 ${nombreActual} - Sistema Profesional de Gestión de Resultados.`;
 
         if (juego === 'mini') {
             if (contAcumu2) contAcumu2.style.display = 'none';
@@ -267,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardDomingo) cardDomingo.style.display = 'block';
             if (labelCasa) labelCasa.textContent = "20% CASA";
             if (labelAcumu1) labelAcumu1.textContent = "Acumulado Primer Premio:";
+            if (labelAcumu2) labelAcumu2.textContent = "Acumulado Segundo Premio:";
         }
     }
 
@@ -311,15 +321,15 @@ document.addEventListener('DOMContentLoaded', () => {
             listaPart.innerHTML = participantes.filter(p => 
                 p.nombre.toLowerCase().includes(filtro) || (p.refe && p.refe.toString().includes(filtro))
             ).map(p => `
-                <li>
+                <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box;">
                     <div style="flex-grow:1;">
                         <strong>#${p.nro_ticket} - ${p.nombre}</strong> (Refe: ${p.refe || 'N/A'})<br>
-                        <span style="font-weight: bold; color: #333; letter-spacing: 1px;">${p.numeros_jugados}</span>
-                        ${p.notas_correccion ? `<br><small class="nota-correccion-aviso">${p.notas_correccion}</small>` : ''}
+                        <span style="font-weight: bold; color: #333;">${p.numeros_jugados}</span>
+                        ${p.notas_correccion ? `<br><small style="color: #dc3545; font-weight: bold; font-size: 0.85em;">${p.notas_correccion}</small>` : ''}
                     </div>
                     <div style="display: flex; gap: 8px;">
-                        <button class="btn-editar" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">Editar</button>
-                        <button class="btn-eliminar" onclick="eliminarJugada(${p.id})">Eliminar</button>
+                        <button style="background:#ffc107; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="editarParticipanteNube(${p.id}, '${p.nombre}', '${p.refe}', '${p.numeros_jugados}')">Editar</button>
+                        <button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="eliminarJugada(${p.id})">Eliminar</button>
                     </div>
                 </li>`).join('');
         }
@@ -327,14 +337,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const listaRes = document.getElementById('lista-resultados');
         if(listaRes) {
             if (!resultadosActuales || resultadosActuales.trim() === "") {
-                listaRes.innerHTML = "<li style='text-align:center; color:#999;'>Sin resultados</li>";
+                listaRes.innerHTML = "<li style='text-align:center; color:#999; width: 100%;'>Sin resultados</li>";
             } else {
                 listaRes.innerHTML = resultadosActuales.split(',').filter(x => x.trim() !== "").map(n => `
-                    <li>
-                        <span style="font-weight: bold;">${n}</span>
-                        <div>
-                            <button class="btn-editar" onclick="editarResultadoEspecifico('${n}')">Editar</button>
-                            <button class="btn-eliminar" onclick="removerResultadoEspecifico('${n}')">Eliminar</button>
+                    <li style="display: flex; justify-content: space-between; align-items: center; background: white; margin-bottom: 10px; padding: 15px; border-radius: 8px; border-left: 5px solid #ffc107; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box;">
+                        <span style="font-weight: bold; color: #333; font-size: 15px;">${n}</span>
+                        <div style="display: flex; gap: 10px;">
+                            <button style="background:#ffc107; color:#212529; border:none; padding:6px 15px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:13px;" onclick="editarResultadoEspecifico('${n}')">Editar</button>
+                            <button style="background:#dc3545; color:white; border:none; padding:6px 15px; border-radius:5px; font-weight:bold; cursor:pointer; font-size:13px;" onclick="removerResultadoEspecifico('${n}')">Eliminar</button>
                         </div>
                     </li>`).join('');
             }
@@ -366,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('nombre').value = nombre;
         document.getElementById('refe').value = refe;
         document.getElementById('jugadas-procesadas').value = jugadas.join(' | ');
-        alert("✅ Texto procesado.");
+        alert("✅ Datos procesados al recuadro.");
     });
 
     document.getElementById('form-finanzas').addEventListener('submit', async (e) => {
@@ -381,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         const { error } = await _supabase.from('finanzas').upsert(dataFinanzas, { onConflict: 'juego' });
         if (error) alert("Error: " + error.message);
-        else { alert("✅ Finanzas guardadas."); cargarDatosDesdeNube(); }
+        else { alert("✅ Finanzas actualizadas."); cargarDatosDesdeNube(); }
     });
 
     document.getElementById('form-participante').addEventListener('submit', async (e) => {
@@ -392,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nombreVal = document.getElementById('nombre').value.trim().toUpperCase();
         const refeVal = document.getElementById('refe').value.trim();
 
-        if(!refeVal) return alert("REFE obligatorio");
+        if(!refeVal) return alert("El REFE es obligatorio");
 
         const { data: ultimas } = await _supabase.from('jugadas').select('nro_ticket').eq('juego', juego).order('nro_ticket', { ascending: false }).limit(1);
         let proximoTicket = ultimas && ultimas.length > 0 ? ultimas[0].nro_ticket + 1 : 1;
@@ -422,10 +432,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const horaSorteo = document.getElementById('sorteo-hora').value;
         const numRaw = document.getElementById('numero-ganador').value.trim();
 
-        if(!horaSorteo) return alert("Seleccione sorteo");
+        if(!horaSorteo) return alert("Seleccione un sorteo");
         
         let listaArray = resultadosActuales ? resultadosActuales.split(',').filter(x => x.trim() !== "") : [];
-        if (listaArray.some(item => item.startsWith(horaSorteo + ":"))) return alert("Sorteo ya registrado.");
+        
+        const yaExiste = listaArray.some(item => item.startsWith(horaSorteo + ":"));
+        if (yaExiste) {
+            alert(`🚫 Ya ingresaste un resultado para ${horaSorteo}. \n\nPara cambiarlo, búscalo abajo y dale a Editar o Eliminar.`);
+            return;
+        }
 
         let numFinal = numRaw === "0" ? "O" : (numRaw === "00" ? "00" : numRaw.padStart(2, '0'));
         listaArray.push(`${horaSorteo}: ${numFinal}`);
@@ -437,10 +452,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-reiniciar-datos').addEventListener('click', async () => {
         const juego = document.getElementById('select-juego-admin').value;
-        if (confirm(`¿Reiniciar ${juego.toUpperCase()}?`) && prompt("Escribe BORRAR") === "BORRAR") {
-            await _supabase.from('jugadas').delete().eq('juego', juego);
-            await _supabase.from('resultados').upsert({ juego: juego, numeros: "" }, { onConflict: 'juego' });
-            cargarDatosDesdeNube();
+        if (confirm(`¿Borrar definitivamente TODOS los registros de ${juego.toUpperCase()}?`)) {
+            if (prompt("Escribe BORRAR para confirmar") === "BORRAR") {
+                await _supabase.from('jugadas').delete().eq('juego', juego);
+                await _supabase.from('resultados').upsert({ juego: juego, numeros: "" }, { onConflict: 'juego' });
+                cargarDatosDesdeNube();
+            }
         }
     });
 
