@@ -9,17 +9,17 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ========================================================= */
-        /* 1. DISEÑO DE CÁPSULA FINA (TABS) - UNIFICADO               */
+        /* 1. DISEÑO DE CÁPSULA FINA CON COLORES ORIGINALES          */
         /* ========================================================= */
         .tabs-fenix-container {
             display: flex;
-            background-color: #fdd835; /* Fondo amarillo sólido como el admin */
+            background-color: rgba(255, 204, 0, 0.15); /* Color original con transparencia */
             border-radius: 50px;
-            padding: 3px; /* Grosor de cápsula fina solicitado */
+            padding: 3px; /* Cápsula fina */
             width: fit-content;
             max-width: 95%;
             margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 2px solid #fbc02d; /* Borde amarillo original */
             gap: 4px;
             overflow-x: auto;
             white-space: nowrap;
@@ -36,13 +36,13 @@
 
         .tab-pill {
             flex: 0 1 auto;
-            padding: 6px 14px; /* Padding reducido para forma de pastilla fina */
+            padding: 6px 14px; /* Padding de pastilla fina */
             cursor: pointer;
             border-radius: 50px;
             font-weight: 800;
-            color: #333;
+            color: #5d4037; /* Color de letra marrón original */
             transition: all 0.3s ease;
-            font-size: 10px; /* Tamaño de letra solicitado a 10px */
+            font-size: 10px; /* Tamaño de letra 10px solicitado */
             text-transform: uppercase;
             text-align: center;
             user-select: none;
@@ -57,7 +57,7 @@
         }
 
         .tab-pill:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
         /* --- CONFIGURACIÓN DE IMPRESIÓN (CENTRADO Y LIMPIO) --- */
