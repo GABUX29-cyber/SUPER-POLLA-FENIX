@@ -27,7 +27,7 @@ header {
     border-radius: 12px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 900px; /* Ancho máximo para el header y contenedores */
+    max-width: 900px;
     box-sizing: border-box;
 }
 
@@ -45,7 +45,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* --- NUEVO: ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
+/* --- ESTILO PARA EL SELECTOR DE JUEGO (ADMIN O PUBLICO) --- */
 .game-selector-container {
     background: #fdd835;
     padding: 15px;
@@ -72,40 +72,42 @@ header p {
 }
 
 /* ========================================================= */
-/* NUEVA SECCIÓN: DISEÑO DE CÁPSULA (TABS OVALADOS)           */
+/* 2. DISEÑO DE CÁPSULA (TABS OVALADOS FINOS)                 */
 /* ========================================================= */
-.tabs-fenix-container {
+/* Aplicado a .tabs-fenix-container y cualquier contenedor de tabs similar */
+.tabs-fenix-container, .tabs-admin-container {
     display: flex;
     background-color: #fdd835;
     border-radius: 50px;
-    padding: 3px; /* Cambiado a 3px para que sea una cápsula fina */
-    width: fit-content; /* Se ajusta al contenido */
+    padding: 3px; /* Cápsula fina */
+    width: fit-content; 
     max-width: 95%; 
     margin: 0 auto 25px auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     gap: 4px;
-    overflow-x: auto; /* Permite scroll horizontal si los botones no caben */
-    white-space: nowrap; /* Mantiene los botones en una sola línea */
-    scrollbar-width: none; /* Oculta scroll en Firefox */
-    -ms-overflow-style: none; /* Oculta scroll en IE/Edge */
+    overflow-x: auto; 
+    white-space: nowrap; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Ocultar barra de scroll en Chrome/Safari */
-.tabs-fenix-container::-webkit-scrollbar {
+/* Ocultar barra de scroll */
+.tabs-fenix-container::-webkit-scrollbar,
+.tabs-admin-container::-webkit-scrollbar {
     display: none;
 }
 
 .tab-pill {
-    flex: 0 1 auto; /* No estira forzosamente, mantiene forma de pastilla */
-    padding: 6px 14px; /* Padding reducido para diseño fino */
+    flex: 0 1 auto; 
+    padding: 6px 14px; /* Padding reducido */
     cursor: pointer;
     border-radius: 50px;
     font-weight: 800;
     color: #333;
     transition: all 0.3s ease;
-    font-size: 10px; /* Letra pequeña como pediste */
+    font-size: 10px; /* Letra pequeña solicitada */
     text-transform: uppercase;
     text-align: center;
     user-select: none;
@@ -124,7 +126,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 2. ÁREA FINANCIERA ULTRA COMPACTA (CON COLORES Y EMOJIS)   */
+/* 3. ÁREA FINANCIERA ULTRA COMPACTA                          */
 /* ========================================================= */
 .compact-resumen {
     padding: 8px !important;
@@ -140,7 +142,6 @@ header p {
 
 .stats-grid-ultra {
     display: grid;
-    /* Ajuste para soportar más columnas según el juego */
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 5px;
 }
@@ -183,27 +184,21 @@ header p {
 /* Colores de las tarjetas financieras */
 .ventas { background-color: #e3f2fd; border-bottom: 3px solid #2196f3; }
 .ventas i { color: #2196f3; }
-
 .recaudado { background-color: #e8f5e9; border-bottom: 3px solid #4caf50; }
 .recaudado i { color: #4caf50; }
-
 .acumulado { background-color: #fffde7; border-bottom: 3px solid #fbc02d; }
 .acumulado i { color: #fbc02d; }
-
 .casa { background-color: #f3e5f5; border-bottom: 3px solid #9c27b0; }
 .casa i { color: #9c27b0; }
-
 .domingo { background-color: #e0f2f1; border-bottom: 3px solid #009688; }
 .domingo i { color: #009688; }
-
 .repartir { background-color: #fff3e0; border-bottom: 3px solid #ff9800; }
 .repartir i { color: #ff9800; }
-
 .ganadores-box-item { background-color: #ffebee; border-bottom: 3px solid #f44336; }
 .ganadores-box-item i { color: #f44336; }
 
 /* ========================================================= */
-/* 3. CONTENEDORES Y TARJETAS                                 */
+/* 4. CONTENEDORES Y TARJETAS                                 */
 /* ========================================================= */
 .card-container {
     display: grid;
@@ -238,7 +233,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 4. TABLA DE RESULTADOS (CUADRÍCULA POR HORAS)              */
+/* 5. TABLA DE RESULTADOS (CUADRÍCULA POR HORAS)              */
 /* ========================================================= */
 .tabla-resultados-wrapper {
     width: 100%;
@@ -286,7 +281,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 5. RESULTADOS DEL DÍA (BOLAS DE LOTERÍA)                   */
+/* 6. RESULTADOS DEL DÍA (BOLAS DE LOTERÍA)                   */
 /* ========================================================= */
 .numeros-ganadores {
     display: flex;
@@ -326,7 +321,7 @@ header p {
 }
 
 /* ========================================================= */
-/* 6. TABLA DE RANKING / PARTICIPANTES                       */
+/* 7. TABLA DE RANKING / PARTICIPANTES                       */
 /* ========================================================= */
 .ranking {
     overflow-x: auto;
@@ -355,13 +350,8 @@ tbody td {
     font-weight: 600;
 }
 
-tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tbody tr:hover {
-    background-color: #fffde7;
-}
+tbody tr:nth-child(even) { background-color: #f9f9f9; }
+tbody tr:hover { background-color: #fffde7; }
 
 .ranking-box {
     display: inline-block;
@@ -378,7 +368,7 @@ tbody tr:hover {
 }
 
 .ranking-box.hit {
-    background-color: #4caf50 !important; /* Verde vibrante */
+    background-color: #4caf50 !important;
     color: white !important;
     border-color: #388e3c !important;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
@@ -396,7 +386,6 @@ tbody tr:hover {
     font-size: 1em;
 }
 
-/* Efecto de Ganador Destacado */
 .ganador-final {
     background: linear-gradient(45deg, #d32f2f, #f44336);
     color: white;
@@ -416,7 +405,7 @@ tbody tr:hover {
 }
 
 /* ========================================================= */
-/* 7. FILTROS Y BUSCADOR                                     */
+/* 8. FILTROS Y BUSCADOR                                     */
 /* ========================================================= */
 .filtro-container {
     width: 100%;
@@ -451,7 +440,7 @@ tbody tr:hover {
 }
 
 /* ========================================================= */
-/* 8. BOTÓN PDF                                              */
+/* 9. BOTÓN PDF                                              */
 /* ========================================================= */
 #btn-descargar-pdf {
     background-color: #d32f2f;
@@ -469,12 +458,10 @@ tbody tr:hover {
     transition: background 0.2s;
 }
 
-#btn-descargar-pdf:hover {
-    background-color: #b71c1c;
-}
+#btn-descargar-pdf:hover { background-color: #b71c1c; }
 
 /* ========================================================= */
-/* 9. PANEL DE ADMINISTRACIÓN                                 */
+/* 10. PANEL DE ADMINISTRACIÓN                                */
 /* ========================================================= */
 .admin-section {
     background-color: white;
@@ -487,7 +474,6 @@ tbody tr:hover {
     box-sizing: border-box;
 }
 
-/* Grid para el Formulario de Finanzas Admin */
 #form-finanzas {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -500,17 +486,9 @@ tbody tr:hover {
     font-size: 0.95em;
 }
 
-#form-finanzas input {
-    width: 100%;
-    margin-bottom: 0; /* Espaciado manejado por el gap */
-}
+#form-finanzas input { width: 100%; margin-bottom: 0; }
+#form-finanzas button { grid-column: span 2; margin-top: 10px; }
 
-#form-finanzas button {
-    grid-column: span 2;
-    margin-top: 10px;
-}
-
-/* Contenedor del Acumulado 2 en Admin */
 #container-acumu2 {
     grid-column: span 2;
     display: grid;
@@ -550,9 +528,7 @@ tbody tr:hover {
     transition: background-color 0.2s ease;
 }
 
-#btn-procesar-pegado:hover {
-    background-color: #0056b3;
-}
+#btn-procesar-pegado:hover { background-color: #0056b3; }
 
 form label {
     display: block;
@@ -614,7 +590,7 @@ form button {
 .btn-eliminar { background-color: #dc3545; color: white; }
 
 /* ========================================================= */
-/* 10. FOOTER                                                */
+/* 11. FOOTER                                                */
 /* ========================================================= */
 footer {
     margin-top: auto;
@@ -625,31 +601,15 @@ footer {
 }
 
 /* ========================================================= */
-/* 11. MEDIA QUERIES (RESPONSIVE)                             */
+/* 12. MEDIA QUERIES (RESPONSIVE)                             */
 /* ========================================================= */
 @media (max-width: 600px) {
-    .stats-grid-ultra {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    #form-finanzas {
-        grid-template-columns: 1fr; /* Una columna en móvil para el formulario */
-    }
-
-    .card-container {
-        grid-template-columns: 1fr;
-    }
-    
+    .stats-grid-ultra { grid-template-columns: repeat(2, 1fr); }
+    #form-finanzas { grid-template-columns: 1fr; }
+    .card-container { grid-template-columns: 1fr; }
     h1 { font-size: 1.4em; }
-    
     .ranking table { font-size: 0.75em; }
-    
-    .ranking-box {
-        width: 22px;
-        height: 22px;
-        line-height: 22px;
-        font-size: 0.75em;
-    }
+    .ranking-box { width: 22px; height: 22px; line-height: 22px; font-size: 0.75em; }
     
     #lista-participantes li, #lista-resultados li {
         flex-direction: column;
@@ -659,7 +619,7 @@ footer {
 
     .tabla-horarios { font-size: 0.65em; }
 
-    /* Ajuste para los botones ovalados finos en móvil */
+    /* Los tabs se mantienen finos y pequeños en móvil */
     .tab-pill {
         padding: 6px 10px;
         font-size: 9px;
@@ -668,11 +628,10 @@ footer {
 }
 
 /* ========================================================= */
-/* 12. ESTILOS DE IMPRESIÓN (PDF)                             */
+/* 13. ESTILOS DE IMPRESIÓN (PDF)                             */
 /* ========================================================= */
 @media print {
-    /* Ocultamos los botones ovalados y el selector en el PDF */
-    #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container, .tabs-fenix-container {
+    #btn-descargar-pdf, .filtro-container, footer, button, .game-selector-container, .tabs-fenix-container, .tabs-admin-container {
         display: none !important;
     }
     
@@ -685,22 +644,14 @@ footer {
         margin: 0;
     }
 
-    header {
-        background-color: #fdd835 !important;
-        color: #333 !important;
-    }
+    header { background-color: #fdd835 !important; color: #333 !important; }
+    .card { background-color: #ffffff !important; color: #333 !important; }
 
-    .card {
-        background-color: #ffffff !important;
-        color: #333 !important;
-    }
-
-    /* --- CAMBIO SOLICITADO: FORZAR GROSOR DE LA BARRA DE ENCABEZADOS --- */
     thead th {
         background-color: #333 !important;
         color: #fdd835 !important;
-        padding: 16px 8px !important; /* Grosor aumentado */
-        font-size: 10pt !important; /* Tamaño fijo para que no se adelgace */
+        padding: 16px 8px !important;
+        font-size: 10pt !important;
         border: 1px solid #444 !important;
         -webkit-print-color-adjust: exact !important;
     }
