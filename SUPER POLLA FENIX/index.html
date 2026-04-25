@@ -9,24 +9,25 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ========================================================= */
-        /* DISEÑO COPIADO DEL ADMINISTRADOR (EVITA ALARGAMIENTO)     */
+        /* DISEÑO IDÉNTICO AL ADMINISTRADOR (PROFESIONAL Y COMPACTO) */
         /* ========================================================= */
         .tabs-fenix-container {
             display: flex;
             justify-content: center;
-            /* Usamos el color sólido del admin para evitar inconsistencias */
-            background-color: #333 !important; 
-            border-radius: 8px; /* Estilo más cuadrado como el admin */
-            padding: 8px; 
-            /* CLAVE: fit-content hace que el recuadro solo mida lo que miden los botones */
-            width: fit-content; 
+            background-color: #333 !important; /* Gris oscuro sólido del admin */
+            border-radius: 8px; /* Redondeado sutil igual al admin */
+            padding: 6px; 
+            width: fit-content; /* CLAVE: Evita que el contenedor se alargue */
             max-width: 95%;
             margin: 20px auto;
-            border: 2px solid #fdd835; /* Borde amarillo sólido del admin */
-            gap: 10px;
+            border: 2px solid #fdd835; /* Amarillo sólido del admin */
+            gap: 8px;
             box-sizing: border-box;
             overflow-x: auto;
             white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Ocultar barra de desplazamiento */
@@ -35,23 +36,24 @@
         }
 
         .tab-pill {
-            flex: 0 0 auto; /* No permite que los botones crezcan o se estiren */
-            padding: 10px 18px; 
+            flex: 0 0 auto;
+            padding: 10px 14px; /* Espaciado interno igual al admin */
             cursor: pointer;
-            border-radius: 4px;
-            font-weight: 800;
-            color: #ffffff; /* Texto blanco como en el admin oscuro */
-            transition: all 0.3s ease;
-            font-size: 11px;
+            border-radius: 4px; /* Botones internos rectangulares suaves */
+            font-weight: 700;
+            color: #ffffff; /* Texto blanco sobre fondo oscuro */
+            transition: all 0.2s ease;
+            font-size: 11px; /* Tamaño de letra del admin */
             text-transform: uppercase;
             text-align: center;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .tab-pill.active {
-            background-color: #fdd835; /* Color amarillo activo */
-            color: #333; /* Texto oscuro para contraste en activo */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            background-color: #fdd835 !important; /* Amarillo activo */
+            color: #333 !important; /* Texto oscuro en el botón activo */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.4);
         }
 
         .tab-pill:hover:not(.active) {
