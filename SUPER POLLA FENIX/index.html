@@ -9,19 +9,19 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ========================================================= */
-        /* DISEÑO IDÉNTICO AL ADMINISTRADOR (PROFESIONAL Y COMPACTO) */
+        /* DISEÑO OVALADO IDÉNTICO AL ADMINISTRADOR                  */
         /* ========================================================= */
         .tabs-fenix-container {
             display: flex;
             justify-content: center;
-            background-color: #333 !important; /* Gris oscuro sólido del admin */
-            border-radius: 8px; /* Redondeado sutil igual al admin */
-            padding: 6px; 
-            width: fit-content; /* CLAVE: Evita que el contenedor se alargue */
+            background-color: #333 !important; /* Gris oscuro sólido */
+            border-radius: 50px; /* OVALADO COMPLETO */
+            padding: 5px; 
+            width: fit-content;
             max-width: 95%;
             margin: 20px auto;
-            border: 2px solid #fdd835; /* Amarillo sólido del admin */
-            gap: 8px;
+            border: 2px solid #fdd835; /* Amarillo sólido */
+            gap: 5px;
             box-sizing: border-box;
             overflow-x: auto;
             white-space: nowrap;
@@ -37,13 +37,13 @@
 
         .tab-pill {
             flex: 0 0 auto;
-            padding: 10px 14px; /* Espaciado interno igual al admin */
+            padding: 10px 20px; /* Espaciado más amplio para forma de cápsula */
             cursor: pointer;
-            border-radius: 4px; /* Botones internos rectangulares suaves */
-            font-weight: 700;
-            color: #ffffff; /* Texto blanco sobre fondo oscuro */
-            transition: all 0.2s ease;
-            font-size: 11px; /* Tamaño de letra del admin */
+            border-radius: 50px; /* BOTONES OVALADOS TAMBIÉN */
+            font-weight: 800; /* Negrita fuerte igual al admin */
+            color: #ffffff;
+            transition: all 0.3s ease;
+            font-size: 11px;
             text-transform: uppercase;
             text-align: center;
             user-select: none;
@@ -51,16 +51,16 @@
         }
 
         .tab-pill.active {
-            background-color: #fdd835 !important; /* Amarillo activo */
-            color: #333 !important; /* Texto oscuro en el botón activo */
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.4);
+            background-color: #fdd835 !important; /* Fondo amarillo activo */
+            color: #333 !important; /* Texto oscuro en activo */
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
         }
 
         .tab-pill:hover:not(.active) {
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- CONFIGURACIÓN DE IMPRESIÓN (CENTRADO Y LIMPIO) --- */
+        /* --- CONFIGURACIÓN DE IMPRESIÓN --- */
         @media print {
             .no-print, 
             .tabs-fenix-container, 
