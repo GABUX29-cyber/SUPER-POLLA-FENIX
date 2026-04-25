@@ -9,18 +9,19 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ========================================================= */
-        /* DISEÑO OVALADO IDÉNTICO AL ADMINISTRADOR                  */
+        /* DISEÑO OVALADO EXACTO A LA IMAGEN (PÚBLICO)               */
         /* ========================================================= */
         .tabs-fenix-container {
             display: flex;
             justify-content: center;
-            background-color: #333 !important; /* Gris oscuro sólido */
-            border-radius: 50px; /* OVALADO COMPLETO */
+            /* Fondo amarillo suave con transparencia igual a la imagen */
+            background-color: rgba(255, 204, 0, 0.2) !important; 
+            border-radius: 50px; 
             padding: 5px; 
             width: fit-content;
             max-width: 95%;
             margin: 20px auto;
-            border: 2px solid #fdd835; /* Amarillo sólido */
+            border: 2px solid #fbc02d; /* Borde amarillo más fuerte */
             gap: 5px;
             box-sizing: border-box;
             overflow-x: auto;
@@ -37,13 +38,13 @@
 
         .tab-pill {
             flex: 0 0 auto;
-            padding: 10px 20px; /* Espaciado más amplio para forma de cápsula */
+            padding: 10px 20px; 
             cursor: pointer;
-            border-radius: 50px; /* BOTONES OVALADOS TAMBIÉN */
-            font-weight: 800; /* Negrita fuerte igual al admin */
-            color: #ffffff;
+            border-radius: 50px; 
+            font-weight: 800; 
+            color: #5d4037; /* Color de letra marrón/oscuro para los no activos */
             transition: all 0.3s ease;
-            font-size: 11px;
+            font-size: 10px; 
             text-transform: uppercase;
             text-align: center;
             user-select: none;
@@ -51,13 +52,15 @@
         }
 
         .tab-pill.active {
-            background-color: #fdd835 !important; /* Fondo amarillo activo */
-            color: #333 !important; /* Texto oscuro en activo */
-            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.3);
+            /* Fondo blanco para el seleccionado según tu imagen */
+            background-color: #ffffff !important; 
+            /* Letras rojas para el seleccionado según tu imagen */
+            color: #d32f2f !important; 
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
         }
 
         .tab-pill:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.4);
         }
 
         /* --- CONFIGURACIÓN DE IMPRESIÓN --- */
