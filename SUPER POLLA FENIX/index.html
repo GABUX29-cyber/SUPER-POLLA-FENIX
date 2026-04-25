@@ -9,23 +9,23 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ========================================================= */
-        /* 1. DISEÑO DE CÁPSULA FINA CON COLORES ORIGINALES          */
+        /* 1. DISEÑO DE CÁPSULA FINA - CORRECCIÓN PARA MÓVIL         */
         /* ========================================================= */
         .tabs-fenix-container {
             display: flex;
-            background-color: rgba(255, 204, 0, 0.15); /* Color original con transparencia */
+            background-color: rgba(255, 204, 0, 0.15); 
             border-radius: 50px;
             padding: 3px; /* Cápsula fina */
             width: fit-content;
-            max-width: 95%;
+            max-width: 90%; /* Ajuste para que no toque los bordes en el tlf */
             margin: 20px auto;
-            border: 2px solid #fbc02d; /* Borde amarillo original */
+            border: 2px solid #fbc02d; 
             gap: 4px;
-            overflow-x: auto;
+            overflow-x: auto; /* Permite deslizar si el tlf es muy pequeño */
             white-space: nowrap;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Evita que el borde empuje el ancho hacia afuera */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -36,13 +36,13 @@
 
         .tab-pill {
             flex: 0 1 auto;
-            padding: 6px 14px; /* Padding de pastilla fina */
+            padding: 6px 12px; /* Padding ajustado para mejor encuadre */
             cursor: pointer;
             border-radius: 50px;
             font-weight: 800;
-            color: #5d4037; /* Color de letra marrón original */
+            color: #5d4037; 
             transition: all 0.3s ease;
-            font-size: 10px; /* Tamaño de letra 10px solicitado */
+            font-size: 10px; /* Tamaño de letra 10px */
             text-transform: uppercase;
             text-align: center;
             user-select: none;
